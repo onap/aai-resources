@@ -1,0 +1,56 @@
+version: '2'
+services:
+  aai-resources:
+    image: ${DOCKER_REGISTRY}/openecomp/aai-resources
+    network_mode: host
+    environment:
+      - AAI_CHEF_ENV=solo
+      - AAI_REPO_PATH=r/aai
+      - AAI_CHEF_LOC=/var/chef/aai-data/environments
+      - docker_gitbranch=master
+      - PROTOCOL=http
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "30m"
+        max-file: "5"
+  aai-graph-query:
+    image: ${DOCKER_REGISTRY}/openecomp/aai-traversal
+    network_mode: host
+    environment:
+      - AAI_CHEF_ENV=solo
+      - AAI_REPO_PATH=r/aai
+      - AAI_CHEF_LOC=/var/chef/aai-data/environments
+      - docker_gitbranch=master
+      - PROTOCOL=http
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "30m"
+        max-file: "5"
+  hbase:
+    image: ${HBASE_IMAGE}
+    network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "30m"
+        max-file: "5"
+  gremlin:
+    image: ${GREMLIN_SERVER_IMAGE}
+    network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "30m"
+        max-file: "5"
+  aai_haproxy:
+    image: ${AAI_HAPROXY_IMAGE}
+    volumes:
+      - /dev/log:/dev/log
+    network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "30m"
+        max-file: "5"
