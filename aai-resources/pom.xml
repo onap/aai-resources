@@ -20,7 +20,7 @@
 		<dockerLocation>${basedir}/target/swm/package/nix/dist_files/</dockerLocation>
 		<maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
 		<docker.image.version>1.0.0</docker.image.version>
-		<aai-schema.version>1.1.0-SNAPSHOT</aai-schema.version>
+		<aai.schema.version>1.1.0-SNAPSHOT</aai.schema.version>
 		<sonar.language>java</sonar.language>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
@@ -31,7 +31,7 @@
 	<dependencies>
 		<!-- Scamper related dependencies -->
 		<dependency>
-			<groupId>org.openecomp.aai</groupId>
+			<groupId>org.onap.aai.aai-common</groupId>
 			<artifactId>aai-core</artifactId>
 			<version>${aai-core.version}</version>
 			<exclusions>
@@ -42,9 +42,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.openecomp.aai</groupId>
+			<groupId>org.onap.aai.aai-common</groupId>
 			<artifactId>aai-schema</artifactId>
-			<version>${aai-schema.version}</version>
+			<version>${aai.schema.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>ajsc-runner</artifactId>
@@ -445,6 +445,11 @@
 			<artifactId>json-path</artifactId>
 			<version>2.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-json</artifactId>
+			<version>1.18</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>aai-resources</finalName>
@@ -496,9 +501,9 @@
 					<configuration>
 						<artifactItems>
 							<artifactItem>
-								<groupId>org.openecomp.aai</groupId>
+								<groupId>org.onap.aai.aai-common</groupId>
 								<artifactId>aai-schema</artifactId>
-								<version>${aai-schema.version}</version>
+								<version>${aai.schema.version}</version>
 								<outputDirectory>bundleconfig-local/etc</outputDirectory>
 								<includes>oxm/*.xml</includes>
 							</artifactItem>
