@@ -7,17 +7,17 @@
 		<groupId>com.att.ajsc</groupId>
 		<version>2.1.0</version>
 	</parent>
-	<groupId>org.openecomp.aai</groupId>
-	<artifactId>aai-resources-service</artifactId>
+	<groupId>org.onap.aai.resources</groupId>
+	<artifactId>resources</artifactId>
 	<version>1.1.0-SNAPSHOT</version>
-	<name>aai-resources-service</name>
+	<name>resources</name>
 	<packaging>pom</packaging>
 	<modules>
 		<module>aai-resources</module>
 	</modules>
 	<properties>
 		<nexusproxy>https://nexus.onap.org</nexusproxy>
-		<sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
+		<sitePath>/content/sites/site/org/onap/aai/resources/${project.artifactId}/${project.version}</sitePath>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<module.ajsc.namespace.name>ActiveAndAvailableInventory-CloudNetwork</module.ajsc.namespace.name>
