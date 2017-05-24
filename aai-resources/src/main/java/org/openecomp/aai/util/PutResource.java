@@ -48,7 +48,7 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class PutResource {
 	
-	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(PutResource.class);
+	private static EELFLogger LOGGER;
 	private static final String FROMAPPID = "AAI-TOOLS";
 	private static final String TRANSID = UUID.randomUUID().toString();
 	private static final String USAGE_STRING = "Usage: putTool.sh <resource-path> <filename> <UpdatingRelationshiplist> <UpdatingChild> <ChildNameList> <SkipIfExists>\n" +
@@ -74,7 +74,7 @@ public class PutResource {
 		Properties props = System.getProperties();
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_PUTTOOL_LOGBACK_PROPS);
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
-				
+		LOGGER = EELFManager.getInstance().getLogger(PutResource.class);
 		Boolean bResVersionEnabled = false;
 		
 		try
@@ -144,16 +144,21 @@ public class PutResource {
 
 					LOGGER.debug("url=" + url);
 					if ( nodeExists( url) ) {
-						LOGGER.info("PUT succeeded, the resource exists already in the DB. Skipping the put based on the skipIfExists command line parameter.\n");
-						System.exit(0);	
+						String infMsg ="PUT succeeded, the resource exists already in the DB. Skipping the put based on the skipIfExists command line parameter.\n";
+						System.out.println(infMsg);
+						LOGGER.info(infMsg);
+						System.exit(0);
 					}
-					
 				}
 			    RestController.<T>Get(t2, FROMAPPID, TRANSID, path, restObj, false);
 			    t2 = restObj.get();
-			    LOGGER.info(" GET succeeded\n");
+			    String infMsg = " GET succeeded\n";
+			    System.out.println(infMsg);
+				LOGGER.info(infMsg);
+
 			} catch (AAIException e) {
-				if ( !doPutIfExists ) { 
+				if ( !doPutIfExists ) {
+					System.out.println("Warning - Caught exception while attempting to PUT resource");
 					LOGGER.warn("Caught exception while attempting to PUT resource", e);
 				}
 				bExist = false;
@@ -161,6 +166,7 @@ public class PutResource {
 			catch (Exception e1)
 			{
 				if ( !doPutIfExists ) {
+					System.out.println("Warning - GET exception ignored with skipExists parameter\n");
 					LOGGER.warn(" GET exception ignored with skipExists parameter\n", e1);
 				}
 				bExist = false;
@@ -177,17 +183,24 @@ public class PutResource {
 
 				String DBresourceVersion = GetResourceVersion(t2);
 				if ( !doPutIfExists ) {
-					LOGGER.info("PUT succeeded, the resource exists already in the DB. Skipping the put based on the skipIfExists command line parameter.\n");
-				    System.exit(0);
+					String infMsg = "PUT succeeded, the resource exists already in the DB. Skipping the put based on the skipIfExists command line parameter.\n";
+					System.out.println(infMsg);
+					LOGGER.info(infMsg);
+					System.exit(0);
 				}
 				
 				if (resourceUpdateVersion == null || resourceUpdateVersion.isEmpty())
 				{
-					 if ( DBresourceVersion != null && !DBresourceVersion.isEmpty())
-					    LOGGER.error("The resource with version = " +  DBresourceVersion + "  exists already in the DB. Please supply the right resourceVersion in input data file.\n");
-					 else
-						 LOGGER.error("The resource exists already in the DB. Please supply the right resourceVersion in input data file.\n");
-				     
+					 if ( DBresourceVersion != null && !DBresourceVersion.isEmpty()){
+					    String eMsg = "The resource with version = " +  DBresourceVersion + "  exists already in the DB. Please supply the right resourceVersion in input data file.\n";
+					    System.out.println(eMsg);
+						LOGGER.error(eMsg);
+					 }
+					 else{
+						String eMsg = "The resource exists already in the DB. Please supply the right resourceVersion in input data file.\n";
+						System.out.println(eMsg);
+						LOGGER.error(eMsg);
+					 }
 				     System.exit(1);	
 				 }
 					
@@ -196,7 +209,9 @@ public class PutResource {
 					if ( resourceUpdateVersion != null && !resourceUpdateVersion.isEmpty() )
 						 if (!DBresourceVersion.equals(resourceUpdateVersion))
 						 {
-							LOGGER.error("DB version doesn't match current version. Please get the latest version and modify.\n");
+							 String eMsg = "DB version doesn't match current version. Please get the latest version and modify.\n";
+							 System.out.println(eMsg);
+							 LOGGER.error(eMsg);
 						     System.exit(1);	
 						 }
 				}
@@ -205,8 +220,10 @@ public class PutResource {
 			{
 				if ( bResVersionEnabled && resourceUpdateVersion != null && !resourceUpdateVersion.isEmpty())
 				{
-					 LOGGER.error("DB doesn't have this resource any more. Please create a new version by taking out the resourceVersion tag from your input resource data file.\n");
-				     System.exit(1);
+					String eMsg = "DB doesn't have this resource any more. Please create a new version by taking out the resourceVersion tag from your input resource data file.\n";
+					System.out.println(eMsg);
+					LOGGER.error(eMsg);
+					System.exit(1);
 				}
 				
 			}
@@ -247,8 +264,12 @@ public class PutResource {
 			
 			RestController.<T>Put(resJson1, FROMAPPID, TRANSID, path, false);
 			
-			LOGGER.info(" PUT succeeded");
-			LOGGER.info("Done!!");
+			String infMsg = " PUT succeeded";
+			System.out.println(infMsg);
+			LOGGER.info(infMsg);
+			infMsg = "Done!!";
+			System.out.println(infMsg);
+			LOGGER.info(infMsg);
 			
 			System.exit(0); 
 
@@ -256,8 +277,13 @@ public class PutResource {
 			if ( !doPutIfExists ) { // ignore 412 failure
 				if ( e.getMessage().equals("AAI_7116")  ) {
 					if ( e.getMessage().indexOf("status=412") > 0) {
-						LOGGER.info("PUT succeeded, return 412 ignored\n");	
-						LOGGER.info("\nDone!!");
+						String infMsg = "PUT succeeded, return 412 ignored\n";
+						System.out.println(infMsg);
+						LOGGER.info(infMsg);
+
+						infMsg = "\nDone!!";
+						System.out.println(infMsg);
+						LOGGER.info(infMsg);
 						System.exit(0);
 					}
 				}
@@ -383,12 +409,14 @@ public class PutResource {
 			    client = HttpsAuthClient.getTwoWaySSLClient();
 			}
 			
-			LOGGER.info("Getting the resource...: " + url);
-		
+			String infMsg = "Getting the resource...: " + url;
+			System.out.println(infMsg);
+			LOGGER.info(infMsg);
+
 			ClientResponse cres = client.resource(url)
 									.header("X-TransactionId", TRANSID)
 									.header("X-FromAppId",  FROMAPPID)
-									.header("Authorization", HttpsAuthClient.getBasicAuthHeaderValue()) 
+									.header("Authorization", HttpsAuthClient.getBasicAuthHeaderValue())
 									.accept("application/json")
 									.get(ClientResponse.class);
 			
@@ -398,9 +426,11 @@ public class PutResource {
 			} else if (cres.getStatus() == 200){
 				return true;
 			} else {
-				LOGGER.error("Getting the Resource failed: " + cres.getStatus()
-												+ ": " + cres.getEntity(String.class));
-	           return false;
+				String eMsg = "Getting the Resource failed: " + cres.getStatus()
+												+ ": " + cres.getEntity(String.class);
+				System.out.println(eMsg);
+				LOGGER.error(eMsg);
+				return false;
 			}
 		} catch (KeyManagementException e) {
             throw new AAIException("AAI_7401", e, "Error during GET");

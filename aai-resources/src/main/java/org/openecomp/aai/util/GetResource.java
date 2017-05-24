@@ -36,7 +36,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 public class GetResource {
 	
-	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(GetResource.class);
+	private static EELFLogger LOGGER;
 	private static final String FROMAPPID = "AAI-TOOLS";
 	private static final String TRANSID   = UUID.randomUUID().toString();
 	private static final String USAGE_STRING = "Usage: getTool.sh <resource-path> \n + "
@@ -53,7 +53,7 @@ public class GetResource {
 		Properties props = System.getProperties();
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_GETRES_LOGBACK_PROPS);
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
-		
+		LOGGER = EELFManager.getInstance().getLogger(GetResource.class);
 		String url = null;
 		try {
 			if (args.length < 1) {
@@ -66,16 +66,23 @@ public class GetResource {
 				url = args[0].replaceFirst("^/", "");
 				url = AAIConfig.get(AAIConstants.AAI_SERVER_URL) + url;
 
-				LOGGER.debug("url=" + url);
+				String dmsg = "url=" + url;
+				LOGGER.debug( dmsg );
+				System.out.println( dmsg );
+				
 				getNode(url);
 				System.exit(0);
 			}
 		} catch (AAIException e) {
-			LOGGER.error("GET failed: " + e.getMessage());
+			String emsg = "GET failed: " + e.getMessage();
+			System.out.println(emsg);
+			LOGGER.error(emsg);
 			ErrorLogHelper.logException(e);
 			System.exit(1);	
 		} catch (Exception e) {
-			LOGGER.error("GET failed: " + e.getMessage());
+			String emsg = "GET failed: " + e.getMessage();
+			System.out.println(emsg);
+			LOGGER.error(emsg);
 			ErrorLogHelper.logError("AAI_7402", e.getMessage());
 			System.exit(1);
 		}
@@ -113,8 +120,10 @@ public class GetResource {
 									.get(ClientResponse.class);
 						
 			if (cres.getStatus() == 404) { // resource not found
-				LOGGER.info("\nResource does not exist: " + cres.getStatus()
-						+ ":" + cres.getEntity(String.class));
+				String infmsg = "\nResource does not exist: " + cres.getStatus()
+						+ ":" + cres.getEntity(String.class);
+				System.out.println(infmsg);
+				LOGGER.info(infmsg);
 	            throw new AAIException("AAI_7404", "Resource does not exist");
 			} else if (cres.getStatus() == 200){
 				String msg = cres.getEntity(String.class);
@@ -122,10 +131,13 @@ public class GetResource {
 				Object json = mapper.readValue(msg, Object.class);
 				String indented = mapper.writerWithDefaultPrettyPrinter()
 				                               .writeValueAsString(json);
+				System.out.println(indented);
 				LOGGER.info(indented);
 			} else {
-				LOGGER.error("Getting the Resource failed: " + cres.getStatus()
-												+ ":\n" + cres.getEntity(String.class));
+				String emsg = "Getting the Resource failed: " + cres.getStatus()
+												+ ":\n" + cres.getEntity(String.class);
+				System.out.println(emsg);
+				LOGGER.error(emsg);
 	            throw new AAIException("AAI_7402", "Error during GET");
 			}
 		} catch (AAIException e) {

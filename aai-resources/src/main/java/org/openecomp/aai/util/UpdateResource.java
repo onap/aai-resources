@@ -35,7 +35,7 @@ import com.att.eelf.configuration.EELFManager;
 
 public class UpdateResource {
 	
-	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(UpdateResource.class.getName());
+	private static EELFLogger LOGGER;
 	private static final String FROMAPPID = "AAIUPDT";
 	private static final String TRANSID = UUID.randomUUID().toString();
 	private static final String UPDATE_URL = "actions/update";	
@@ -59,7 +59,7 @@ public class UpdateResource {
 		Properties props = System.getProperties();
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_UPDTOOL_LOGBACK_PROPS);
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
-
+		LOGGER = EELFManager.getInstance().getLogger(UpdateResource.class.getName());
 		try {		
 			if (args.length < 3) {
 				System.out.println("Nothing to update or Insufficient arguments");
@@ -76,9 +76,11 @@ public class UpdateResource {
 			System.exit(0);
 		
 		} catch (AAIException e) {
+			System.out.println("Error - Update Failed.");
 			ErrorLogHelper.logException(e);
 			System.exit(1);
 		} catch (Exception e) {
+			System.out.println("Error - Update Failed." + e.getMessage());
 			ErrorLogHelper.logError("AAI_7402", "Update failed: " + e.getMessage());
 			System.exit(1);
 		}
@@ -113,10 +115,16 @@ public class UpdateResource {
 
 				update.getAction().add(action);	
 				
-				LOGGER.info("updating the resource... ");
-			
+				String infMsg = "updating the resource... ";
+				System.out.println(infMsg);
+				LOGGER.info(infMsg);
+
 				RestController.<Update>Put(update, FROMAPPID, TRANSID, UPDATE_URL);
-				LOGGER.info("Update Successful");
+
+				infMsg = "Update Successful";
+				System.out.println(infMsg);
+				LOGGER.info(infMsg);
+
 		} catch (AAIException e) {
 			throw e;
 		}  catch (Exception e) {

@@ -41,7 +41,7 @@ import com.google.common.base.CaseFormat;
 
 public class DeleteResource {
 	
-	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(DeleteResource.class);
+	private static EELFLogger LOGGER;
 	private static final String FROMAPPID = "AAI-TOOLS";
 	private static final String TRANSID   = UUID.randomUUID().toString();
 	// the logic below to parse the url is dependent on the node types
@@ -64,7 +64,7 @@ public class DeleteResource {
 		Properties props = System.getProperties();
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_DELTOOL_LOGBACK_PROPS);
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
-		
+		LOGGER = EELFManager.getInstance().getLogger(DeleteResource.class);
 		String url = null;
 		try {
 			if ((args.length < 1) || ((args.length > 1) )) {
@@ -113,8 +113,12 @@ public class DeleteResource {
 			String resourceClass = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, resource);
 			resourceClass = "org.openecomp.aai.domain.yang." + resourceClass;
 			
-			LOGGER.debug("class=" + resourceClass);
-			LOGGER.debug("path=" + path);
+			String dMsg = "class=" + resourceClass;
+			System.out.println(dMsg);
+			LOGGER.debug(dMsg);
+			dMsg = "path=" + path;
+			System.out.println(dMsg);
+			LOGGER.debug(dMsg);
 			
 			if (bResVersionEnabled)
 			{
@@ -127,7 +131,9 @@ public class DeleteResource {
 				{
 				    RestController.<T>Get(t, FROMAPPID, TRANSID, path, restObj, false);
 				    t = restObj.get();
-				    LOGGER.info(" GET resoruceversion succeeded\n");
+				    String infMsg = " GET resoruceversion succeeded\n";
+					System.out.println(infMsg);
+					LOGGER.info(infMsg);
 				    String resourceUpdateVersion = GetResourceVersion(t); 
 				    path += "?resource-version=" + resourceUpdateVersion;
 				} catch (AAIException e) {	
@@ -150,12 +156,14 @@ public class DeleteResource {
 			String confirm = s.next();
 			
 			if (!confirm.equalsIgnoreCase("y")) {
-				LOGGER.info("User chose to exit before deleting");
+				String infMsg = "User chose to exit before deleting";
+				System.out.println(infMsg);
+				LOGGER.info(infMsg);
 				System.exit(1);
 			}
 			
 			RestController.Delete(FROMAPPID, TRANSID, path);
-			
+
 			s.close();
 			System.exit(0);
 			
