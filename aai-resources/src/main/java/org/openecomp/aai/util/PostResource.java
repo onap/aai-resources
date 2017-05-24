@@ -41,7 +41,7 @@ import com.google.common.base.CaseFormat;
  */
 public class PostResource {
 
-	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(PostResource.class);
+	private static EELFLogger LOGGER;
 	private static final String FROMAPPID = "AAI-TOOLS";
 	private static final String TRANSID = UUID.randomUUID().toString();
 	private static final String USAGE_STRING = "Usage: postTool.sh <resource-path> <filename>\n" +
@@ -61,7 +61,7 @@ public class PostResource {
 		Properties props = System.getProperties();
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_POSTTOOL_LOGBACK_PROPS);
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
-		
+		LOGGER = EELFManager.getInstance().getLogger(PostResource.class);
 		try {
 			if (args.length < 2) {
 				System.out.println("Insufficient arguments");
@@ -85,8 +85,13 @@ public class PostResource {
 				System.exit(1);
 			}
 			
-			LOGGER.debug("class=" + resourceClass);
-			LOGGER.debug("path=" + path);
+			String dMsg = "class=" + resourceClass;
+			System.out.println(dMsg);
+			LOGGER.debug(dMsg);
+			
+			dMsg = "path=" + path;
+			System.out.println(dMsg);
+			LOGGER.debug(dMsg);
 			
 			@SuppressWarnings("unchecked")
 			T resJson1 = (T)readJsonFile(Class.forName(resourceClass), args[1]);
@@ -95,9 +100,17 @@ public class PostResource {
 			ObjectMapper mapper = new ObjectMapper();
 			Object json = mapper.readValue(response, Object.class);
 			
-			LOGGER.info(" POST succeeded\n");
-			LOGGER.info("Response = " + mapper.writer().withDefaultPrettyPrinter().writeValueAsString(json));
-			LOGGER.info("\nDone!!");
+			String infMsg = " POST succeeded\n";
+			System.out.println(infMsg);
+			LOGGER.info(infMsg);
+			
+			infMsg = "Response = " + mapper.writer().withDefaultPrettyPrinter().writeValueAsString(json);
+			System.out.println(infMsg);
+			LOGGER.info(infMsg);
+			
+			infMsg = "\nDone!!";
+			System.out.println(infMsg);
+			LOGGER.info(infMsg);
 			
 			System.exit(0); 
 

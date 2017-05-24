@@ -43,6 +43,7 @@ if [ "${userid}" != "aaiadmin" ]; then
 fi 
 
 . /etc/profile.d/aai.sh
+PROJECT_HOME=/opt/app/aai-resources
 
 for JAR in `ls $PROJECT_HOME/extJars/*.jar`
 do

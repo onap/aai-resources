@@ -43,7 +43,7 @@ public class ManageSchemaTest {
 	private TitanGraph graph = null;
 	@BeforeClass
 	public static void before() {
-		System.setProperty("AJSC_HOME", "./src/test/resources/");;
+		System.setProperty("AJSC_HOME", ".");
 		System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");
 	
 	}
