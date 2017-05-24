@@ -140,6 +140,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			dbEngine = httpEntry.getDbEngine();
    			
 			URI uriObject = UriBuilder.fromPath(uri).build();
+			this.validateURI(uriObject);
 
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
 			
@@ -421,7 +422,8 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				throw new AAIException("AAI_3102", "You must supply a relationship");
 			}
 			URI uriObject = UriBuilder.fromPath(uri).build();
-			
+			this.validateURI(uriObject);
+
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
         				
 			Introspector wrappedEntity = loader.unmarshal("relationship", content, org.openecomp.aai.restcore.MediaType.getEnum(this.getInputMediaType(inputMediaType)));
@@ -524,7 +526,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		Boolean success = true;
 
 		try {
-	
 			validateRequest(info);
 
 			version = Version.valueOf(versionParam);
@@ -533,7 +534,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			loader = httpEntry.getLoader();
 			dbEngine = httpEntry.getDbEngine();
 			URI uriObject = UriBuilder.fromPath(uri).build();
-
+			this.validateURI(uriObject);
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
 	        String objName = uriQuery.getResultType();
 	        if (content.length() == 0) {
@@ -580,4 +581,14 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		return response;
 	}
 	
+	private void validateURI(URI uri) throws AAIException {
+		if (hasRelatedTo(uri)) {
+			throw new AAIException("AAI_3010");
+		}
+	}
+	private boolean hasRelatedTo(URI uri) {
+		
+		return uri.toString().contains("/" + RestTokens.COUSIN + "/");
+		
+	}
 }

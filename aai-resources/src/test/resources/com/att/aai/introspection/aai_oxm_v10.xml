@@ -8,9 +8,7 @@
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-  
-       http://www.apache.org/licenses/LICENSE-2.0
-  
+     http://www.apache.org/licenses/LICENSE-2.0
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -1215,7 +1213,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />				
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Openstack snapshot" />
@@ -1598,6 +1596,7 @@
 						<xml-property name="description" value="Prov Status of this device (not under canopi control) Valid values [PREPROV/NVTPROV/PROV]" />
 					</xml-properties>
 				</xml-element>
+				<xml-element container-type="java.util.ArrayList" java-attribute="testList" name="test-list" type="java.lang.String" />
 				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
 				<xml-element java-attribute="pInterfaces" name="p-interfaces" type="inventory.aai.openecomp.org.v10.PInterfaces" />
 				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.openecomp.org.v10.LagInterfaces" />
@@ -5818,6 +5817,7 @@
 							value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
+						<xml-property name="requires" value="model-version-id" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="modelVersionId" name="model-version-id"
@@ -5827,6 +5827,7 @@
 							value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
+						<xml-property name="requires" value="model-invariant-id" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="personaModelVer" name="persona-model-ver"

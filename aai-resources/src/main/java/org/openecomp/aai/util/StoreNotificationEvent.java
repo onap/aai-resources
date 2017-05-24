@@ -25,20 +25,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.bind.Marshaller;
 
-import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.eclipse.persistence.dynamic.DynamicEntity;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import org.openecomp.aai.dmaap.AAIDmaapEventJMSProducer;
+import org.openecomp.aai.domain.notificationEvent.NotificationEvent;
 import org.openecomp.aai.exceptions.AAIException;
 import org.openecomp.aai.introspection.Introspector;
 import org.openecomp.aai.introspection.Loader;
@@ -49,31 +46,90 @@ public class StoreNotificationEvent {
 	private AAIDmaapEventJMSProducer messageProducer;
 	private String fromAppId = "";
 	private String transId = "";
-
+	private final String transactionId;
+	private final String sourceOfTruth;
 	/**
 	 * Instantiates a new store notification event.
 	 */
-	public StoreNotificationEvent() {
+	public StoreNotificationEvent(String transactionId, String sourceOfTruth) {
 		this.messageProducer = new AAIDmaapEventJMSProducer();
-		Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
-		Map<String, List<String>> headersList = CastUtils.cast((Map<?, ?>) inMessage.get(Message.PROTOCOL_HEADERS));
-		if (headersList != null) {
-			List<String> xt = headersList.get("X-TransactionId");
-			if (xt != null) {
-				for (String transIdValue : xt) {
-					transId = transIdValue;
-				}
-			}
-			List<String> fa = headersList.get("X-FromAppId");
-			if (fa != null) {
-				for (String fromAppIdValue : fa) {
-
-					fromAppId = fromAppIdValue;
-				}
-			}
-		}
+		this.transactionId = transactionId;
+		this.sourceOfTruth = sourceOfTruth;
 	}
 
+	/**
+	 * Store event.
+	 *
+	 * @param eh
+	 *            the eh
+	 * @param obj
+	 *            the obj
+	 * @throws AAIException
+	 *             the AAI exception
+	 */
+	public void storeEvent(NotificationEvent.EventHeader eh, Object obj) throws AAIException {
+
+		if (obj == null) {
+			throw new AAIException("AAI_7350");
+		}
+
+		org.openecomp.aai.domain.notificationEvent.ObjectFactory factory = new org.openecomp.aai.domain.notificationEvent.ObjectFactory();
+
+		org.openecomp.aai.domain.notificationEvent.NotificationEvent ne = factory.createNotificationEvent();
+
+		if (eh.getId() == null) {
+			eh.setId(genDate2() + "-" + UUID.randomUUID().toString());
+		}
+		if (eh.getTimestamp() == null) {
+			eh.setTimestamp(genDate());
+		}
+
+		// there's no default, but i think we want to put this in hbase?
+
+		if (eh.getEntityLink() == null) {
+			eh.setEntityLink("UNK");
+		}
+
+		if (eh.getAction() == null) {
+			eh.setAction("UNK");
+		}
+
+		if (eh.getEventType() == null) {
+			eh.setEventType(AAIConfig.get("aai.notificationEvent.default.eventType", "UNK"));
+		}
+
+		if (eh.getDomain() == null) {
+			eh.setDomain(AAIConfig.get("aai.notificationEvent.default.domain", "UNK"));
+		}
+
+		if (eh.getSourceName() == null) {
+			eh.setSourceName(AAIConfig.get("aai.notificationEvent.default.sourceName", "UNK"));
+		}
+
+		if (eh.getSequenceNumber() == null) {
+			eh.setSequenceNumber(AAIConfig.get("aai.notificationEvent.default.sequenceNumber", "UNK"));
+		}
+
+		if (eh.getSeverity() == null) {
+			eh.setSeverity(AAIConfig.get("aai.notificationEvent.default.severity", "UNK"));
+		}
+
+		if (eh.getVersion() == null) {
+			eh.setVersion(AAIConfig.get("aai.notificationEvent.default.version", "UNK"));
+		}
+
+		ne.setCambriaPartition(AAIConstants.UEB_PUB_PARTITION_AAI);
+		ne.setEventHeader(eh);
+		ne.setEntity(obj);
+
+		try {
+			PojoUtils pu = new PojoUtils();
+			String entityJson = pu.getJsonFromObject(ne);
+			sendToDmaapJmsQueue(entityJson);
+		} catch (Exception e) {
+			throw new AAIException("AAI_7350", e);
+		}
+	}
 
 	/**
 	 * Store dynamic event.

@@ -126,7 +126,7 @@ public class AAIDmaapEventJMSConsumer implements MessageListener {
 		//String aaiEvent = "";
 		//String eventName = "";
 
-		
+
 		//String environment = "";
 
 		//if (message instanceof TextMessage) {
