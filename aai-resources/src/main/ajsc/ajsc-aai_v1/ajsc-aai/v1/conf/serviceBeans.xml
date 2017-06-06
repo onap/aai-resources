@@ -36,6 +36,7 @@
 		</cxf:outInterceptors>
 	</cxf:bus>
 	<context:component-scan base-package="org.openecomp.aai.tasks" />
+	<context:component-scan base-package="org.openecomp.aai.config" />
 
 	<task:scheduler id="taskScheduler" pool-size="10" />
 	<task:executor id="taskExecutor" pool-size="10"

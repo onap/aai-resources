@@ -31,14 +31,14 @@ public class AAIDmaapEventJMSProducer {
 	private JmsTemplate jmsTemplate;
 
 	public AAIDmaapEventJMSProducer() {
-		//this.jmsTemplate = new JmsTemplate();
-		//this.jmsTemplate.setConnectionFactory(new CachingConnectionFactory(new ActiveMQConnectionFactory("tcp://localhost:61447")));
-		//this.jmsTemplate.setDefaultDestination(new ActiveMQQueue("IN_QUEUE"));
+		this.jmsTemplate = new JmsTemplate();
+		this.jmsTemplate.setConnectionFactory(new CachingConnectionFactory(new ActiveMQConnectionFactory("tcp://localhost:61447")));
+		this.jmsTemplate.setDefaultDestination(new ActiveMQQueue("IN_QUEUE"));
 	}
 
 	public void sendMessageToDefaultDestination(JSONObject finalJson) {
-		//jmsTemplate.convertAndSend(finalJson.toString());
-		//CachingConnectionFactory ccf = (CachingConnectionFactory)this.jmsTemplate.getConnectionFactory();
-		//ccf.destroy();
+		jmsTemplate.convertAndSend(finalJson.toString());
+		CachingConnectionFactory ccf = (CachingConnectionFactory)this.jmsTemplate.getConnectionFactory();
+		ccf.destroy();
 	}
 }
