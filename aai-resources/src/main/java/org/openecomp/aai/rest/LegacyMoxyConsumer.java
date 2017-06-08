@@ -48,7 +48,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.ext.PATCH;
 import org.javatuples.Pair;
-
 import org.openecomp.aai.dbmap.DBConnectionType;
 import org.openecomp.aai.exceptions.AAIException;
 import org.openecomp.aai.introspection.Introspector;
@@ -58,12 +57,14 @@ import org.openecomp.aai.introspection.Version;
 import org.openecomp.aai.parsers.query.QueryParser;
 import org.openecomp.aai.rest.db.DBRequest;
 import org.openecomp.aai.rest.db.HttpEntry;
+import org.openecomp.aai.rest.exceptions.AAIInvalidXMLNamespace;
 import org.openecomp.aai.rest.util.ValidateEncoding;
 import org.openecomp.aai.restcore.HttpMethod;
 import org.openecomp.aai.restcore.RESTAPI;
 import org.openecomp.aai.serialization.engines.QueryStyle;
 import org.openecomp.aai.serialization.engines.TransactionalGraphEngine;
 import org.openecomp.aai.workarounds.RemoveDME2QueryParams;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.google.common.base.Joiner;
@@ -100,7 +101,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		
 		MediaType mediaType = headers.getMediaType();
 
-		return this.handleWrites(Action.PUT, mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info, req);
+		return this.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info);
 	}
 	
 	/**
@@ -195,7 +196,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		
 		MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
 		
-		return this.handleWrites(Action.PUT, mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info, req);
+		return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info);
 	
 	}
 	
@@ -513,7 +514,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 * @param req the req
 	 * @return the response
 	 */
-	private Response handleWrites(Action aaiAction, MediaType mediaType, HttpMethod method, String content, String versionParam, String uri, HttpHeaders headers, UriInfo info, HttpServletRequest req) {
+	private Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam, String uri, HttpHeaders headers, UriInfo info) {
 		
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
@@ -524,7 +525,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		TitanTransaction g = null;
 		Boolean success = true;
-
+		
 		try {
 			validateRequest(info);
 
@@ -547,6 +548,10 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	        Introspector obj = loader.unmarshal(objName, content, org.openecomp.aai.restcore.MediaType.getEnum(this.getInputMediaType(mediaType)));
 	        if (obj == null) {
 	        	throw new AAIException("AAI_3000", "object could not be unmarshalled:" + content);
+	        }
+	       
+	        if (mediaType.toString().contains(MediaType.APPLICATION_XML) && !content.equals("<empty/>") && isEmptyObject(obj)) {
+		        throw new AAIInvalidXMLNamespace(content);
 	        }
 	        
 	        this.validateIntrospector(obj, loader, uriObject, method);
@@ -589,6 +594,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	private boolean hasRelatedTo(URI uri) {
 		
 		return uri.toString().contains("/" + RestTokens.COUSIN + "/");
-		
+	}
+	
+	protected boolean isEmptyObject(Introspector obj) {
+       return "{}".equals(obj.marshal(false));
 	}
 }

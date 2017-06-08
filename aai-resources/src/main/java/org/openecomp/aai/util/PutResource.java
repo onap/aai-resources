@@ -24,17 +24,21 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
-import java.util.ArrayList;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.openecomp.aai.db.props.AAIProperties;
 import org.openecomp.aai.exceptions.AAIException;
-import org.openecomp.aai.ingestModel.DbMaps;
-import org.openecomp.aai.ingestModel.IngestModelMoxyOxm;
+import org.openecomp.aai.introspection.Loader;
+import org.openecomp.aai.introspection.LoaderFactory;
+import org.openecomp.aai.introspection.ModelType;
 import org.openecomp.aai.logging.ErrorLogHelper;
+import org.openecomp.aai.parsers.uri.URIToObject;
+
 import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -98,31 +102,17 @@ public class PutResource {
 				System.out.println(USAGE_STRING);
 				System.exit(1);
 			} 
-			
+				
+			Loader loader = LoaderFactory.createLoaderForVersion(ModelType.MOXY, AAIProperties.LATEST);
 			// Assume the config AAI_SERVER_URL has a last slash so remove if  
 			//  resource-path has it as the first char
-			String path = args[0].replaceFirst("^/", "");		
+			URI uri = new URI(args[0]);
+			String path = args[0].replaceFirst("^/", "");
 			Path p = Paths.get(path);
 			
-			// if the node type has one key
-			String resource = p.getName(p.getNameCount() - 2).toString();
-			// if the node type has two keys - this assumes max 2 keys
-			IngestModelMoxyOxm moxyMod = new IngestModelMoxyOxm();
-			DbMaps dbMaps = null;
-			try {
-				ArrayList <String> defaultVerLst = new ArrayList <String> ();
-				defaultVerLst.add( AAIConfig.get(AAIConstants.AAI_DEFAULT_API_VERSION_PROP) );
-				moxyMod.init( defaultVerLst, false);
-				// Just make sure we can get DbMaps - don't actually need it until later.
-				dbMaps = IngestModelMoxyOxm.dbMapsContainer.get(AAIConfig.get(AAIConstants.AAI_DEFAULT_API_VERSION_PROP));
-				}
-			catch (Exception ex){
-				ErrorLogHelper.logError("AAI_7402", "ERROR - Could not get the DbMaps object.");
-				System.exit(1);
-			}
+			URIToObject parser = new URIToObject(loader, uri);
+			String resource = parser.getEntityName();
 			
-			if (!dbMaps.NodeKeyProps.containsKey(resource))
-				resource = p.getName(p.getNameCount() - 3).toString();
 			String resourceClass = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, resource);
 			resourceClass = "org.openecomp.aai.domain.yang." + resourceClass;
 			

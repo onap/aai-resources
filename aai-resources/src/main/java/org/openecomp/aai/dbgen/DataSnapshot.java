@@ -25,20 +25,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.LegacyGraphSONReader;
-
 import org.openecomp.aai.dbmap.AAIGraph;
 import org.openecomp.aai.exceptions.AAIException;
 import org.openecomp.aai.logging.ErrorLogHelper;
 import org.openecomp.aai.util.AAIConfig;
 import org.openecomp.aai.util.AAIConstants;
+import org.openecomp.aai.util.FormatDate;
+
 import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -100,9 +98,8 @@ public class DataSnapshot {
 				// ------------------------------------------
 				// They just want to take a snapshot.
 				// ------------------------------------------
-				SimpleDateFormat d = new SimpleDateFormat("yyyyMMddHHmm");
-				d.setTimeZone(TimeZone.getTimeZone("GMT"));
-				String dteStr = d.format(new Date()).toString();
+				FormatDate fd = new FormatDate("yyyyMMddHHmm", "GMT");
+				String dteStr = fd.getDateTime();
 				String newSnapshotOutFname = targetDir + AAIConstants.AAI_FILESEP + "dataSnapshot.graphSON." + dteStr;
 
 				graph.io(IoCore.graphson()).writeGraph(newSnapshotOutFname);
