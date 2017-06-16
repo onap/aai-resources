@@ -18,23 +18,32 @@
  * ============LICENSE_END=========================================================
  */
 
-package org.openecomp.aai.rest.exceptions;
+package org.openecomp.aai.migration;
 
-import org.openecomp.aai.exceptions.AAIException;
+import org.openecomp.aai.dbmap.AAIGraph;
 
-public class AAIInvalidXMLNamespace extends AAIException {
-	
-	private static final long serialVersionUID = 7487333042291858169L;
+/**
+ * Wrapper class to allow {@link com.openecomp.aai.migration.MigrationControllerInternal MigrationControllerInternal}
+ * to be run from a shell script
+ */
+public class MigrationController {
 
-	public AAIInvalidXMLNamespace(String message) {
-		super("AAI_3011", message);
-	}
-
-	public AAIInvalidXMLNamespace(Throwable cause) {
-		super("AAI_3011",cause);
-	}
-
-	public AAIInvalidXMLNamespace(String message, Throwable cause) {
-		super("AAI_3011", cause, message);
+	/**
+	 * The main method.
+	 *
+	 * @param args
+	 *            the arguments
+	 */
+	public static void main(String[] args) {
+		
+		MigrationControllerInternal internal = new MigrationControllerInternal();
+		
+		try {
+			internal.run(args);
+		} catch (Exception e) {
+			//ignore
+		}
+		AAIGraph.getInstance().getGraph().close();
+		System.exit(0);
 	}
 }

@@ -20,6 +20,9 @@
 
 package org.openecomp.aai.migration;
 
+/**
+ * Used to describe the type of DMaaP event you would like to create
+ */
 public enum EventAction {
 	CREATE,
 	UPDATE,

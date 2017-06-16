@@ -18,23 +18,13 @@
  * ============LICENSE_END=========================================================
  */
 
-package org.openecomp.aai.rest.exceptions;
+package org.openecomp.aai.migration;
 
-import org.openecomp.aai.exceptions.AAIException;
-
-public class AAIInvalidXMLNamespace extends AAIException {
-	
-	private static final long serialVersionUID = 7487333042291858169L;
-
-	public AAIInvalidXMLNamespace(String message) {
-		super("AAI_3011", message);
-	}
-
-	public AAIInvalidXMLNamespace(Throwable cause) {
-		super("AAI_3011",cause);
-	}
-
-	public AAIInvalidXMLNamespace(String message, Throwable cause) {
-		super("AAI_3011", cause, message);
-	}
+/**
+ * Defines the status of the completed migration
+ */
+public enum Status {
+	SUCCESS,
+	CHECK_LOGS,
+	FAILURE
 }

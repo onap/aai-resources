@@ -28,7 +28,6 @@ import java.util.List;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-
 import org.openecomp.aai.exceptions.AAIException;
 import org.openecomp.aai.introspection.Introspector;
 import org.openecomp.aai.introspection.Loader;
@@ -37,9 +36,13 @@ import org.openecomp.aai.rest.ueb.UEBNotification;
 import org.openecomp.aai.serialization.db.DBSerializer;
 import org.openecomp.aai.serialization.engines.TransactionalGraphEngine;
 import org.openecomp.aai.serialization.engines.query.QueryEngine;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 
+/**
+ * Allows for DMaaP notifications from Migrations
+ */
 public class NotificationHelper {
 
 	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(NotificationHelper.class);
