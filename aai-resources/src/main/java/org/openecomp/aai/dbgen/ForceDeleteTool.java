@@ -23,15 +23,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Scanner;
+
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
-import org.slf4j.MDC;
-
 import org.openecomp.aai.exceptions.AAIException;
+import org.openecomp.aai.serialization.db.EdgeProperties;
+import org.openecomp.aai.serialization.db.EdgeProperty;
 import org.openecomp.aai.util.AAIConfig;
 import org.openecomp.aai.util.AAIConstants;
+import org.slf4j.MDC;
+
 import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -39,16 +43,11 @@ import com.thinkaurelius.titan.core.TitanEdge;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.thinkaurelius.titan.core.TitanGraphQuery;
-import com.thinkaurelius.titan.core.TitanVertex;
 
 
 
 public class ForceDeleteTool {
-
-	
-	private static final int MAXDESCENDENTDEPTH = 15;
-	
-	/**
+	/*
 	 * The main method.
 	 *
 	 * @param args the arguments
@@ -206,7 +205,7 @@ public class ForceDeleteTool {
 		System.out.println(msg);
 		logger.info(msg);
   	
-		
+		ForceDelete fd = new ForceDelete(graph);
     	if( actionVal.equals("COLLECT_DATA") ){
 	  		// When doing COLLECT_DATA, we expect the dataString string to be comma separated
     		// name value pairs like this:
@@ -241,13 +240,13 @@ public class ForceDeleteTool {
 		  		}
 	  		}
 	  	   	if( (tgQ != null) && (tgQ instanceof TitanGraphQuery) ){
-	        	Iterable <TitanVertex> verts = (Iterable<TitanVertex>) tgQ.vertices();
-	        	Iterator <TitanVertex> vertItor = verts.iterator();
+	        	Iterable <Vertex> verts = (Iterable<Vertex>) tgQ.vertices();
+	        	Iterator <Vertex> vertItor = verts.iterator();
 	           	while( vertItor.hasNext() ){
 	        		resCount++;
-	        		TitanVertex v = (TitanVertex)vertItor.next();
-	        		showNodeInfo( logger, v, displayAllVidsFlag );
-	        		int descendantCount = countDescendants( logger, v, 0 );
+	        		Vertex v = vertItor.next();
+	        		fd.showNodeInfo( logger, v, displayAllVidsFlag );
+	        		int descendantCount = fd.countDescendants( logger, v, 0 );
 	        		String infMsg = " Found " + descendantCount + " descendant nodes \n";
 	    	  		System.out.println( infMsg );
 	    	  		logger.info( infMsg );
@@ -268,20 +267,20 @@ public class ForceDeleteTool {
 	  		Iterator <Vertex> vtxItr = graph.vertices( vertexIdLong );
 	  		if( vtxItr != null && vtxItr.hasNext() ) {
 	  			Vertex vtx = vtxItr.next();
-	  			showNodeInfo( logger, vtx, displayAllVidsFlag );
-        		int descendantCount = countDescendants( logger, (TitanVertex)vtx, 0 );
+	  			fd.showNodeInfo( logger, vtx, displayAllVidsFlag );
+        		int descendantCount = fd.countDescendants( logger, vtx, 0 );
         		String infMsg = " Found " + descendantCount + " descendant nodes.  Note - forceDelete does not cascade to " +
         				" child nodes, but they may become unreachable after the delete. \n";
     	  		System.out.println( infMsg );
     	  		logger.info( infMsg );
     	  		
-    	  		int edgeCount = countEdges( logger, vtx );
+    	  		int edgeCount = fd.countEdges( logger, vtx );
     			
     			infMsg = " Found total of " + edgeCount + " edges incident on this node.  \n";
     	  		System.out.println( infMsg );
     	  		logger.info( infMsg );
     			
-    			if( getNodeDelConfirmation(logger, userIdVal, vtx, descendantCount, edgeCount, overRideProtection) ){
+    			if( fd.getNodeDelConfirmation(logger, userIdVal, vtx, descendantCount, edgeCount, overRideProtection) ){
 			  		vtx.remove();
 			  		graph.tx().commit();
 			  		infMsg = ">>>>>>>>>> Removed node with vertexId = " + vertexIdLong;
@@ -314,7 +313,7 @@ public class ForceDeleteTool {
 		  		System.exit(0);
 		  	}
 	  		
-	  		if( getEdgeDelConfirmation(logger, userIdVal, thisEdge, overRideProtection) ){
+	  		if( fd.getEdgeDelConfirmation(logger, userIdVal, thisEdge, overRideProtection) ){
 	  			thisEdge.remove();
 		  		graph.tx().commit();
 		  		String infMsg = ">>>>>>>>>> Removed edge with edgeId = " + edgeIdStr;
@@ -339,383 +338,389 @@ public class ForceDeleteTool {
     
 	}// end of main()
 	
-	
-	public static void showNodeInfo(EELFLogger logger, Vertex tVert, Boolean displayAllVidsFlag ){ 
+	public static class ForceDelete {
 		
-		try {
-			Iterator<VertexProperty<Object>> pI = tVert.properties();
-			String infStr = ">>> Found Vertex with VertexId = " + tVert.id() + ", properties:    ";
-			System.out.println( infStr );
-			logger.info(infStr);
-			while( pI.hasNext() ){
-				VertexProperty<Object> tp = pI.next();
-				infStr = " [" + tp.key() + "|" + tp.value() + "] ";
-				System.out.println( infStr ); 
-				logger.info(infStr);
-			}
-		
-			ArrayList <String> retArr = collectEdgeInfoForNode( logger, tVert, displayAllVidsFlag );
-			for( String infoStr : retArr ){ 
-				System.out.println( infoStr ); 
-				logger.info(infoStr);
-			}
+		private final int MAXDESCENDENTDEPTH = 15;
+		private final TitanGraph graph;
+		public ForceDelete(TitanGraph graph) {
+			this.graph = graph;
 		}
-		catch (Exception e){
-			String warnMsg = " -- Error -- trying to display edge info. [" + e.getMessage() + "]";
-			System.out.println( warnMsg );
-			logger.warn(warnMsg);
-		}
-		
-	}// End of showNodeInfo()
-
-	
-	public static void showPropertiesForEdge( EELFLogger logger, TitanEdge tEd ){ 
-		String infMsg = "";
-		if( tEd == null ){
-			infMsg = "null Edge object passed to showPropertiesForEdge()";
-			System.out.print(infMsg);
-			logger.info(infMsg);
-			return;
-		}
-		
-		// Try to show the edge properties
-		try {
-			infMsg =" Label for this Edge = [" + tEd.label() + "] ";
-			System.out.print(infMsg);
-			logger.info(infMsg);
+		public void showNodeInfo(EELFLogger logger, Vertex tVert, Boolean displayAllVidsFlag ){ 
 			
-			infMsg =" EDGE Properties for edgeId = " + tEd.id() + ": ";
-			System.out.print(infMsg);
-			logger.info(infMsg);
-			Iterator <String> pI = tEd.keys().iterator();
-			while( pI.hasNext() ){
-				String propKey = pI.next();
-				infMsg = "Prop: [" + propKey + "], val = [" 
-						+ tEd.property(propKey) + "] ";
+			try {
+				Iterator<VertexProperty<Object>> pI = tVert.properties();
+				String infStr = ">>> Found Vertex with VertexId = " + tVert.id() + ", properties:    ";
+				System.out.println( infStr );
+				logger.info(infStr);
+				while( pI.hasNext() ){
+					VertexProperty<Object> tp = pI.next();
+					infStr = " [" + tp.key() + "|" + tp.value() + "] ";
+					System.out.println( infStr ); 
+					logger.info(infStr);
+				}
+			
+				ArrayList <String> retArr = collectEdgeInfoForNode( logger, tVert, displayAllVidsFlag );
+				for( String infoStr : retArr ){ 
+					System.out.println( infoStr ); 
+					logger.info(infoStr);
+				}
+			}
+			catch (Exception e){
+				String warnMsg = " -- Error -- trying to display edge info. [" + e.getMessage() + "]";
+				System.out.println( warnMsg );
+				logger.warn(warnMsg);
+			}
+			
+		}// End of showNodeInfo()
+
+		
+		public void showPropertiesForEdge( EELFLogger logger, TitanEdge tEd ){ 
+			String infMsg = "";
+			if( tEd == null ){
+				infMsg = "null Edge object passed to showPropertiesForEdge()";
 				System.out.print(infMsg);
 				logger.info(infMsg);
+				return;
 			}
-		}
-		catch( Exception ex ){
-			infMsg = " Could not retrieve properties for this edge. exMsg = [" 
-					+ ex.getMessage() + "] ";
-			System.out.println( infMsg ); 
-			logger.info(infMsg);
-		}
-		
-		// Try to show what's connected to the IN side of this Edge
-		try {
-			infMsg = " Looking for the Vertex on the IN side of the edge:  ";
-			System.out.print(infMsg);
-			logger.info(infMsg);
-			TitanVertex inVtx = tEd.inVertex();
-			Iterator<VertexProperty<Object>> pI = inVtx.properties();
-			String infStr = ">>> Found Vertex with VertexId = " + inVtx.id() 
-				+ ", properties:    ";
-			System.out.println( infStr );
-			logger.info(infStr);
-			while( pI.hasNext() ){
-				VertexProperty<Object> tp = pI.next();
-				infStr = " [" + tp.key() + "|" + tp.value() + "] ";
-				System.out.println( infStr ); 
+			
+			// Try to show the edge properties
+			try {
+				infMsg =" Label for this Edge = [" + tEd.label() + "] ";
+				System.out.print(infMsg);
+				logger.info(infMsg);
+				
+				infMsg =" EDGE Properties for edgeId = " + tEd.id() + ": ";
+				System.out.print(infMsg);
+				logger.info(infMsg);
+				Iterator <String> pI = tEd.keys().iterator();
+				while( pI.hasNext() ){
+					String propKey = pI.next();
+					infMsg = "Prop: [" + propKey + "], val = [" 
+							+ tEd.property(propKey) + "] ";
+					System.out.print(infMsg);
+					logger.info(infMsg);
+				}
+			}
+			catch( Exception ex ){
+				infMsg = " Could not retrieve properties for this edge. exMsg = [" 
+						+ ex.getMessage() + "] ";
+				System.out.println( infMsg ); 
+				logger.info(infMsg);
+			}
+			
+			// Try to show what's connected to the IN side of this Edge
+			try {
+				infMsg = " Looking for the Vertex on the IN side of the edge:  ";
+				System.out.print(infMsg);
+				logger.info(infMsg);
+				Vertex inVtx = tEd.inVertex();
+				Iterator<VertexProperty<Object>> pI = inVtx.properties();
+				String infStr = ">>> Found Vertex with VertexId = " + inVtx.id() 
+					+ ", properties:    ";
+				System.out.println( infStr );
 				logger.info(infStr);
+				while( pI.hasNext() ){
+					VertexProperty<Object> tp = pI.next();
+					infStr = " [" + tp.key() + "|" + tp.value() + "] ";
+					System.out.println( infStr ); 
+					logger.info(infStr);
+				}
 			}
-		}
-		catch( Exception ex ){
-			infMsg = " Could not retrieve vertex data for the IN side of "
-					+ "the edge. exMsg = [" + ex.getMessage() + "] ";
-			System.out.println( infMsg ); 
-			logger.info(infMsg);
-		}
-		
-		// Try to show what's connected to the OUT side of this Edge
-		try {
-			infMsg = " Looking for the Vertex on the OUT side of the edge:  ";
-			System.out.print(infMsg);
-			logger.info(infMsg);
-			TitanVertex outVtx = tEd.outVertex();
-			Iterator<VertexProperty<Object>> pI = outVtx.properties();
-			String infStr = ">>> Found Vertex with VertexId = " + outVtx.id() 
-				+ ", properties:    ";
-			System.out.println( infStr );
-			logger.info(infStr);
-			while( pI.hasNext() ){
-				VertexProperty<Object> tp = pI.next();
-				infStr = " [" + tp.key() + "|" + tp.value() + "] ";
-				System.out.println( infStr ); 
+			catch( Exception ex ){
+				infMsg = " Could not retrieve vertex data for the IN side of "
+						+ "the edge. exMsg = [" + ex.getMessage() + "] ";
+				System.out.println( infMsg ); 
+				logger.info(infMsg);
+			}
+			
+			// Try to show what's connected to the OUT side of this Edge
+			try {
+				infMsg = " Looking for the Vertex on the OUT side of the edge:  ";
+				System.out.print(infMsg);
+				logger.info(infMsg);
+				Vertex outVtx = tEd.outVertex();
+				Iterator<VertexProperty<Object>> pI = outVtx.properties();
+				String infStr = ">>> Found Vertex with VertexId = " + outVtx.id() 
+					+ ", properties:    ";
+				System.out.println( infStr );
 				logger.info(infStr);
+				while( pI.hasNext() ){
+					VertexProperty<Object> tp = pI.next();
+					infStr = " [" + tp.key() + "|" + tp.value() + "] ";
+					System.out.println( infStr ); 
+					logger.info(infStr);
+				}
 			}
-		}
-		catch( Exception ex ){
-			infMsg = " Could not retrieve vertex data for the OUT side of "
-					+ "the edge. exMsg = [" + ex.getMessage() + "] ";
-			System.out.println( infMsg ); 
-			logger.info(infMsg);
-		}
-		
-	}// end showPropertiesForEdge()
+			catch( Exception ex ){
+				infMsg = " Could not retrieve vertex data for the OUT side of "
+						+ "the edge. exMsg = [" + ex.getMessage() + "] ";
+				System.out.println( infMsg ); 
+				logger.info(infMsg);
+			}
+			
+		}// end showPropertiesForEdge()
 
-	
-	
-	public static ArrayList <String> collectEdgeInfoForNode( EELFLogger logger, Vertex tVert, boolean displayAllVidsFlag ){ 
-		ArrayList <String> retArr = new ArrayList <String> ();
-		Direction dir = Direction.OUT;
-		for ( int i = 0; i <= 1; i++ ){
-			if( i == 1 ){
-				// Second time through we'll look at the IN edges.
-				dir = Direction.IN;
-			}
-			Iterator <Edge> eI = tVert.edges(dir);
-			if( ! eI.hasNext() ){
-				retArr.add("No " + dir + " edges were found for this vertex. ");
-			}
-			while( eI.hasNext() ){
-				Edge ed =  eI.next();
-				String lab = ed.label();
-				Vertex vtx = null;
-				if( dir == Direction.OUT ){
-					// get the vtx on the "other" side
-					vtx = ed.inVertex();
+		
+		
+		public ArrayList <String> collectEdgeInfoForNode( EELFLogger logger, Vertex tVert, boolean displayAllVidsFlag ){ 
+			ArrayList <String> retArr = new ArrayList <String> ();
+			Direction dir = Direction.OUT;
+			for ( int i = 0; i <= 1; i++ ){
+				if( i == 1 ){
+					// Second time through we'll look at the IN edges.
+					dir = Direction.IN;
 				}
-				else {
-					// get the vtx on the "other" side
-					vtx = ed.outVertex();
+				Iterator <Edge> eI = tVert.edges(dir);
+				if( ! eI.hasNext() ){
+					retArr.add("No " + dir + " edges were found for this vertex. ");
 				}
-				if( vtx == null ){
-					retArr.add(" >>> COULD NOT FIND VERTEX on the other side of this edge edgeId = " + ed.id() + " <<< ");
-				}
-				else {
-					String nType = vtx.<String>property("aai-node-type").orElse(null);
-					if( displayAllVidsFlag ){
-						// This should rarely be needed
-						String vid = vtx.id().toString();
-						retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node with VtxId = " + vid );
+				while( eI.hasNext() ){
+					Edge ed =  eI.next();
+					String lab = ed.label();
+					Vertex vtx = null;
+					if( dir == Direction.OUT ){
+						// get the vtx on the "other" side
+						vtx = ed.inVertex();
 					}
 					else {
-						// This is the normal case
-						retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node. ");
+						// get the vtx on the "other" side
+						vtx = ed.outVertex();
+					}
+					if( vtx == null ){
+						retArr.add(" >>> COULD NOT FIND VERTEX on the other side of this edge edgeId = " + ed.id() + " <<< ");
+					}
+					else {
+						String nType = vtx.<String>property("aai-node-type").orElse(null);
+						if( displayAllVidsFlag ){
+							// This should rarely be needed
+							String vid = vtx.id().toString();
+							retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node with VtxId = " + vid );
+						}
+						else {
+							// This is the normal case
+							retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node. ");
+						}
 					}
 				}
 			}
-		}
-		return retArr;
-		
-	}// end of collectEdgeInfoForNode()
+			return retArr;
+			
+		}// end of collectEdgeInfoForNode()
 
-	
-	public static int countEdges( EELFLogger logger, Vertex vtx ){ 
-		int edgeCount = 0;
-		try {
-			Iterator<Edge> edgesItr = vtx.edges(Direction.BOTH);
-			while( edgesItr.hasNext() ){
-				edgesItr.next();
-				edgeCount++;
+		
+		public int countEdges( EELFLogger logger, Vertex vtx ){ 
+			int edgeCount = 0;
+			try {
+				Iterator<Edge> edgesItr = vtx.edges(Direction.BOTH);
+				while( edgesItr.hasNext() ){
+					edgesItr.next();
+					edgeCount++;
+				}
 			}
-		}
-		catch (Exception e) {
-			String wMsg = "-- ERROR -- Stopping the counting of edges because of Exception [" + e.getMessage() + "]";
-			System.out.println( wMsg );
-			logger.warn( wMsg );
-		}
-		return edgeCount;
+			catch (Exception e) {
+				String wMsg = "-- ERROR -- Stopping the counting of edges because of Exception [" + e.getMessage() + "]";
+				System.out.println( wMsg );
+				logger.warn( wMsg );
+			}
+			return edgeCount;
+			
+		}// end of countEdges()
 		
-	}// end of countEdges()
-	
 
-	public static int countDescendants(EELFLogger logger, TitanVertex vtx, int levelVal ){ 
-		int totalCount = 0;
-		int thisLevel = levelVal + 1;
-		
-		if( thisLevel > MAXDESCENDENTDEPTH ){
-			String wMsg = "Warning -- Stopping the counting of descendents because we reached the max depth of " + MAXDESCENDENTDEPTH;
-			System.out.println( wMsg );
-			logger.warn( wMsg );
+		public int countDescendants(EELFLogger logger, Vertex vtx, int levelVal ){ 
+			int totalCount = 0;
+			int thisLevel = levelVal + 1;
+			
+			if( thisLevel > MAXDESCENDENTDEPTH ){
+				String wMsg = "Warning -- Stopping the counting of descendents because we reached the max depth of " + MAXDESCENDENTDEPTH;
+				System.out.println( wMsg );
+				logger.warn( wMsg );
+				return totalCount;
+			}
+			
+			try {
+				Iterator <Vertex> vertI = graph.traversal().V(vtx).union(__.outE().has(EdgeProperties.out(EdgeProperty.IS_PARENT), true).inV(), __.inE().has(EdgeProperties.in(EdgeProperty.IS_PARENT), true).outV());
+				while( vertI != null && vertI.hasNext() ){
+					totalCount++;
+					Vertex childVtx = vertI.next();
+					totalCount = totalCount + countDescendants( logger, childVtx, thisLevel );
+				}
+			}
+			catch (Exception e) {
+				String wMsg = "Error -- Stopping the counting of descendents because of Exception [" + e.getMessage() + "]";
+				System.out.println( wMsg );
+				logger.warn( wMsg );
+			}
+			
 			return totalCount;
-		}
+		}// end of countDescendants()
+
 		
-		try {
-			Iterable <?> verts = vtx.query().direction(Direction.OUT).has("isParent",true).vertices();
-			Iterator <?> vertI = verts.iterator();
-			while( vertI != null && vertI.hasNext() ){
-				totalCount++;
-				TitanVertex childVtx = (TitanVertex) vertI.next();
-				totalCount = totalCount + countDescendants( logger, childVtx, thisLevel );
+		public boolean getEdgeDelConfirmation( EELFLogger logger, String uid, TitanEdge ed, 
+				Boolean overRideProtection ) {
+			
+			showPropertiesForEdge( logger, ed );
+			System.out.print("\n Are you sure you want to delete this EDGE? (y/n): ");
+			Scanner s = new Scanner(System.in);
+			s.useDelimiter("");
+			String confirm = s.next();
+			s.close();
+			
+			if (!confirm.equalsIgnoreCase("y")) {
+				String infMsg = " User [" + uid + "] has chosen to abandon this delete request. ";
+				System.out.println("\n" + infMsg);
+				logger.info(infMsg);
+				return false;
 			}
-		}
-		catch (Exception e) {
-			String wMsg = "Error -- Stopping the counting of descendents because of Exception [" + e.getMessage() + "]";
-			System.out.println( wMsg );
-			logger.warn( wMsg );
-		}
+			else {
+				String infMsg = " User [" + uid + "] has confirmed this delete request. ";
+				System.out.println("\n" + infMsg);
+				logger.info(infMsg);
+				return true;
+			}
 		
-		return totalCount;
-	}// end of countDescendants()
+		} // End of getEdgeDelConfirmation()
+			
 
-	
-	public static boolean getEdgeDelConfirmation( EELFLogger logger, String uid, TitanEdge ed, 
-			Boolean overRideProtection ) {
-		
-		showPropertiesForEdge( logger, ed );
-		System.out.print("\n Are you sure you want to delete this EDGE? (y/n): ");
-		Scanner s = new Scanner(System.in);
-		s.useDelimiter("");
-		String confirm = s.next();
-		s.close();
-		
-		if (!confirm.equalsIgnoreCase("y")) {
-			String infMsg = " User [" + uid + "] has chosen to abandon this delete request. ";
-			System.out.println("\n" + infMsg);
-			logger.info(infMsg);
-			return false;
-		}
-		else {
-			String infMsg = " User [" + uid + "] has confirmed this delete request. ";
-			System.out.println("\n" + infMsg);
-			logger.info(infMsg);
-			return true;
-		}
-	
-	} // End of getEdgeDelConfirmation()
-		
-
-	public static boolean getNodeDelConfirmation( EELFLogger logger, String uid, Vertex vtx, int edgeCount, 
-			int descendantCount, Boolean overRideProtection ) {
-		String thisNodeType = "";
-		try {
-			thisNodeType = vtx.<String>property("aai-node-type").orElse(null);
-		}
-		catch ( Exception nfe ){
-			// Let the user know something is going on - but they can confirm the delete if they want to. 
-			String infMsg = " -- WARNING -- could not get an aai-node-type for this vertex. -- WARNING -- ";
-			System.out.println( infMsg );
-			logger.warn( infMsg );
-		}
-		
-		String ntListString = "";  
-		String maxDescString = "";
-		String maxEdgeString = "";
-		
-		int maxDescCount = 10; // default value
-		int maxEdgeCount = 10; // default value
-		ArrayList <String> protectedNTypes = new ArrayList <String> ();
-		protectedNTypes.add("cloud-region");  // default value
-		
-		try {
-			ntListString = AAIConfig.get("aai.forceDel.protected.nt.list");
-			maxDescString = AAIConfig.get("aai.forceDel.protected.descendant.count");
-			maxEdgeString = AAIConfig.get("aai.forceDel.protected.edge.count");
-		}
-		catch ( Exception nfe ){
-			// Don't worry, we will use default values 
-			String infMsg = "-- WARNING -- could not get aai.forceDel.protected values from aaiconfig.properties -- will use default values. ";
-			System.out.println( infMsg );
-			logger.warn( infMsg );
-		}
-		
-		if( maxDescString != null && !maxDescString.equals("") ){
+		public boolean getNodeDelConfirmation( EELFLogger logger, String uid, Vertex vtx, int edgeCount, 
+				int descendantCount, Boolean overRideProtection ) {
+			String thisNodeType = "";
 			try {
-				maxDescCount = Integer.parseInt(maxDescString);
+				thisNodeType = vtx.<String>property("aai-node-type").orElse(null);
 			}
 			catch ( Exception nfe ){
-				// Don't worry, we will leave "maxDescCount" set to the default value 
+				// Let the user know something is going on - but they can confirm the delete if they want to. 
+				String infMsg = " -- WARNING -- could not get an aai-node-type for this vertex. -- WARNING -- ";
+				System.out.println( infMsg );
+				logger.warn( infMsg );
 			}
-		}
-		
-		if( maxEdgeString != null &&  !maxEdgeString.equals("") ){
+			
+			String ntListString = "";  
+			String maxDescString = "";
+			String maxEdgeString = "";
+			
+			int maxDescCount = 10; // default value
+			int maxEdgeCount = 10; // default value
+			ArrayList <String> protectedNTypes = new ArrayList <String> ();
+			protectedNTypes.add("cloud-region");  // default value
+			
 			try {
-				maxEdgeCount = Integer.parseInt(maxEdgeString);
+				ntListString = AAIConfig.get("aai.forceDel.protected.nt.list");
+				maxDescString = AAIConfig.get("aai.forceDel.protected.descendant.count");
+				maxEdgeString = AAIConfig.get("aai.forceDel.protected.edge.count");
 			}
 			catch ( Exception nfe ){
-				// Don't worry, we will leave "maxEdgeCount" set to the default value 
+				// Don't worry, we will use default values 
+				String infMsg = "-- WARNING -- could not get aai.forceDel.protected values from aaiconfig.properties -- will use default values. ";
+				System.out.println( infMsg );
+				logger.warn( infMsg );
 			}
-		}
-		
-		if( ntListString != null && !ntListString.trim().equals("") ){
-			String [] nodeTypes = ntListString.split("\\|");
-			for( int i = 0; i < nodeTypes.length; i++ ){
-				protectedNTypes.add(nodeTypes[i]);
+			
+			if( maxDescString != null && !maxDescString.equals("") ){
+				try {
+					maxDescCount = Integer.parseInt(maxDescString);
+				}
+				catch ( Exception nfe ){
+					// Don't worry, we will leave "maxDescCount" set to the default value 
+				}
 			}
-		}
-		
-		boolean giveProtOverRideMsg = false;
-		boolean giveProtErrorMsg = false;
-		if( descendantCount > maxDescCount ){
-			// They are trying to delete a node with a lots of descendants
-			String infMsg = " >> WARNING >> This node has more descendant edges than the max ProtectedDescendantCount: " + edgeCount + ".  Max = " + 
-						maxEdgeCount + ".  It can be DANGEROUS to delete one of these. << WARNING << ";
-			System.out.println(infMsg);
-			logger.info(infMsg);
-			if( ! overRideProtection ){
-				// They cannot delete this kind of node without using the override option
-				giveProtErrorMsg = true;
+			
+			if( maxEdgeString != null &&  !maxEdgeString.equals("") ){
+				try {
+					maxEdgeCount = Integer.parseInt(maxEdgeString);
+				}
+				catch ( Exception nfe ){
+					// Don't worry, we will leave "maxEdgeCount" set to the default value 
+				}
+			}
+			
+			if( ntListString != null && !ntListString.trim().equals("") ){
+				String [] nodeTypes = ntListString.split("\\|");
+				for( int i = 0; i < nodeTypes.length; i++ ){
+					protectedNTypes.add(nodeTypes[i]);
+				}
+			}
+			
+			boolean giveProtOverRideMsg = false;
+			boolean giveProtErrorMsg = false;
+			if( descendantCount > maxDescCount ){
+				// They are trying to delete a node with a lots of descendants
+				String infMsg = " >> WARNING >> This node has more descendant edges than the max ProtectedDescendantCount: " + edgeCount + ".  Max = " + 
+							maxEdgeCount + ".  It can be DANGEROUS to delete one of these. << WARNING << ";
+				System.out.println(infMsg);
+				logger.info(infMsg);
+				if( ! overRideProtection ){
+					// They cannot delete this kind of node without using the override option
+					giveProtErrorMsg = true;
+				}
+				else {
+					giveProtOverRideMsg = true;
+				}
+			}
+			
+			if( edgeCount > maxEdgeCount ){
+				// They are trying to delete a node with a lot of edges
+				String infMsg = " >> WARNING >> This node has more edges than the max ProtectedEdgeCount: " + edgeCount + ".  Max = " + 
+							maxEdgeCount + ".  It can be DANGEROUS to delete one of these. << WARNING << ";
+				System.out.println(infMsg);
+				logger.info(infMsg);
+				if( ! overRideProtection ){
+					// They cannot delete this kind of node without using the override option
+					giveProtErrorMsg = true;
+				}
+				else {
+					giveProtOverRideMsg = true;
+				}
+			}
+			
+			if( thisNodeType != null && !thisNodeType.equals("") && protectedNTypes.contains(thisNodeType) ){
+				// They are trying to delete a protected Node Type
+				String infMsg = " >> WARNING >> This node is a PROTECTED NODE-TYPE (" + thisNodeType + "). " +
+						" It can be DANGEROUS to delete one of these. << WARNING << ";
+				System.out.println(infMsg);
+				logger.info(infMsg);
+				if( ! overRideProtection ){
+					// They cannot delete this kind of node without using the override option
+					giveProtErrorMsg = true;
+				}
+				else {
+					giveProtOverRideMsg = true;
+				}
+			}
+			
+			if( giveProtOverRideMsg ){
+				String infMsg = " !!>> WARNING >>!! you are using the overRideProtection parameter which will let you do this potentially dangerous delete.";
+				System.out.println("\n" + infMsg);
+				logger.info(infMsg);
+			}
+			else if( giveProtErrorMsg ) {
+				String errMsg = " ERROR >> this kind of node can only be deleted if you pass the overRideProtection parameter.";
+				System.out.println("\n" + errMsg);
+				logger.error(errMsg);
+				return false;
+			}
+			
+			System.out.print("\n Are you sure you want to do this delete? (y/n): ");
+			Scanner s = new Scanner(System.in);
+			s.useDelimiter("");
+			String confirm = s.next();
+			s.close();
+			
+			if (!confirm.equalsIgnoreCase("y")) {
+				String infMsg = " User [" + uid + "] has chosen to abandon this delete request. ";
+				System.out.println("\n" + infMsg);
+				logger.info(infMsg);
+				return false;
 			}
 			else {
-				giveProtOverRideMsg = true;
+				String infMsg = " User [" + uid + "] has confirmed this delete request. ";
+				System.out.println("\n" + infMsg);
+				logger.info(infMsg);
+				return true;
 			}
-		}
 		
-		if( edgeCount > maxEdgeCount ){
-			// They are trying to delete a node with a lot of edges
-			String infMsg = " >> WARNING >> This node has more edges than the max ProtectedEdgeCount: " + edgeCount + ".  Max = " + 
-						maxEdgeCount + ".  It can be DANGEROUS to delete one of these. << WARNING << ";
-			System.out.println(infMsg);
-			logger.info(infMsg);
-			if( ! overRideProtection ){
-				// They cannot delete this kind of node without using the override option
-				giveProtErrorMsg = true;
-			}
-			else {
-				giveProtOverRideMsg = true;
-			}
-		}
-		
-		if( thisNodeType != null && !thisNodeType.equals("") && protectedNTypes.contains(thisNodeType) ){
-			// They are trying to delete a protected Node Type
-			String infMsg = " >> WARNING >> This node is a PROTECTED NODE-TYPE (" + thisNodeType + "). " +
-					" It can be DANGEROUS to delete one of these. << WARNING << ";
-			System.out.println(infMsg);
-			logger.info(infMsg);
-			if( ! overRideProtection ){
-				// They cannot delete this kind of node without using the override option
-				giveProtErrorMsg = true;
-			}
-			else {
-				giveProtOverRideMsg = true;
-			}
-		}
-		
-		if( giveProtOverRideMsg ){
-			String infMsg = " !!>> WARNING >>!! you are using the overRideProtection parameter which will let you do this potentially dangerous delete.";
-			System.out.println("\n" + infMsg);
-			logger.info(infMsg);
-		}
-		else if( giveProtErrorMsg ) {
-			String errMsg = " ERROR >> this kind of node can only be deleted if you pass the overRideProtection parameter.";
-			System.out.println("\n" + errMsg);
-			logger.error(errMsg);
-			return false;
-		}
-		
-		System.out.print("\n Are you sure you want to do this delete? (y/n): ");
-		Scanner s = new Scanner(System.in);
-		s.useDelimiter("");
-		String confirm = s.next();
-		s.close();
-		
-		if (!confirm.equalsIgnoreCase("y")) {
-			String infMsg = " User [" + uid + "] has chosen to abandon this delete request. ";
-			System.out.println("\n" + infMsg);
-			logger.info(infMsg);
-			return false;
-		}
-		else {
-			String infMsg = " User [" + uid + "] has confirmed this delete request. ";
-			System.out.println("\n" + infMsg);
-			logger.info(infMsg);
-			return true;
-		}
-	
-	} // End of getNodeDelConfirmation()
+		} // End of getNodeDelConfirmation()
+	}
 	
 }
 

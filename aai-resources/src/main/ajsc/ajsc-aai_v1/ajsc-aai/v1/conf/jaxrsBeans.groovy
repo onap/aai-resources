@@ -11,7 +11,7 @@ beans{
 	ExampleConsumer(org.openecomp.aai.rest.ExampleConsumer)
     V3ThroughV7Consumer(org.openecomp.aai.rest.retired.V3ThroughV7Consumer)
 	EchoResponse(org.openecomp.aai.rest.util.EchoResponse)
-
+	ModelVersionTransformer(org.openecomp.aai.rest.tools.ModelVersionTransformer)
 
 	util.list(id: 'jaxrsServices') {
 		
@@ -22,6 +22,7 @@ beans{
 		ref(bean:'BulkAddConsumer')
 		ref(bean:'BulkProcessConsumer')
 		ref(bean:'V3ThroughV7Consumer')
+		ref(bean:'ModelVersionTransformer')
 
 		ref(bean:'EchoResponse')
 	}

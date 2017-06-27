@@ -271,8 +271,6 @@ public class HttpEntry {
 							case PUT: 
 								if (isNewVertex) {
 									v = serializer.createNewVertex(obj);
-								} else {
-									serializer.touchStandardVertexProperties(v, false);
 								}
 								serializer.serializeToDb(obj, v, query, uri.getRawPath(), requestContext);
 								status = Status.OK;
