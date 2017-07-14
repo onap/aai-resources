@@ -24,7 +24,7 @@ import javax.ws.rs.Path;
 
 import org.openecomp.aai.restcore.HttpMethod;
 
-@Path("{version: v[8-9]|v1[0]}/bulkadd")
+@Path("{version: v[8-9]|v1[01]}/bulkadd")
 public class BulkAddConsumer extends BulkConsumer {
 
 	@Override

@@ -46,7 +46,7 @@ import org.openecomp.aai.restcore.RESTAPI;
 /**
  * The Class ExampleConsumer.
  */
-@Path("/{version: v[2789]|v1[0]}/examples")
+@Path("/{version: v[2789]|v1[01]}/examples")
 public class ExampleConsumer extends RESTAPI {
 
 	

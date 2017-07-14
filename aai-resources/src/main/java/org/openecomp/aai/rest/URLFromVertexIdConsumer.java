@@ -54,7 +54,7 @@ import org.openecomp.aai.workarounds.LegacyURITransformer;
 /**
  * The Class URLFromVertexIdConsumer.
  */
-@Path("{version: v[2789]|v1[0]}/generateurl")
+@Path("{version: v[2789]|v1[01]}/generateurl")
 public class URLFromVertexIdConsumer extends RESTAPI {
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;

@@ -74,7 +74,7 @@ import com.thinkaurelius.titan.core.TitanTransaction;
 /**
  * The Class LegacyMoxyConsumer.
  */
-@Path("{version: v[2789]|v1[0]}")
+@Path("{version: v[2789]|v1[01]}")
 public class LegacyMoxyConsumer extends RESTAPI {
 	
 	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(LegacyMoxyConsumer.class.getName());
