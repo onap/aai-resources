@@ -62,12 +62,10 @@ import org.openecomp.aai.serialization.db.EdgeType;
 import org.openecomp.aai.serialization.db.exceptions.NoEdgeRuleFoundException;
 import org.openecomp.aai.serialization.engines.QueryStyle;
 import org.openecomp.aai.serialization.engines.TransactionalGraphEngine;
-import org.radeox.util.logging.Logger;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.google.common.base.Joiner;
-import com.thinkaurelius.titan.core.TitanTransaction;
 
 
 /**
@@ -106,7 +104,6 @@ public class ModelVersionTransformer extends RESTAPI {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
-		TitanTransaction g = null;
 		Boolean success = true;
 		AAIException ex;
 		
