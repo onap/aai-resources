@@ -27,9 +27,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-
 import org.openecomp.aai.dbmap.AAIGraph;
 import org.openecomp.aai.dbmodel.DbEdgeRules;
 import org.openecomp.aai.exceptions.AAIException;
@@ -37,10 +37,8 @@ import org.openecomp.aai.logging.ErrorLogHelper;
 import org.openecomp.aai.serialization.db.EdgeRule;
 import org.openecomp.aai.serialization.db.EdgeRules;
 import org.openecomp.aai.util.AAIConfig;
-import com.thinkaurelius.titan.core.TitanEdge;
+
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanTransaction;
-import com.thinkaurelius.titan.core.TitanVertex;
 
 
 
@@ -152,17 +150,15 @@ public class UpdateEdgeTags {
 	 		System.exit(0);
         }
 
-    	TitanTransaction g = graph.newTransaction();
 		try {  
-        	 Iterable <?> edges = graph.query().edges();
-        	 Iterator <?> edgeItr = edges.iterator();
+        	 Iterator<Edge> edgeItr = graph.traversal().E();
         	 
      		 // Loop through all edges and update their tags if they are a type we are interested in.
         	 //    Sorry about looping over everything, but for now, I can't find a way to just select one type of edge at a time...!?
 			 StringBuffer sb;
 			 boolean missingEdge = false;
         	 while( edgeItr != null && edgeItr.hasNext() ){
-				 TitanEdge tmpEd = (TitanEdge) edgeItr.next();
+        		 Edge tmpEd = edgeItr.next();
 	        	 String edLab = tmpEd.label().toString(); 
 	        	 
 	     		 // Since we have edgeLabels that can be used for different pairs of node-types, we have to
@@ -170,7 +166,7 @@ public class UpdateEdgeTags {
 	        	 String derivedEdgeKey = "";
 	        	 if( labelMapsToMultipleKeys.contains(edLab) ){
 	        		 // need to figure out which key is right for this edge
-	        		 derivedEdgeKey = deriveEdgeRuleKeyForThisEdge( TRANSID, FROMAPPID, g, tmpEd );
+	        		 derivedEdgeKey = deriveEdgeRuleKeyForThisEdge( TRANSID, FROMAPPID, graph, tmpEd );
 	        	 }
 	        	 else {
 	        		 // This kind of label only maps to one key -- so we can just look it up.
@@ -183,7 +179,7 @@ public class UpdateEdgeTags {
 	        			 Vertex vIn = null;
 	        			 Vertex vOut = null;
 	        			 Object obj = null;
-	        			 vIn = tmpEd.vertex(Direction.IN);
+	        			 vIn = tmpEd.inVertex();
 	        			 if ( vIn != null ){
 	        				 obj = vIn.<String>property("aai-node-type").orElse(null);
 	        				 if ( obj != null ) {
@@ -197,7 +193,7 @@ public class UpdateEdgeTags {
 	        			 } else {
 	        				 sb.append(" missing inbound vertex ");
 	        			 }
-	        			 vOut = tmpEd.vertex(Direction.OUT);
+	        			 vOut = tmpEd.outVertex();
 	        			 if ( vOut != null ) {
 	        				 obj = vOut.<String>property("aai-node-type").orElse(null);
 	        				 if ( obj != null ) {
@@ -257,11 +253,11 @@ public class UpdateEdgeTags {
 	 * @return String - key to look up edgeRule (fromNodeType|toNodeType)
 	 * @throws AAIException the AAI exception
 	 */
-	public static String deriveEdgeRuleKeyForThisEdge( String transId, String fromAppId, TitanTransaction graph,  
-			TitanEdge tEdge ) throws AAIException{
+	public static String deriveEdgeRuleKeyForThisEdge( String transId, String fromAppId, Graph graph,  
+			Edge tEdge ) throws AAIException{
 
-		TitanVertex fromVtx = tEdge.outVertex();
-		TitanVertex toVtx = tEdge.inVertex();
+		Vertex fromVtx = tEdge.outVertex();
+		Vertex toVtx = tEdge.inVertex();
 		String startNodeType = fromVtx.<String>property("aai-node-type").orElse(null);
 		String targetNodeType = toVtx.<String>property("aai-node-type").orElse(null);
 		String key = startNodeType + "|" + targetNodeType;

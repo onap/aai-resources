@@ -37,6 +37,7 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
 import org.openecomp.aai.db.props.AAIProperties;
 import org.openecomp.aai.dbmap.AAIGraph;
@@ -59,7 +60,6 @@ import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.thinkaurelius.titan.core.TitanTransaction;
 
 /**
  * Runs a series of migrations from a defined directory based on the presence of 
@@ -301,7 +301,7 @@ public class MigrationControllerInternal {
 		String dateStr= fd.getDateTime();
 		String fileName = snapshotLocation + File.separator + phase + "Migration." + dateStr + ".graphson";
 		logAndPrint("Saving snapshot of inmemory graph " + phase + " migration to " + fileName);
-		TitanTransaction transaction = null;
+		Graph transaction = null;
 		try {
 			
 			Path pathToFile = Paths.get(fileName);

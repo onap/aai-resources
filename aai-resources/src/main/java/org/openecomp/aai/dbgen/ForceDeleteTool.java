@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Scanner;
 
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -39,10 +40,8 @@ import org.slf4j.MDC;
 import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import com.thinkaurelius.titan.core.TitanEdge;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanGraphQuery;
 
 
 
@@ -220,8 +219,8 @@ public class ForceDeleteTool {
 		 		logger.error(msg);
 		 		System.exit(0);
 	  		}
-	  		TitanGraphQuery tgQ  = graph.query();
-	  		String qStringForMsg = " graph.query()";
+	  		GraphTraversal<Vertex, Vertex> g  = graph.traversal().V();
+	  		String qStringForMsg = " graph.traversal().V()";
 	  	   	// Note - if they're only passing on parameter, there won't be any commas
 	  		String [] paramArr = dataString.split(",");
 	  		for( int i = 0; i < paramArr.length; i++ ){
@@ -235,13 +234,12 @@ public class ForceDeleteTool {
 	  			else {
 	  				String propName = paramArr[i].substring(0,pipeLoc);
 		  			String propVal = paramArr[i].substring(pipeLoc + 1);
-		  			tgQ = tgQ.has(propName,propVal);
+		  			g = g.has(propName,propVal);
 		  			qStringForMsg = qStringForMsg + ".has(" + propName + "," + propVal + ")";
 		  		}
 	  		}
-	  	   	if( (tgQ != null) && (tgQ instanceof TitanGraphQuery) ){
-	        	Iterable <Vertex> verts = (Iterable<Vertex>) tgQ.vertices();
-	        	Iterator <Vertex> vertItor = verts.iterator();
+	  	   	if( (g != null)){
+	        	Iterator<Vertex> vertItor = g;
 	           	while( vertItor.hasNext() ){
 	        		resCount++;
 	        		Vertex v = vertItor.next();
@@ -300,10 +298,10 @@ public class ForceDeleteTool {
 	  		}
 	  	}
 	  	else if( actionVal.equals("DELETE_EDGE") ){
-	  		TitanEdge thisEdge = null;
+	  		Edge thisEdge = null;
 	  		Iterator <Edge> edItr = graph.edges( edgeIdStr );
 	  		if( edItr != null && edItr.hasNext() ) {
-		  		thisEdge = (TitanEdge)edItr.next();
+		  		thisEdge = edItr.next();
 	  		}
 	  		
 	  		if( thisEdge == null ){
@@ -374,7 +372,7 @@ public class ForceDeleteTool {
 		}// End of showNodeInfo()
 
 		
-		public void showPropertiesForEdge( EELFLogger logger, TitanEdge tEd ){ 
+		public void showPropertiesForEdge( EELFLogger logger, Edge tEd ){ 
 			String infMsg = "";
 			if( tEd == null ){
 				infMsg = "null Edge object passed to showPropertiesForEdge()";
@@ -556,7 +554,7 @@ public class ForceDeleteTool {
 		}// end of countDescendants()
 
 		
-		public boolean getEdgeDelConfirmation( EELFLogger logger, String uid, TitanEdge ed, 
+		public boolean getEdgeDelConfirmation( EELFLogger logger, String uid, Edge ed, 
 				Boolean overRideProtection ) {
 			
 			showPropertiesForEdge( logger, ed );

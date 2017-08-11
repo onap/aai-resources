@@ -41,11 +41,11 @@
 #  -userId (required) must be followed by a userid
 #  -params4Collect (followed by a string to tell what properties/values to use 
 #  		as part of a COLLECT_DATA request.  Must be in the format
-#  		of “propertName|propValue” use commas to separate if there
+#  		of ?propertName|propValue? use commas to separate if there
 #  		are more than one name/value being passed.
 #  -vertexId - required for a DELETE_NODE request
 #  -edgeId - required for a DELETE_EDGE request
-#  -overRideProtection --- WARNING – This over-rides the protections we introduced!
+#  -overRideProtection --- WARNING ? This over-rides the protections we introduced!
 #       It will let you override a protected vertex or vertex that has more
 #       than the allowed number of edges or descendants.
 #  -DISPLAY_ALL_VIDS (optional) - in the rare case when you want to see the 
