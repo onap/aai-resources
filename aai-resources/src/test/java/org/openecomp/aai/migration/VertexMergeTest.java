@@ -34,12 +34,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.openecomp.aai.db.props.AAIProperties;
 import org.openecomp.aai.dbmap.DBConnectionType;
 import org.openecomp.aai.introspection.Loader;
@@ -51,12 +51,12 @@ import org.openecomp.aai.serialization.db.EdgeRules;
 import org.openecomp.aai.serialization.engines.QueryStyle;
 import org.openecomp.aai.serialization.engines.TitanDBEngine;
 import org.openecomp.aai.serialization.engines.TransactionalGraphEngine;
-//import org.openecomp.aai.serialization.queryformats.QueryFormatTestHelper;
+import org.openecomp.aai.serialization.queryformats.QueryFormatTestHelper;
 import org.openecomp.aai.util.AAIConstants;
+
 import com.thinkaurelius.titan.core.Cardinality;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanTransaction;
 import com.thinkaurelius.titan.core.schema.TitanManagement;
 
 @Ignore
@@ -72,7 +72,7 @@ public class VertexMergeTest {
 	private static TitanGraph graph;
 	private static EdgeRules rules;
 	private static GraphTraversalSource g;
-	private static TitanTransaction tx;
+	private static Graph tx;
 	@BeforeClass
 	public static void setUp() throws NoSuchFieldException, SecurityException, Exception {
 		graph = TitanFactory.build().set("storage.backend","inmemory").open();
@@ -80,7 +80,7 @@ public class VertexMergeTest {
 		g = tx.traversal();
 		System.setProperty("AJSC_HOME", ".");
 		System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");
-//		QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"), "src/test/resources/org/openecomp/aai/introspection/");
+		QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"), "src/test/resources/org/openecomp/aai/introspection/");
 		loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
 		dbEngine = new TitanDBEngine(
 				queryStyle,
@@ -166,7 +166,7 @@ public class VertexMergeTest {
 	}
 	@AfterClass
 	public static void cleanUp() {
-		tx.rollback();
+		tx.tx().rollback();
 		graph.close();
 	}
 

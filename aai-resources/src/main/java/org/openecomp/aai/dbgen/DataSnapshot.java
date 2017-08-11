@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.tinkerpop.gremlin.structure.io.IoCore;
@@ -41,7 +40,6 @@ import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanVertex;
 import com.thinkaurelius.titan.core.util.TitanCleanup;
 
 public class DataSnapshot {
@@ -199,12 +197,7 @@ public class DataSnapshot {
 				graph.tx().commit();
 				System.out.println("Completed reloading Titan 0.5 data.");
 
-				int vCount = 0;
-				Iterator<TitanVertex> vIt = graph.query().vertices().iterator();
-				while (vIt.hasNext()) {
-					vCount++;
-					vIt.next();
-				}
+				long vCount = graph.traversal().V().count().next();
 				System.out.println("A little after repopulating from an old snapshot, we see: " + vCount + " vertices in the db.");
 			} else if (command.equals("RELOAD_DATA")) {
 				// -------------------------------------------------------------------
@@ -238,12 +231,8 @@ public class DataSnapshot {
 				graph.tx().commit();
 				System.out.println("Completed reloading data.");
 
-				int vCount = 0;
-				Iterator<TitanVertex> vIt = graph.query().vertices().iterator();
-				while (vIt.hasNext()) {
-					vCount++;
-					vIt.next();
-				}
+				long vCount = graph.traversal().V().count().next();
+				
 				System.out.println("A little after repopulating from an old snapshot, we see: " + vCount + " vertices in the db.");
 			} else {
 				String emsg = "Bad command passed to DataSnapshot: [" + command + "]";
