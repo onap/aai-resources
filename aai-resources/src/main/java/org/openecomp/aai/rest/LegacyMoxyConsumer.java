@@ -68,7 +68,6 @@ import org.openecomp.aai.workarounds.RemoveDME2QueryParams;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.google.common.base.Joiner;
-import com.thinkaurelius.titan.core.TitanTransaction;
 
 
 /**
@@ -128,7 +127,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		Response response = null;
 		Loader loader = null;
 		TransactionalGraphEngine dbEngine = null;
-		TitanTransaction g = null;
 		boolean success = true;
 
    	 	try {
@@ -242,7 +240,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
-		TitanTransaction g = null;
 		Loader loader = null;
 		
 		try {
@@ -331,7 +328,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		Response response = Response.status(404)
 				.type(outputMediaType).build();
 				
-		TitanTransaction g = null;
 		boolean success = true;
 
 		try {
@@ -408,7 +404,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		Response response = Response.status(404)
 				.type(outputMediaType).build();
 	
-		TitanTransaction g = null;
 		boolean success = true;
 
 		try {
@@ -523,7 +518,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
-		TitanTransaction g = null;
 		Boolean success = true;
 		
 		try {

@@ -39,9 +39,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.javatuples.Pair;
-
 import org.openecomp.aai.db.props.AAIProperties;
 import org.openecomp.aai.dbmap.DBConnectionType;
 import org.openecomp.aai.domain.responseMessage.AAIResponseMessage;
@@ -66,6 +66,7 @@ import org.openecomp.aai.serialization.engines.QueryStyle;
 import org.openecomp.aai.serialization.engines.TitanDBEngine;
 import org.openecomp.aai.serialization.engines.TransactionalGraphEngine;
 import org.openecomp.aai.serialization.engines.query.QueryEngine;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -73,7 +74,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import com.thinkaurelius.titan.core.TitanException;
-import com.thinkaurelius.titan.core.TitanTransaction;
 
 /**
  * The Class HttpEntry.
@@ -268,7 +268,7 @@ public class HttpEntry {
 								}
 								
 								break;
-							case PUT: 
+							case PUT:
 								if (isNewVertex) {
 									v = serializer.createNewVertex(obj);
 								}
@@ -282,7 +282,7 @@ public class HttpEntry {
 									relatedObjects = this.getRelatedObjects(serializer, queryEngine, v);
 								}
 								notification.createNotificationEvent(transactionId, sourceOfTruth, status, uri, obj, relatedObjects);
-								
+
 								break;
 							case PUT_EDGE:
 								serializer.touchStandardVertexProperties(v, false);
@@ -313,7 +313,6 @@ public class HttpEntry {
 										//if the caller didn't touch the relationship-list, we shouldn't either
 										patchedObj.setValue("relationship-list", null);
 									}
-									serializer.touchStandardVertexProperties(v, false);
 									serializer.serializeToDb(patchedObj, v, query, uri.getRawPath(), requestContext);
 									status = Status.OK;
 									patchedObj = serializer.getLatestVersionView(v);
@@ -471,7 +470,7 @@ public class HttpEntry {
         
         return obj;
 	}
-	
+
 
 	/**
 	 * Creates the not found message.
