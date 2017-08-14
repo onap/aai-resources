@@ -1,5 +1,5 @@
 # OpenECOMP AAI Resources
-
+# 
 ---
 ---
 
