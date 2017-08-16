@@ -227,7 +227,13 @@ public class MigrationControllerInternal {
 	}
 	private Set<Class<? extends Migrator>> findClasses(Reflections reflections) {
 		Set<Class<? extends Migrator>> migratorClasses = reflections.getSubTypesOf(Migrator.class);
+		/*
+		 * TODO- Change this to make sure only classes in the specific $release are added in the runList
+		 * Or add a annotation like exclude which folks again need to remember to add ??
+		 */
+		
 		migratorClasses.remove(PropertyMigrator.class);
+		migratorClasses.remove(EdgeMigrator.class);
 		return migratorClasses;
 	}
 
