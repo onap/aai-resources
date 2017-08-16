@@ -31,7 +31,7 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.openecomp.aai.exceptions.AAIException;
-import org.openecomp.aai.serialization.db.EdgeProperties;
+import org.openecomp.aai.serialization.db.AAIDirection;
 import org.openecomp.aai.serialization.db.EdgeProperty;
 import org.openecomp.aai.util.AAIConfig;
 import org.openecomp.aai.util.AAIConstants;
@@ -537,7 +537,7 @@ public class ForceDeleteTool {
 			}
 			
 			try {
-				Iterator <Vertex> vertI = graph.traversal().V(vtx).union(__.outE().has(EdgeProperties.out(EdgeProperty.IS_PARENT), true).inV(), __.inE().has(EdgeProperties.in(EdgeProperty.IS_PARENT), true).outV());
+				Iterator <Vertex> vertI = graph.traversal().V(vtx).union(__.outE().has(EdgeProperty.CONTAINS.toString(), AAIDirection.OUT.toString()).inV(), __.inE().has(EdgeProperty.CONTAINS.toString(), AAIDirection.IN.toString()).outV());
 				while( vertI != null && vertI.hasNext() ){
 					totalCount++;
 					Vertex childVtx = vertI.next();
