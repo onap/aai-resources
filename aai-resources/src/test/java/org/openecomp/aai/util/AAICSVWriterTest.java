@@ -20,24 +20,19 @@
 
 package org.openecomp.aai.util;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.modules.agent.PowerMockAgent;
 import org.powermock.modules.junit4.rule.PowerMockRule;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AAICSVWriterTest {
 	

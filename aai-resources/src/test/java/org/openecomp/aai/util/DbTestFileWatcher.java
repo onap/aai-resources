@@ -20,8 +20,8 @@
 
 package org.openecomp.aai.util;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.util.TimerTask;
 
 public abstract class DbTestFileWatcher extends TimerTask {
   private long timeStamp;

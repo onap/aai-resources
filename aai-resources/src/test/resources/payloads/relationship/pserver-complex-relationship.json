@@ -1,0 +1,8 @@
+{
+  "related-to" : "complex",
+  "related-link" : "/aai/v11/cloud-infrastructure/complexes/complex/e13d4587-19ad-4bf5-80f5-c021efb5b61c",
+  "relationship-data" : [{
+    "relationship-key" : "complex.physical-location-id",
+    "relationship-value" : "e13d4587-19ad-4bf5-80f5-c021efb5b61c"
+  }]
+}

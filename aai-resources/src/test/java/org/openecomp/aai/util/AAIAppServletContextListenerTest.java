@@ -20,31 +20,28 @@
 
 package org.openecomp.aai.util;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.ServletContextEvent;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.openecomp.aai.dbmap.AAIGraph;
+import org.openecomp.aai.logging.ErrorLogHelper;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.agent.PowerMockAgent;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.slf4j.LoggerFactory;
 
-import org.openecomp.aai.dbmap.AAIGraph;
-import org.openecomp.aai.logging.ErrorLogHelper;
+import javax.servlet.ServletContextEvent;
+import java.util.ArrayList;
+import java.util.List;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.PatternLayout;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.AppenderBase;
+import static org.junit.Assert.assertTrue;
 
 @PrepareForTest({AAIGraph.class, AAIConfig.class, ErrorLogHelper.class})
 public class AAIAppServletContextListenerTest {

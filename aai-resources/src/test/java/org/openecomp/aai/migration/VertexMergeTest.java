@@ -20,26 +20,15 @@
 
 package org.openecomp.aai.migration;
 
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.thinkaurelius.titan.core.Cardinality;
+import com.thinkaurelius.titan.core.TitanFactory;
+import com.thinkaurelius.titan.core.TitanGraph;
+import com.thinkaurelius.titan.core.schema.TitanManagement;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
+import org.openecomp.aai.AAISetup;
 import org.openecomp.aai.db.props.AAIProperties;
 import org.openecomp.aai.dbmap.DBConnectionType;
 import org.openecomp.aai.introspection.Loader;
@@ -51,36 +40,36 @@ import org.openecomp.aai.serialization.db.EdgeRules;
 import org.openecomp.aai.serialization.engines.QueryStyle;
 import org.openecomp.aai.serialization.engines.TitanDBEngine;
 import org.openecomp.aai.serialization.engines.TransactionalGraphEngine;
-import org.openecomp.aai.serialization.queryformats.QueryFormatTestHelper;
-import org.openecomp.aai.util.AAIConstants;
 
-import com.thinkaurelius.titan.core.Cardinality;
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.schema.TitanManagement;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 @Ignore
-public class VertexMergeTest {
+public class VertexMergeTest extends AAISetup {
 	
 	
 	private final static Version version = Version.v10;
 	private final static ModelType introspectorFactoryType = ModelType.MOXY;
 	private final static QueryStyle queryStyle = QueryStyle.TRAVERSAL;
 	private final static DBConnectionType type = DBConnectionType.REALTIME;
-	private static Loader loader;
-	private static TransactionalGraphEngine dbEngine;
-	private static TitanGraph graph;
-	private static EdgeRules rules;
-	private static GraphTraversalSource g;
-	private static Graph tx;
-	@BeforeClass
-	public static void setUp() throws NoSuchFieldException, SecurityException, Exception {
+	private Loader loader;
+	private TransactionalGraphEngine dbEngine;
+	private TitanGraph graph;
+	private EdgeRules rules;
+	private GraphTraversalSource g;
+	private Graph tx;
+
+	@Before
+	public void setUp() throws Exception {
 		graph = TitanFactory.build().set("storage.backend","inmemory").open();
 		tx = graph.newTransaction();
 		g = tx.traversal();
-		System.setProperty("AJSC_HOME", ".");
-		System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");
-		QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"), "src/test/resources/org/openecomp/aai/introspection/");
 		loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
 		dbEngine = new TitanDBEngine(
 				queryStyle,
@@ -164,8 +153,9 @@ public class VertexMergeTest {
 		VertexMerge merge = new VertexMerge.Builder(loader, spy, serializer).build();
 		merge.performMerge(pserverCanopi, pserverSkeleton, forceCopy);
 	}
-	@AfterClass
-	public static void cleanUp() {
+
+	@After
+	public void cleanUp() {
 		tx.tx().rollback();
 		graph.close();
 	}

@@ -20,34 +20,27 @@
 
 package org.openecomp.aai.schema.db;
 
-import java.io.IOException;
-import java.util.Set;
-
+import com.thinkaurelius.titan.core.TitanFactory;
+import com.thinkaurelius.titan.core.TitanGraph;
+import com.thinkaurelius.titan.core.schema.TitanManagement;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
+import org.openecomp.aai.AAISetup;
 import org.openecomp.aai.db.schema.DBIndex;
 import org.openecomp.aai.db.schema.ManageTitanSchema;
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.schema.TitanManagement;
+
+import java.io.IOException;
+import java.util.Set;
 
 @Ignore("not ready yet")
-public class ManageSchemaTest {
+public class ManageSchemaTest extends AAISetup {
 
 	private TitanGraph graph = null;
-	@BeforeClass
-	public static void before() {
-		System.setProperty("AJSC_HOME", ".");
-		System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");
-	
-	}
-	
+
 	@Before
 	public void beforeTest() {
 		//graph = TitanFactory.open("src/test/resources/inmemory_titan.properties");

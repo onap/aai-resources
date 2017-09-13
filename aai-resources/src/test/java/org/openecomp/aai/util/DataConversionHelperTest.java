@@ -20,12 +20,12 @@
 
 package org.openecomp.aai.util;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.powermock.modules.agent.PowerMockAgent;
 import org.powermock.modules.junit4.rule.PowerMockRule;
+
+import static org.junit.Assert.assertEquals;
 
 public class DataConversionHelperTest {	
 	

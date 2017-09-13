@@ -1,0 +1,16 @@
+{
+  "physical-location-id" : "e13d4587-19ad-4bf5-80f5-c021efb5b61c",
+  "physical-location-type" : "uug",
+  "street1" : "kDv5Ge6dr",
+  "city" : "KpEa5IjqY0u82",
+  "postal-code" : "6CRqacfEW2",
+  "country" : "P0ho",
+  "region" : "Sk2QevPYRBjT",
+  "ctag-pools" : {
+    "ctag-pool" : [ {
+      "target-pe" : "5dbe73c6-cedf-4e68-a7c5-699ba6d90e1d",
+      "availability-zone-name" : "819ec2fa-fb9f-49f0-8fd8-5feb941aad1f",
+      "ctag-pool-purpose" : "4TMeWI"
+    } ]
+  }
+}

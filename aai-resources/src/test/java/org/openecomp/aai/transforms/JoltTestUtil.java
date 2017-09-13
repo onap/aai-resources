@@ -21,13 +21,12 @@
 package org.openecomp.aai.transforms;
 
 
-import java.io.IOException;
-
-import org.junit.Assert;
-
 import com.bazaarvoice.jolt.ArrayOrderObliviousDiffy;
 import com.bazaarvoice.jolt.Diffy;
 import com.bazaarvoice.jolt.JsonUtils;
+import org.junit.Assert;
+
+import java.io.IOException;
 
 public class JoltTestUtil {
 

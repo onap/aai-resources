@@ -20,16 +20,15 @@
 
 package org.openecomp.aai.rest.util;
 
-import static org.junit.Assert.*;
-
-import java.io.UnsupportedEncodingException;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import java.io.UnsupportedEncodingException;
 
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.junit.Assert.assertEquals;
 
 public class ValidateEncodingTest {
 

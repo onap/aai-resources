@@ -19,7 +19,7 @@
   ============LICENSE_END=========================================================
   -->
 
-<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm" package-name="inventory.aai.openecomp.org.v10" xml-mapping-metadata-complete="true">
+<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm" package-name="inventory.aai.onap.org.v10" xml-mapping-metadata-complete="true">
 	<xml-schema element-form-default="QUALIFIED">
 		<xml-ns namespace-uri="http://org.openecomp.aai.inventory/v10" />
 	</xml-schema>
@@ -27,14 +27,15 @@
 		<java-type name="Inventory">
 			<xml-root-element name="inventory" />
 			<java-attributes>
-				<xml-element java-attribute="search" name="search" type="inventory.aai.openecomp.org.v10.Search" />
-				<xml-element java-attribute="actions" name="actions" type="inventory.aai.openecomp.org.v10.Actions" />
-				<xml-element java-attribute="cloudInfrastructure" name="cloud-infrastructure" type="inventory.aai.openecomp.org.v10.CloudInfrastructure" />
-				<xml-element java-attribute="business" name="business" type="inventory.aai.openecomp.org.v10.Business" />
-				<xml-element java-attribute="serviceDesignAndCreation" name="service-design-and-creation" type="inventory.aai.openecomp.org.v10.ServiceDesignAndCreation" />
-				<xml-element java-attribute="network" name="network" type="inventory.aai.openecomp.org.v10.Network" />
-				<xml-element java-attribute="aaiInternal" name="aai-internal" type="inventory.aai.openecomp.org.v10.AaiInternal" />
-				<xml-element java-attribute="nodes" name="nodes" type="inventory.aai.openecomp.org.v10.Nodes"/>
+				<xml-element java-attribute="search" name="search" type="inventory.aai.onap.org.v10.Search" />
+				<xml-element java-attribute="actions" name="actions" type="inventory.aai.onap.org.v10.Actions" />
+				<xml-element java-attribute="cloudInfrastructure" name="cloud-infrastructure" type="inventory.aai.onap.org.v10.CloudInfrastructure" />
+				<xml-element java-attribute="licenseManagement" name="license-management" type="inventory.aai.onap.org.v10.LicenseManagement" />
+				<xml-element java-attribute="business" name="business" type="inventory.aai.onap.org.v10.Business" />
+				<xml-element java-attribute="serviceDesignAndCreation" name="service-design-and-creation" type="inventory.aai.onap.org.v10.ServiceDesignAndCreation" />
+				<xml-element java-attribute="network" name="network" type="inventory.aai.onap.org.v10.Network" />
+				<xml-element java-attribute="aaiInternal" name="aai-internal" type="inventory.aai.onap.org.v10.AaiInternal" />
+				<xml-element java-attribute="nodes" name="nodes" type="inventory.aai.onap.org.v10.Nodes"/>
 			</java-attributes>
 		</java-type>
 
@@ -44,24 +45,24 @@
 		<java-type name="Search">
 			<xml-root-element name="search" />
 			<java-attributes>
-				<xml-element java-attribute="edgeTagQueryResult" name="edge-tag-query-result" type="inventory.aai.openecomp.org.v10.EdgeTagQueryResult" />
-				<xml-element java-attribute="edgeTagQueryRequest" name="edge-tag-query-request" type="inventory.aai.openecomp.org.v10.EdgeTagQueryRequest" />
-				<xml-element java-attribute="searchResults" name="search-results" type="inventory.aai.openecomp.org.v10.SearchResults" />
-				<xml-element java-attribute="sdnZoneResponse" name="sdn-zone-response" type="inventory.aai.openecomp.org.v10.SdnZoneResponse" />
+				<xml-element java-attribute="edgeTagQueryResult" name="edge-tag-query-result" type="inventory.aai.onap.org.v10.EdgeTagQueryResult" />
+				<xml-element java-attribute="edgeTagQueryRequest" name="edge-tag-query-request" type="inventory.aai.onap.org.v10.EdgeTagQueryRequest" />
+				<xml-element java-attribute="searchResults" name="search-results" type="inventory.aai.onap.org.v10.SearchResults" />
+				<xml-element java-attribute="sdnZoneResponse" name="sdn-zone-response" type="inventory.aai.onap.org.v10.SdnZoneResponse" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="EdgeTagQueryResult">
 			<xml-root-element name="edge-tag-query-result" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="taggedInventoryItemList" name="tagged-inventory-item-list" type="inventory.aai.openecomp.org.v10.TaggedInventoryItemList" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="taggedInventoryItemList" name="tagged-inventory-item-list" type="inventory.aai.onap.org.v10.TaggedInventoryItemList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="TaggedInventoryItemList">
 			<xml-root-element name="tagged-inventory-item-list" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="inventoryItem" name="inventory-item" type="inventory.aai.openecomp.org.v10.InventoryItem" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="inventoryItem" name="inventory-item" type="inventory.aai.onap.org.v10.InventoryItem" />
 			</java-attributes>
 		</java-type>
 
@@ -70,8 +71,8 @@
 			<java-attributes>
 				<xml-element java-attribute="inventoryItemType" name="inventory-item-type" type="java.lang.String" />
 				<xml-element java-attribute="inventoryItemLink" name="inventory-item-link" type="java.lang.String" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="inventoryItemData" name="inventory-item-data" type="inventory.aai.openecomp.org.v10.InventoryItemData" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="taggedInventoryItemList" name="tagged-inventory-item-list" type="inventory.aai.openecomp.org.v10.TaggedInventoryItemList" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="inventoryItemData" name="inventory-item-data" type="inventory.aai.onap.org.v10.InventoryItemData" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="taggedInventoryItemList" name="tagged-inventory-item-list" type="inventory.aai.onap.org.v10.TaggedInventoryItemList" />
 			</java-attributes>
 		</java-type>
 
@@ -89,9 +90,9 @@
 				<xml-element java-attribute="edgeTag" name="edge-tag" type="java.lang.String" />
 				<xml-element java-attribute="resultDetail" name="result-detail" type="java.lang.String" />
 				<xml-element java-attribute="startNodeType" name="start-node-type" type="java.lang.String" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="startNodeFilter" name="start-node-filter" type="inventory.aai.openecomp.org.v10.StartNodeFilter" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="includeNodeFilter" name="include-node-filter" type="inventory.aai.openecomp.org.v10.IncludeNodeFilter" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="secondaryFilter" name="secondary-filter" type="inventory.aai.openecomp.org.v10.SecondaryFilter" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="startNodeFilter" name="start-node-filter" type="inventory.aai.onap.org.v10.StartNodeFilter" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="includeNodeFilter" name="include-node-filter" type="inventory.aai.onap.org.v10.IncludeNodeFilter" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="secondaryFilter" name="secondary-filter" type="inventory.aai.onap.org.v10.SecondaryFilter" />
 			</java-attributes>
 		</java-type>
 
@@ -122,7 +123,7 @@
 		<java-type name="SearchResults">
 			<xml-root-element name="search-results" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="resultData" name="result-data" type="inventory.aai.openecomp.org.v10.ResultData" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="resultData" name="result-data" type="inventory.aai.onap.org.v10.ResultData" />
 			</java-attributes>
 		</java-type>
 
@@ -145,16 +146,16 @@
 		<java-type name="SdnZoneResponse">
 			<xml-root-element name="sdn-zone-response" />
 			<java-attributes>
-				<xml-element java-attribute="oamNetworks" name="oam-networks" type="inventory.aai.openecomp.org.v10.OamNetworks" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="azAndDvsSwitches" name="az-and-dvs-switches" type="inventory.aai.openecomp.org.v10.AzAndDvsSwitches" />
+				<xml-element java-attribute="oamNetworks" name="oam-networks" type="inventory.aai.onap.org.v10.OamNetworks" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="azAndDvsSwitches" name="az-and-dvs-switches" type="inventory.aai.onap.org.v10.AzAndDvsSwitches" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="AzAndDvsSwitches">
 			<xml-root-element name="az-and-dvs-switches" />
 			<java-attributes>
-				<xml-element java-attribute="dvsSwitches" name="dvs-switches" type="inventory.aai.openecomp.org.v10.DvsSwitches" />
-				<xml-element java-attribute="availabilityZone" name="availability-zone" type="inventory.aai.openecomp.org.v10.AvailabilityZone" />
+				<xml-element java-attribute="dvsSwitches" name="dvs-switches" type="inventory.aai.onap.org.v10.DvsSwitches" />
+				<xml-element java-attribute="availabilityZone" name="availability-zone" type="inventory.aai.onap.org.v10.AvailabilityZone" />
 			</java-attributes>
 		</java-type>
 
@@ -164,8 +165,8 @@
 			</xml-properties>
 			<xml-root-element name="actions" />
 			<java-attributes>
-				<xml-element java-attribute="update" name="update" type="inventory.aai.openecomp.org.v10.Update" />
-				<xml-element java-attribute="notify" name="notify" type="inventory.aai.openecomp.org.v10.Notify" />
+				<xml-element java-attribute="update" name="update" type="inventory.aai.onap.org.v10.Update" />
+				<xml-element java-attribute="notify" name="notify" type="inventory.aai.onap.org.v10.Notify" />
 			</java-attributes>
 		</java-type>
 
@@ -176,9 +177,9 @@
 			<xml-root-element name="update" />
 			<java-attributes>
 				<xml-element java-attribute="updateNodeType" name="update-node-type" required="true" type="java.lang.String" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="updateNodeKey" name="update-node-key" type="inventory.aai.openecomp.org.v10.UpdateNodeKey" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="updateNodeKey" name="update-node-key" type="inventory.aai.onap.org.v10.UpdateNodeKey" />
 				<xml-element java-attribute="updateNodeUri" name="update-node-uri" type="java.lang.String" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="action" name="action" type="inventory.aai.openecomp.org.v10.Action" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="action" name="action" type="inventory.aai.onap.org.v10.Action" />
 			</java-attributes>
 		</java-type>
 
@@ -186,7 +187,7 @@
 			<xml-root-element name="action" />
 			<java-attributes>
 				<xml-element java-attribute="actionType" name="action-type" type="java.lang.String" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="actionData" name="action-data" type="inventory.aai.openecomp.org.v10.ActionData" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="actionData" name="action-data" type="inventory.aai.onap.org.v10.ActionData" />
 			</java-attributes>
 		</java-type>
 
@@ -212,7 +213,7 @@
 				<xml-element java-attribute="eventId" name="event-id" required="true" type="java.lang.String" />
 				<xml-element java-attribute="nodeType" name="node-type" type="java.lang.String" />
 				<xml-element java-attribute="eventTrigger" name="event-trigger" type="java.lang.String" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="keyData" name="key-data" type="inventory.aai.openecomp.org.v10.KeyData" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="keyData" name="key-data" type="inventory.aai.onap.org.v10.KeyData" />
 				<xml-element java-attribute="selflink" name="selflink" type="java.lang.String" />
 			</java-attributes>
 		</java-type>
@@ -231,18 +232,18 @@
 			</xml-properties>
 			<xml-root-element name="cloud-infrastructure" />
 			<java-attributes>
-				<xml-element java-attribute="complexes" name="complexes" type="inventory.aai.openecomp.org.v10.Complexes" />
-				<xml-element java-attribute="cloudRegions" name="cloud-regions" type="inventory.aai.openecomp.org.v10.CloudRegions" />
-				<xml-element java-attribute="networkProfiles" name="network-profiles" type="inventory.aai.openecomp.org.v10.NetworkProfiles" />
-				<xml-element java-attribute="pservers" name="pservers" type="inventory.aai.openecomp.org.v10.Pservers" />
-				<xml-element java-attribute="virtualDataCenters" name="virtual-data-centers" type="inventory.aai.openecomp.org.v10.VirtualDataCenters" />
+				<xml-element java-attribute="complexes" name="complexes" type="inventory.aai.onap.org.v10.Complexes" />
+				<xml-element java-attribute="cloudRegions" name="cloud-regions" type="inventory.aai.onap.org.v10.CloudRegions" />
+				<xml-element java-attribute="networkProfiles" name="network-profiles" type="inventory.aai.onap.org.v10.NetworkProfiles" />
+				<xml-element java-attribute="pservers" name="pservers" type="inventory.aai.onap.org.v10.Pservers" />
+				<xml-element java-attribute="virtualDataCenters" name="virtual-data-centers" type="inventory.aai.onap.org.v10.VirtualDataCenters" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="CloudRegions">
 			<xml-root-element name="cloud-regions" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="cloudRegion" name="cloud-region" type="inventory.aai.openecomp.org.v10.CloudRegion" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="cloudRegion" name="cloud-region" type="inventory.aai.onap.org.v10.CloudRegion" />
 			</java-attributes>
             <xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -254,7 +255,7 @@
 			<java-attributes>
 				<xml-element java-attribute="cloudOwner" name="cloud-owner" required="true" type="java.lang.String" xml-key="true">
 					<xml-properties>
-						<xml-property name="description" value="Identifies the vendor and cloud name. First part of composite key should be formatted as vendor-cloudname" />
+						<xml-property name="description" value="Identifies the vendor and cloud name, e.g., att-aic. First part of composite key should be formatted as vendor-cloudname" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="cloudRegionId" name="cloud-region-id" required="true" type="java.lang.String" xml-key="true">
@@ -297,19 +298,19 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="volumeGroups" name="volume-groups" type="inventory.aai.openecomp.org.v10.VolumeGroups" />
-				<xml-element java-attribute="tenants" name="tenants" type="inventory.aai.openecomp.org.v10.Tenants" />
-				<xml-element java-attribute="flavors" name="flavors" type="inventory.aai.openecomp.org.v10.Flavors" />
-				<xml-element java-attribute="groupAssignments" name="group-assignments" type="inventory.aai.openecomp.org.v10.GroupAssignments" />
-				<xml-element java-attribute="snapshots" name="snapshots" type="inventory.aai.openecomp.org.v10.Snapshots" />
-				<xml-element java-attribute="images" name="images" type="inventory.aai.openecomp.org.v10.Images" />
-				<xml-element java-attribute="dvsSwitches" name="dvs-switches" type="inventory.aai.openecomp.org.v10.DvsSwitches" />
-				<xml-element java-attribute="oamNetworks" name="oam-networks" type="inventory.aai.openecomp.org.v10.OamNetworks" />
-				<xml-element java-attribute="availabilityZones" name="availability-zones" type="inventory.aai.openecomp.org.v10.AvailabilityZones" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="volumeGroups" name="volume-groups" type="inventory.aai.onap.org.v10.VolumeGroups" />
+				<xml-element java-attribute="tenants" name="tenants" type="inventory.aai.onap.org.v10.Tenants" />
+				<xml-element java-attribute="flavors" name="flavors" type="inventory.aai.onap.org.v10.Flavors" />
+				<xml-element java-attribute="groupAssignments" name="group-assignments" type="inventory.aai.onap.org.v10.GroupAssignments" />
+				<xml-element java-attribute="snapshots" name="snapshots" type="inventory.aai.onap.org.v10.Snapshots" />
+				<xml-element java-attribute="images" name="images" type="inventory.aai.onap.org.v10.Images" />
+				<xml-element java-attribute="dvsSwitches" name="dvs-switches" type="inventory.aai.onap.org.v10.DvsSwitches" />
+				<xml-element java-attribute="oamNetworks" name="oam-networks" type="inventory.aai.onap.org.v10.OamNetworks" />
+				<xml-element java-attribute="availabilityZones" name="availability-zones" type="inventory.aai.onap.org.v10.AvailabilityZones" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
-				<xml-property name="description" value="cloud-region designates an installation of a cloud cluster or region or instantiation." />
+				<xml-property name="description" value="cloud-region designates an installation of a cloud cluster or region or instantiation. In AT&amp;Ts AIC cloud, this could be an LCP or DCP. Cloud regions are uniquely identified by a composite key, cloud-owner + cloud-region-id. The format of the cloud-owner is vendor-cloudname and we will use att-aic for AT&amp;T's AIC." />
 				<xml-property name="indexedProps" value="cloud-owner,cloud-region-id,cloud-type,owner-defined-type" />
 				<xml-property name="nameProps" value="owner-defined-type" />
 				<xml-property name="container" value="cloud-regions" />
@@ -322,7 +323,7 @@
 			</xml-properties>
 			<xml-root-element name="volume-groups" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="volumeGroup" name="volume-group" type="inventory.aai.openecomp.org.v10.VolumeGroup" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="volumeGroup" name="volume-group" type="inventory.aai.onap.org.v10.VolumeGroup" />
 			</java-attributes>
 		</java-type>
 
@@ -369,7 +370,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Persistent block-level storage." />
@@ -383,7 +384,7 @@
 		<java-type name="RelationshipList">
 			<xml-root-element name="relationship-list" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="relationship" name="relationship" type="inventory.aai.openecomp.org.v10.Relationship" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="relationship" name="relationship" type="inventory.aai.onap.org.v10.Relationship" />
 			</java-attributes>
 		</java-type>
 
@@ -400,8 +401,8 @@
 						<xml-property name="description" value="URL to the object in A&amp;AI." />
 					</xml-properties>
 				</xml-element>
-				<xml-element container-type="java.util.ArrayList" java-attribute="relationshipData" name="relationship-data" type="inventory.aai.openecomp.org.v10.RelationshipData" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="relatedToProperty" name="related-to-property" type="inventory.aai.openecomp.org.v10.RelatedToProperty" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="relationshipData" name="relationship-data" type="inventory.aai.onap.org.v10.RelationshipData" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="relatedToProperty" name="related-to-property" type="inventory.aai.onap.org.v10.RelatedToProperty" />
 			</java-attributes>
 		</java-type>
 
@@ -443,7 +444,7 @@
 			</xml-properties>
 			<xml-root-element name="complexes" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="complex" name="complex" type="inventory.aai.openecomp.org.v10.Complex" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="complex" name="complex" type="inventory.aai.onap.org.v10.Complex" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -494,8 +495,8 @@
 				<xml-element java-attribute="longitude" name="longitude" type="java.lang.String" />
 				<xml-element java-attribute="elevation" name="elevation" type="java.lang.String" />
 				<xml-element java-attribute="lata" name="lata" type="java.lang.String" />
-				<xml-element java-attribute="ctagPools" name="ctag-pools" type="inventory.aai.openecomp.org.v10.CtagPools" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="ctagPools" name="ctag-pools" type="inventory.aai.onap.org.v10.CtagPools" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Collection of physical locations that can house cloud-regions." />
@@ -510,7 +511,7 @@
 		<java-type name="CtagPools">
 			<xml-root-element name="ctag-pools" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="ctagPool" name="ctag-pool" type="inventory.aai.openecomp.org.v10.CtagPool" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="ctagPool" name="ctag-pool" type="inventory.aai.onap.org.v10.CtagPool" />
 			</java-attributes>
 		</java-type>
 
@@ -542,7 +543,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="A collection of C tags (vlan tags) grouped for a specific purpose." />
@@ -558,7 +559,7 @@
 			</xml-properties>
 			<xml-root-element name="tenants" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="tenant" name="tenant" type="inventory.aai.openecomp.org.v10.Tenant" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="tenant" name="tenant" type="inventory.aai.onap.org.v10.Tenant" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -583,8 +584,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="vservers" name="vservers" type="inventory.aai.openecomp.org.v10.Vservers" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="vservers" name="vservers" type="inventory.aai.onap.org.v10.Vservers" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Openstack tenant" />
@@ -602,7 +603,7 @@
 			</xml-properties>
 			<xml-root-element name="vservers" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vserver" name="vserver" type="inventory.aai.openecomp.org.v10.Vserver" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vserver" name="vserver" type="inventory.aai.onap.org.v10.Vserver" />
 			</java-attributes>
 		</java-type>
 
@@ -651,9 +652,9 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="volumes" name="volumes" type="inventory.aai.openecomp.org.v10.Volumes" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.openecomp.org.v10.LInterfaces" />
+				<xml-element java-attribute="volumes" name="volumes" type="inventory.aai.onap.org.v10.Volumes" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.onap.org.v10.LInterfaces" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Virtual Servers, aka virtual machine or VM." />
@@ -671,7 +672,7 @@
 			</xml-properties>
 			<xml-root-element name="l-interfaces" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="lInterface" name="l-interface" type="inventory.aai.openecomp.org.v10.LInterface" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="lInterface" name="l-interface" type="inventory.aai.onap.org.v10.LInterface" />
 			</java-attributes>
 		</java-type>
 
@@ -740,12 +741,12 @@
 						<xml-property name="description" value="used to indicate whether or not this object is in maintenance mode (maintenance mode = true)" />
 					</xml-properties>
 				</xml-element>				
-				<xml-element java-attribute="vlans" name="vlans" type="inventory.aai.openecomp.org.v10.Vlans" />
-				<xml-element java-attribute="sriovVfs" name="sriov-vfs" type="inventory.aai.openecomp.org.v10.SriovVfs" />
-				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.openecomp.org.v10.LInterfaces" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv4AddressList" name="l3-interface-ipv4-address-list" type="inventory.aai.openecomp.org.v10.L3InterfaceIpv4AddressList" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv6AddressList" name="l3-interface-ipv6-address-list" type="inventory.aai.openecomp.org.v10.L3InterfaceIpv6AddressList" />
+				<xml-element java-attribute="vlans" name="vlans" type="inventory.aai.onap.org.v10.Vlans" />
+				<xml-element java-attribute="sriovVfs" name="sriov-vfs" type="inventory.aai.onap.org.v10.SriovVfs" />
+				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.onap.org.v10.LInterfaces" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv4AddressList" name="l3-interface-ipv4-address-list" type="inventory.aai.onap.org.v10.L3InterfaceIpv4AddressList" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv6AddressList" name="l3-interface-ipv6-address-list" type="inventory.aai.onap.org.v10.L3InterfaceIpv6AddressList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Logical interfaces, e.g., a vnic." />
@@ -761,7 +762,7 @@
 			</xml-properties>
 			<xml-root-element name="sriov-vfs" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="sriovVf" name="sriov-vf" type="inventory.aai.openecomp.org.v10.SriovVf" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="sriovVf" name="sriov-vf" type="inventory.aai.onap.org.v10.SriovVf" />
 			</java-attributes>
 		</java-type>
 		<java-type name="SriovVf">
@@ -837,7 +838,7 @@
 						<xml-property name="description" value="Neutron network id of the interface" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="SR-IOV Virtual Function (not to be confused with virtual network function)" />
@@ -890,7 +891,7 @@
 						<xml-property name="description" value="Neutron id of subnet that address belongs to" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="IPv4 Address Range" />
@@ -902,7 +903,7 @@
 		<java-type name="Vlans">
 			<xml-root-element name="vlans" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vlan" name="vlan" type="inventory.aai.openecomp.org.v10.Vlan" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vlan" name="vlan" type="inventory.aai.onap.org.v10.Vlan" />
 			</java-attributes>
 		</java-type>
 
@@ -949,7 +950,7 @@
 						<xml-property name="description" value="Whether customer is going to use this VLAN for backdoor connection to another customer premise device." />
 					</xml-properties>
 				</xml-element>					
-				<xml-element java-attribute="vpnId" name="vpn-id" type="java.lang.String">
+				<xml-element java-attribute="vpnKey" name="vpn-key" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="This indicates the customers VPN ID associated with this vlan" />
 					</xml-properties>
@@ -965,14 +966,13 @@
 						<xml-property name="description" value="used to indicate whether or not this object is in maintenance mode (maintenance mode = true)" />
 					</xml-properties>
 				</xml-element>			
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv4AddressList" name="l3-interface-ipv4-address-list" type="inventory.aai.openecomp.org.v10.L3InterfaceIpv4AddressList" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv6AddressList" name="l3-interface-ipv6-address-list" type="inventory.aai.openecomp.org.v10.L3InterfaceIpv6AddressList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv4AddressList" name="l3-interface-ipv4-address-list" type="inventory.aai.onap.org.v10.L3InterfaceIpv4AddressList" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="l3InterfaceIpv6AddressList" name="l3-interface-ipv6-address-list" type="inventory.aai.onap.org.v10.L3InterfaceIpv6AddressList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Definition of vlan" />
-				<xml-property name="indexedProps" value="vlan-interface,vlan-id-inner,vpn-id" />
-				<xml-property name="uniqueProps" value="vpn-id" />
+				<xml-property name="indexedProps" value="vlan-interface,vlan-id-inner,vpn-key" />
 				<xml-property name="dependentOn" value="l-interface" />
 				<xml-property name="container" value="vlans" />
 			</xml-properties>
@@ -1021,7 +1021,7 @@
 						<xml-property name="description" value="Neutron id of subnet that address belongs to" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="IPv6 Address Range" />
@@ -1036,7 +1036,7 @@
 			</xml-properties>
 			<xml-root-element name="volumes" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="volume" name="volume" type="inventory.aai.openecomp.org.v10.Volume" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="volume" name="volume" type="inventory.aai.onap.org.v10.Volume" />
 			</java-attributes>
 		</java-type>
 
@@ -1058,7 +1058,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Ephemeral Block storage volume." />
@@ -1074,7 +1074,7 @@
 			</xml-properties>
 			<xml-root-element name="flavors" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="flavor" name="flavor" type="inventory.aai.openecomp.org.v10.Flavor" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="flavor" name="flavor" type="inventory.aai.onap.org.v10.Flavor" />
 			</java-attributes>
 		</java-type>
 
@@ -1136,7 +1136,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Openstack flavor." />
@@ -1153,7 +1153,7 @@
 			</xml-properties>
 			<xml-root-element name="snapshots" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="snapshot" name="snapshot" type="inventory.aai.openecomp.org.v10.Snapshot" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="snapshot" name="snapshot" type="inventory.aai.onap.org.v10.Snapshot" />
 			</java-attributes>		
 		</java-type>
 		
@@ -1215,7 +1215,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />				
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Openstack snapshot" />
@@ -1233,7 +1233,7 @@
 			</xml-properties>
 			<xml-root-element name="group-assignments" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="groupAssignment" name="group-assignment" type="inventory.aai.openecomp.org.v10.GroupAssignment" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="groupAssignment" name="group-assignment" type="inventory.aai.onap.org.v10.GroupAssignment" />
 			</java-attributes>
 		</java-type>
 		
@@ -1265,12 +1265,13 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>		
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Openstack group-assignment used to store exclusivity groups (EG)." />
 				<xml-property name="nameProps" value="group-name" />
 				<xml-property name="indexedProps" value="group-id,group-type,group-name" />
+				<xml-property name="searchable" value="group-id,group-name"/>
 				<xml-property name="dependentOn" value="cloud-region" />
 				<xml-property name="container" value="group-assignments" />
 			</xml-properties>
@@ -1282,7 +1283,7 @@
 			</xml-properties>
 			<xml-root-element name="images" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="image" name="image" type="inventory.aai.openecomp.org.v10.Image" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="image" name="image" type="inventory.aai.onap.org.v10.Image" />
 			</java-attributes>
 		</java-type>
 
@@ -1339,8 +1340,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.openecomp.org.v10.Metadata" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.onap.org.v10.Metadata" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Openstack image." />
@@ -1357,7 +1358,7 @@
 			</xml-properties>
 			<xml-root-element name="metadata" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="metadatum" name="metadatum" type="inventory.aai.openecomp.org.v10.Metadatum" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="metadatum" name="metadatum" type="inventory.aai.onap.org.v10.Metadatum" />
 			</java-attributes>
 		</java-type>
 
@@ -1386,7 +1387,7 @@
 			</xml-properties>
 			<xml-root-element name="dvs-switches" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="dvsSwitch" name="dvs-switch" type="inventory.aai.openecomp.org.v10.DvsSwitch" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="dvsSwitch" name="dvs-switch" type="inventory.aai.onap.org.v10.DvsSwitch" />
 			</java-attributes>
 		</java-type>
 
@@ -1408,7 +1409,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Digital virtual switch metadata, used by SDN-C to configure VCEs.  A&amp;AI needs to receive this data from the PO deployment team and administer it using the provisioningTool.sh into A&amp;AI. " />
@@ -1424,7 +1425,7 @@
 			</xml-properties>
 			<xml-root-element name="network-profiles" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="networkProfile" name="network-profile" type="inventory.aai.openecomp.org.v10.NetworkProfile" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="networkProfile" name="network-profile" type="inventory.aai.onap.org.v10.NetworkProfile" />
 			</java-attributes>
 		</java-type>
 
@@ -1446,7 +1447,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Network profile populated by SDN-GP for SNMP" />
@@ -1462,7 +1463,7 @@
 			</xml-properties>
 			<xml-root-element name="pservers" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="pserver" name="pserver" type="inventory.aai.openecomp.org.v10.Pserver" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="pserver" name="pserver" type="inventory.aai.onap.org.v10.Pserver" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -1598,9 +1599,9 @@
 						<xml-property name="description" value="Prov Status of this device (not under canopi control) Valid values [PREPROV/NVTPROV/PROV]" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="pInterfaces" name="p-interfaces" type="inventory.aai.openecomp.org.v10.PInterfaces" />
-				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.openecomp.org.v10.LagInterfaces" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="pInterfaces" name="p-interfaces" type="inventory.aai.onap.org.v10.PInterfaces" />
+				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.onap.org.v10.LagInterfaces" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Compute host whose hostname must be unique and must exactly match what is sent as a relationship to a vserver." />
@@ -1618,7 +1619,7 @@
 			</xml-properties>
 			<xml-root-element name="p-interfaces" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="pInterface" name="p-interface" type="inventory.aai.openecomp.org.v10.PInterface" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="pInterface" name="p-interface" type="inventory.aai.onap.org.v10.PInterface" />
 			</java-attributes>
 		</java-type>
 
@@ -1676,8 +1677,8 @@
 						<xml-property name="description" value="used to indicate whether or not this object is in maintenance mode (maintenance mode = true)" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.openecomp.org.v10.LInterfaces" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.onap.org.v10.LInterfaces" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Physical interface (e.g., nic)" />
@@ -1694,7 +1695,7 @@
 			</xml-properties>
 			<xml-root-element name="lag-interfaces" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="lagInterface" name="lag-interface" type="inventory.aai.openecomp.org.v10.LagInterface" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="lagInterface" name="lag-interface" type="inventory.aai.onap.org.v10.LagInterface" />
 			</java-attributes>
 		</java-type>
 
@@ -1747,8 +1748,8 @@
 						<xml-property name="description" value="used to indicate whether or not this object is in maintenance mode (maintenance mode = true)" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.openecomp.org.v10.LInterfaces" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.onap.org.v10.LInterfaces" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Link aggregate interface" />
@@ -1764,7 +1765,7 @@
 			</xml-properties>
 			<xml-root-element name="oam-networks" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="oamNetwork" name="oam-network" type="inventory.aai.openecomp.org.v10.OamNetwork" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="oamNetwork" name="oam-network" type="inventory.aai.onap.org.v10.OamNetwork" />
 			</java-attributes>
 		</java-type>
 
@@ -1801,7 +1802,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="OAM network, to be deprecated shortly.  Do not use for new purposes. " />
@@ -1818,7 +1819,7 @@
 			</xml-properties>
 			<xml-root-element name="availability-zones" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="availabilityZone" name="availability-zone" type="inventory.aai.openecomp.org.v10.AvailabilityZone" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="availabilityZone" name="availability-zone" type="inventory.aai.onap.org.v10.AvailabilityZone" />
 			</java-attributes>
 		</java-type>
 
@@ -1835,7 +1836,7 @@
 						<xml-property name="description" value="Type of hypervisor.  Source of truth should define valid values." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="operationalState" name="operational-state" type="java.lang.String">
+				<xml-element java-attribute="operationalStatus" name="operational-status" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="State that indicates whether the availability zone should be used, etc.  Source of truth should define valid values." />
 					</xml-properties>
@@ -1845,7 +1846,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Availability zone, a collection of compute hosts/pservers" />
@@ -1861,7 +1862,7 @@
 			</xml-properties>
 			<xml-root-element name="virtual-data-centers" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="virtualDataCenter" name="virtual-data-center" type="inventory.aai.openecomp.org.v10.VirtualDataCenter" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="virtualDataCenter" name="virtual-data-center" type="inventory.aai.onap.org.v10.VirtualDataCenter" />
 			</java-attributes>
 		</java-type>
 
@@ -1883,7 +1884,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Virtual organization of cloud infrastructure elements in a data center context" />
@@ -1894,8 +1895,50 @@
 			</xml-properties>
 		</java-type>
 
+		<java-type name="LicenseManagement">
+			<xml-root-element name="license-management" />
+			<java-attributes>
+				<xml-element java-attribute="licenseKeyResources" name="license-key-resources" type="inventory.aai.onap.org.v10.LicenseKeyResources" />
+			</java-attributes>
+		</java-type>
 
+		<java-type name="LicenseKeyResources">
+			<xml-root-element name="license-key-resources" />
+			<java-attributes>
+				<xml-element container-type="java.util.ArrayList" java-attribute="licenseKeyResource" name="license-key-resource" type="inventory.aai.onap.org.v10.LicenseKeyResource" />
+			</java-attributes>
+		</java-type>
 
+		<java-type name="LicenseKeyResource">
+			<xml-root-element name="license-key-resource" />
+			<java-attributes>
+				<xml-element java-attribute="attUuid" name="att-uuid" required="true" type="java.lang.String" xml-key="true" />
+				<xml-element java-attribute="assignmentType" name="assignment-type" type="java.lang.String" />
+				<xml-element java-attribute="assignmentStatus" name="assignment-status" type="java.lang.String" />
+				<xml-element java-attribute="assignmentGroupUuid" name="assignment-group-uuid" required="true" type="java.lang.String" />
+				<xml-element java-attribute="assignmentDate" name="assignment-date" type="java.lang.String" />
+				<xml-element java-attribute="name" name="name" type="java.lang.String" />
+				<xml-element java-attribute="modelUuid" name="model-uuid" type="java.lang.String" />
+				<xml-element java-attribute="modelVersion" name="model-version" type="java.lang.String" />
+				<xml-element java-attribute="licenseKey" name="license-key" type="java.lang.String" />
+				<xml-element java-attribute="licenseKeyFileUrl" name="license-key-file-url" type="java.lang.String" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="supplierReleaseList" name="supplier-release-list" type="java.lang.String" />
+				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String">
+					<xml-properties>
+						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
+					</xml-properties>
+				</xml-element>
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+			</java-attributes>
+			<xml-properties>
+				<xml-property name="description" value="OBSOLETE OBJECT:  do not use" />
+				<xml-property name="nameProps" value="name" />
+				<xml-property name="indexedProps" value="assignment-group-uuid,att-uuid,name" />
+				<xml-property name="uniqueProps" value="att-uuid" />
+				<xml-property name="container" value="license-key-resources" />
+				<xml-property name="namespace" value="license-management" />
+			</xml-properties>
+		</java-type>
 
 		<java-type name="Business">
 			<xml-properties>
@@ -1903,8 +1946,8 @@
 			</xml-properties>
 			<xml-root-element name="business" />
 			<java-attributes>
-				<xml-element java-attribute="connectors" name="connectors" type="inventory.aai.openecomp.org.v10.Connectors" />
-				<xml-element java-attribute="customers" name="customers" type="inventory.aai.openecomp.org.v10.Customers" />
+				<xml-element java-attribute="connectors" name="connectors" type="inventory.aai.onap.org.v10.Connectors" />
+				<xml-element java-attribute="customers" name="customers" type="inventory.aai.onap.org.v10.Customers" />
 			</java-attributes>
 		</java-type>
 
@@ -1914,7 +1957,7 @@
 			</xml-properties>
 			<xml-root-element name="connectors" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="connector" name="connector" type="inventory.aai.openecomp.org.v10.Connector" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="connector" name="connector" type="inventory.aai.onap.org.v10.Connector" />
 			</java-attributes>
 		</java-type>
 
@@ -1935,6 +1978,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-version-id" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -1942,6 +1986,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-invariant-id" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -1949,7 +1994,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="internal" />
-						<xml-property name="dataLocation" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
+						<xml-property name="dataCopy" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="widgetModelId" name="widget-model-id" type="java.lang.String">
@@ -1962,8 +2007,8 @@
 						<xml-property name="description" value="the ASDC data dictionary version of the widget model.This maps directly to the A&amp;AI version of the widget." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.openecomp.org.v10.Metadata" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.onap.org.v10.Metadata" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Collection of resource instances used to connect a variety of disparate inventory widgets" />
@@ -1979,7 +2024,7 @@
 			</xml-properties>
 			<xml-root-element name="customers" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="customer" name="customer" type="inventory.aai.openecomp.org.v10.Customer" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="customer" name="customer" type="inventory.aai.onap.org.v10.Customer" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -2010,8 +2055,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="serviceSubscriptions" name="service-subscriptions" type="inventory.aai.openecomp.org.v10.ServiceSubscriptions" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="serviceSubscriptions" name="service-subscriptions" type="inventory.aai.onap.org.v10.ServiceSubscriptions" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="customer identifiers to provide linkage back to BSS information." />
@@ -2030,7 +2075,7 @@
 			</xml-properties>
 			<xml-root-element name="service-subscriptions" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="serviceSubscription" name="service-subscription" type="inventory.aai.openecomp.org.v10.ServiceSubscription" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="serviceSubscription" name="service-subscription" type="inventory.aai.onap.org.v10.ServiceSubscription" />
 			</java-attributes>
 		</java-type>
 
@@ -2052,9 +2097,9 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="serviceInstances" name="service-instances" type="inventory.aai.openecomp.org.v10.ServiceInstances">
+				<xml-element java-attribute="serviceInstances" name="service-instances" type="inventory.aai.onap.org.v10.ServiceInstances">
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Object that group service instances." />
@@ -2071,7 +2116,7 @@
 			</xml-properties>
 			<xml-root-element name="service-instances" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="serviceInstance" name="service-instance" type="inventory.aai.openecomp.org.v10.ServiceInstance" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="serviceInstance" name="service-instance" type="inventory.aai.onap.org.v10.ServiceInstance" />
 			</java-attributes>
 		</java-type>
 
@@ -2092,6 +2137,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-version-id" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -2099,6 +2145,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-invariant-id" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -2106,7 +2153,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="internal" />
-						<xml-property name="dataLocation" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
+						<xml-property name="dataCopy" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="widgetModelId" name="widget-model-id" type="java.lang.String">
@@ -2149,11 +2196,6 @@
 						<xml-property name="description" value="URL customers will use to access the vHN Portal." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="operationalStatus" name="operational-status" type="java.lang.String">
-					<xml-properties>
-						<xml-property name="description" value="Operational status of the service-instance." />
-					</xml-properties>
-				</xml-element>
 				<xml-element java-attribute="serviceInstanceLocationId" name="service-instance-location-id" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="An identifier that customers assign to the location where this service is being used." />
@@ -2174,9 +2216,9 @@
 						<xml-property name="description" value="Orchestration status of this service." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.openecomp.org.v10.Metadata" />
-				<xml-element java-attribute="allottedResources" name="allotted-resources" type="inventory.aai.openecomp.org.v10.AllottedResources" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.onap.org.v10.Metadata" />
+				<xml-element java-attribute="allottedResources" name="allotted-resources" type="inventory.aai.onap.org.v10.AllottedResources" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Instance of a service" />
@@ -2195,11 +2237,11 @@
 			</xml-properties>
 			<xml-root-element name="service-design-and-creation" />
 			<java-attributes>
-				<xml-element java-attribute="vnfImages" name="vnf-images" type="inventory.aai.openecomp.org.v10.VnfImages" />
-				<xml-element java-attribute="services" name="services" type="inventory.aai.openecomp.org.v10.Services" />
-				<xml-element java-attribute="serviceCapabilities" name="service-capabilities" type="inventory.aai.openecomp.org.v10.ServiceCapabilities" />
-				<xml-element java-attribute="models" name="models" type="inventory.aai.openecomp.org.v10.Models" />
-				<xml-element java-attribute="namedQueries" name="named-queries" type="inventory.aai.openecomp.org.v10.NamedQueries" />
+				<xml-element java-attribute="vnfImages" name="vnf-images" type="inventory.aai.onap.org.v10.VnfImages" />
+				<xml-element java-attribute="services" name="services" type="inventory.aai.onap.org.v10.Services" />
+				<xml-element java-attribute="serviceCapabilities" name="service-capabilities" type="inventory.aai.onap.org.v10.ServiceCapabilities" />
+				<xml-element java-attribute="models" name="models" type="inventory.aai.onap.org.v10.Models" />
+				<xml-element java-attribute="namedQueries" name="named-queries" type="inventory.aai.onap.org.v10.NamedQueries" />
 			</java-attributes>
 		</java-type>
 
@@ -2209,16 +2251,17 @@
 			</xml-properties>
 			<xml-root-element name="vnf-images" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vnfImage" name="vnf-image" type="inventory.aai.openecomp.org.v10.VnfImage" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vnfImage" name="vnf-image" type="inventory.aai.onap.org.v10.VnfImage" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="VnfImage">
 			<xml-root-element name="vnf-image" />
 			<java-attributes>
-				<xml-element java-attribute="vnfImageUuid" name="vnf-image-uuid" required="true" type="java.lang.String" xml-key="true">
+				<xml-element java-attribute="attUuid" name="att-uuid" required="true" type="java.lang.String" xml-key="true">
 					<xml-properties>
 						<xml-property name="description" value="Unique ID of this asset" />
+						<xml-property name="dbAlias" value="vnf-image-uuid" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="application" name="application" required="true" type="java.lang.String">
@@ -2246,12 +2289,12 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Image object that pertain to a VNF that doesn't have associated vservers.  This is a kludge." />
-				<xml-property name="indexedProps" value="application,vnf-image-uuid,application-vendor,application-version" />
-				<xml-property name="uniqueProps" value="vnf-image-uuid" />
+				<xml-property name="indexedProps" value="application,att-uuid,application-vendor,application-version" />
+				<xml-property name="uniqueProps" value="att-uuid" />
 				<xml-property name="container" value="vnf-images" />
 				<xml-property name="namespace" value="service-design-and-creation" />
 			</xml-properties>
@@ -2263,7 +2306,7 @@
 			</xml-properties>
 			<xml-root-element name="services" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="service" name="service" type="inventory.aai.openecomp.org.v10.Service" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="service" name="service" type="inventory.aai.onap.org.v10.Service" />
 			</java-attributes>
 		</java-type>
 
@@ -2295,7 +2338,7 @@
 						<xml-property name="description" value="service version" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Stand-in for service model definitions.  Likely to be deprecated in favor of models from ASDC.  Does not strictly map to ASDC services." />
@@ -2311,7 +2354,7 @@
 			</xml-properties>
 			<xml-root-element name="service-capabilities" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="serviceCapability" name="service-capability" type="inventory.aai.openecomp.org.v10.ServiceCapability" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="serviceCapability" name="service-capability" type="inventory.aai.onap.org.v10.ServiceCapability" />
 			</java-attributes>
 		</java-type>
 
@@ -2333,7 +2376,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Early definition of server/resource pairings, likely to be replaced by models.  No new use should be made of this." />
@@ -2349,24 +2392,24 @@
 			</xml-properties>
 			<xml-root-element name="network" />
 			<java-attributes>
-				<xml-element java-attribute="logicalLinks" name="logical-links" type="inventory.aai.openecomp.org.v10.LogicalLinks" />
-				<xml-element java-attribute="sitePairSets" name="site-pair-sets" type="inventory.aai.openecomp.org.v10.SitePairSets" />
-				<xml-element java-attribute="vpnBindings" name="vpn-bindings" type="inventory.aai.openecomp.org.v10.VpnBindings" />
-				<xml-element java-attribute="vplsPes" name="vpls-pes" type="inventory.aai.openecomp.org.v10.VplsPes" />
-				<xml-element java-attribute="multicastConfigurations" name="multicast-configurations" type="inventory.aai.openecomp.org.v10.MulticastConfigurations" />
-				<xml-element java-attribute="vces" name="vces" type="inventory.aai.openecomp.org.v10.Vces" />
-				<xml-element java-attribute="vnfcs" name="vnfcs" type="inventory.aai.openecomp.org.v10.Vnfcs" />
-				<xml-element java-attribute="l3Networks" name="l3-networks" type="inventory.aai.openecomp.org.v10.L3Networks" />
-				<xml-element java-attribute="networkPolicies" name="network-policies" type="inventory.aai.openecomp.org.v10.NetworkPolicies" />
-				<xml-element java-attribute="genericVnfs" name="generic-vnfs" type="inventory.aai.openecomp.org.v10.GenericVnfs" />
-				<xml-element java-attribute="lagLinks" name="lag-links" type="inventory.aai.openecomp.org.v10.LagLinks" />
-				<xml-element java-attribute="newvces" name="newvces" type="inventory.aai.openecomp.org.v10.Newvces" />
-				<xml-element java-attribute="pnfs" name="pnfs" type="inventory.aai.openecomp.org.v10.Pnfs" />
-				<xml-element java-attribute="physicalLinks" name="physical-links" type="inventory.aai.openecomp.org.v10.PhysicalLinks" />
-				<xml-element java-attribute="ipsecConfigurations" name="ipsec-configurations" type="inventory.aai.openecomp.org.v10.IpsecConfigurations" />
-				<xml-element java-attribute="routeTableReferences" name="route-table-references" type="inventory.aai.openecomp.org.v10.RouteTableReferences" />
-				<xml-element java-attribute="instanceGroups" name="instance-groups" type="inventory.aai.openecomp.org.v10.InstanceGroups" />
-				<xml-element java-attribute="zones" name="zones" type="inventory.aai.openecomp.org.v10.Zones" />
+				<xml-element java-attribute="logicalLinks" name="logical-links" type="inventory.aai.onap.org.v10.LogicalLinks" />
+				<xml-element java-attribute="sitePairSets" name="site-pair-sets" type="inventory.aai.onap.org.v10.SitePairSets" />
+				<xml-element java-attribute="vpnBindings" name="vpn-bindings" type="inventory.aai.onap.org.v10.VpnBindings" />
+				<xml-element java-attribute="vplsPes" name="vpls-pes" type="inventory.aai.onap.org.v10.VplsPes" />
+				<xml-element java-attribute="multicastConfigurations" name="multicast-configurations" type="inventory.aai.onap.org.v10.MulticastConfigurations" />
+				<xml-element java-attribute="vces" name="vces" type="inventory.aai.onap.org.v10.Vces" />
+				<xml-element java-attribute="vnfcs" name="vnfcs" type="inventory.aai.onap.org.v10.Vnfcs" />
+				<xml-element java-attribute="l3Networks" name="l3-networks" type="inventory.aai.onap.org.v10.L3Networks" />
+				<xml-element java-attribute="networkPolicies" name="network-policies" type="inventory.aai.onap.org.v10.NetworkPolicies" />
+				<xml-element java-attribute="genericVnfs" name="generic-vnfs" type="inventory.aai.onap.org.v10.GenericVnfs" />
+				<xml-element java-attribute="lagLinks" name="lag-links" type="inventory.aai.onap.org.v10.LagLinks" />
+				<xml-element java-attribute="newvces" name="newvces" type="inventory.aai.onap.org.v10.Newvces" />
+				<xml-element java-attribute="pnfs" name="pnfs" type="inventory.aai.onap.org.v10.Pnfs" />
+				<xml-element java-attribute="physicalLinks" name="physical-links" type="inventory.aai.onap.org.v10.PhysicalLinks" />
+				<xml-element java-attribute="ipsecConfigurations" name="ipsec-configurations" type="inventory.aai.onap.org.v10.IpsecConfigurations" />
+				<xml-element java-attribute="routeTableReferences" name="route-table-references" type="inventory.aai.onap.org.v10.RouteTableReferences" />
+				<xml-element java-attribute="instanceGroups" name="instance-groups" type="inventory.aai.onap.org.v10.InstanceGroups" />
+				<xml-element java-attribute="zones" name="zones" type="inventory.aai.onap.org.v10.Zones" />
 			</java-attributes>
 		</java-type>
 
@@ -2376,7 +2419,7 @@
 			</xml-properties>
 			<xml-root-element name="logical-links" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="logicalLink" name="logical-link" type="inventory.aai.openecomp.org.v10.LogicalLink" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="logicalLink" name="logical-link" type="inventory.aai.onap.org.v10.LogicalLink" />
 			</java-attributes>
 		</java-type>
 
@@ -2405,7 +2448,7 @@
 				</xml-element>
 				<xml-element java-attribute="ipVersion" name="ip-version" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="v4, v6, or ds for dual stack" />
+						<xml-property name="description" value="v4, v6, or ds for dual stack (should be att-ip-version)" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="routingProtocol" name="routing-protocol" type="java.lang.String">
@@ -2422,6 +2465,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-version-id" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -2429,6 +2473,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-invariant-id" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -2436,7 +2481,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="internal" />
-						<xml-property name="dataLocation" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
+						<xml-property name="dataCopy" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="widgetModelId" name="widget-model-id" type="java.lang.String">
@@ -2484,7 +2529,7 @@
 						<xml-property name="description" value="Reason for this entity, role it is playing" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Logical links generally connect l-interfaces but are used to express logical connectivity between two points" />
@@ -2502,7 +2547,7 @@
 			</xml-properties>
 			<xml-root-element name="site-pair-sets" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="sitePairSet" name="site-pair-set" type="inventory.aai.openecomp.org.v10.SitePairSet" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="sitePairSet" name="site-pair-set" type="inventory.aai.onap.org.v10.SitePairSet" />
 			</java-attributes>
 		</java-type>
 
@@ -2519,8 +2564,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="routingInstances" name="routing-instances" type="inventory.aai.openecomp.org.v10.RoutingInstances" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="routingInstances" name="routing-instances" type="inventory.aai.onap.org.v10.RoutingInstances" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Set of instances for probes used to measure service level agreements" />
@@ -2537,7 +2582,7 @@
 			</xml-properties>
 			<xml-root-element name="routing-instances" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="routingInstance" name="routing-instance" type="inventory.aai.openecomp.org.v10.RoutingInstance" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="routingInstance" name="routing-instance" type="inventory.aai.onap.org.v10.RoutingInstance" />
 			</java-attributes>
 		</java-type>
 
@@ -2559,8 +2604,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="sitePairs" name="site-pairs" type="inventory.aai.openecomp.org.v10.SitePairs" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="sitePairs" name="site-pairs" type="inventory.aai.onap.org.v10.SitePairs" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="indexedProps" value="routing-instance-id" />
@@ -2576,7 +2621,7 @@
 			</xml-properties>
 			<xml-root-element name="site-pairs" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="sitePair" name="site-pair" type="inventory.aai.openecomp.org.v10.SitePair" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="sitePair" name="site-pair" type="inventory.aai.onap.org.v10.SitePair" />
 			</java-attributes>
 		</java-type>
 
@@ -2610,7 +2655,7 @@
 				</xml-element>
 				<xml-element java-attribute="destinationEquipType" name="destination-equip-type" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="The type of destinatination equipment. Could be Router, etc." />
+						<xml-property name="description" value="The type of destinatination equipment. Could be Router, UCPE, etc." />
 					</xml-properties>
 				</xml-element>					
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String">
@@ -2618,8 +2663,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="classesOfService" name="classes-of-service" type="inventory.aai.openecomp.org.v10.ClassesOfService" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="classesOfService" name="classes-of-service" type="inventory.aai.onap.org.v10.ClassesOfService" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="indexedProps" value="site-pair-id" />
@@ -2635,7 +2680,7 @@
 			</xml-properties>
 			<xml-root-element name="classes-of-service" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="classOfService" name="class-of-service" type="inventory.aai.openecomp.org.v10.ClassOfService" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="classOfService" name="class-of-service" type="inventory.aai.onap.org.v10.ClassOfService" />
 			</java-attributes>
 		</java-type>
 
@@ -2662,7 +2707,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="indexedProps" value="cos" />
@@ -2674,7 +2719,7 @@
 		<java-type name="VpnBindings">
 			<xml-root-element name="vpn-bindings" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vpnBinding" name="vpn-binding" type="inventory.aai.openecomp.org.v10.VpnBinding" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vpnBinding" name="vpn-binding" type="inventory.aai.onap.org.v10.VpnBinding" />
 			</java-attributes>
 		</java-type>
 
@@ -2689,11 +2734,6 @@
 				<xml-element java-attribute="vpnName" name="vpn-name" required="true" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="VPN Name" />
-					</xml-properties>
-				</xml-element>
-				<xml-element java-attribute="globalRouteTarget" name="global-route-target" required="true" type="java.lang.String">
-					<xml-properties>
-						<xml-property name="description" value="Number used to identify a VPN, globally unique in the network" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="vpnPlatform" name="vpn-platform" type="java.lang.String">
@@ -2711,17 +2751,13 @@
 						<xml-property name="description" value="Used to distinguish the distinct VPN routes of separate customers who connect to the provider in an MPLS network." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="routeTargetRole" name="route-target-role" type="java.lang.String">
-					<xml-properties>
-						<xml-property name="description" value="Role assigned to this route target" />
-					</xml-properties>
-				</xml-element>
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList">
+				<xml-element java-attribute="routeTargets" name="route-targets" type="inventory.aai.onap.org.v10.RouteTargets" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList">
 					<xml-properties>
 						<xml-property name="description" value="l3-networks relate to vpn-bindings" />
 					</xml-properties>
@@ -2730,7 +2766,7 @@
 			<xml-properties>
 				<xml-property name="description" value="VPN binding" />
 				<xml-property name="nameProps" value="vpn-name,vpn-type" />
-				<xml-property name="indexedProps" value="vpn-name,vpn-id,global-route-target,vpn-type" />
+				<xml-property name="indexedProps" value="vpn-name,vpn-id,vpn-type" />
 				<xml-property name="searchable" value="vpn-id,vpn-name" />
 				<xml-property name="uniqueProps" value="vpn-id" />
 				<xml-property name="container" value="vpn-bindings" />
@@ -2744,7 +2780,7 @@
 			</xml-properties>
 			<xml-root-element name="vpls-pes" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vplsPe" name="vpls-pe" type="inventory.aai.openecomp.org.v10.VplsPe" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vplsPe" name="vpls-pe" type="inventory.aai.onap.org.v10.VplsPe" />
 			</java-attributes>
 		</java-type>
 
@@ -2777,9 +2813,9 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="pInterfaces" name="p-interfaces" type="inventory.aai.openecomp.org.v10.PInterfaces" />
-				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.openecomp.org.v10.LagInterfaces" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="pInterfaces" name="p-interfaces" type="inventory.aai.onap.org.v10.PInterfaces" />
+				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.onap.org.v10.LagInterfaces" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="VPLS Provider Edge routers." />
@@ -2795,7 +2831,7 @@
 			</xml-properties>
 			<xml-root-element name="multicast-configurations" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="multicastConfiguration" name="multicast-configuration" type="inventory.aai.openecomp.org.v10.MulticastConfiguration" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="multicastConfiguration" name="multicast-configuration" type="inventory.aai.onap.org.v10.MulticastConfiguration" />
 			</java-attributes>
 		</java-type>
 
@@ -2822,7 +2858,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="indexedProps" value="multicast-configuration-id" />
@@ -2838,7 +2874,7 @@
 			</xml-properties>
 			<xml-root-element name="vces" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vce" name="vce" type="inventory.aai.openecomp.org.v10.Vce" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vce" name="vce" type="inventory.aai.onap.org.v10.Vce" />
 			</java-attributes>
 		</java-type>
 
@@ -2880,7 +2916,7 @@
 						<xml-property name="description" value="Trigger for operational monitoring of this resource by Service Assurance systems." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="operationalState" name="operational-state" type="java.lang.String">
+				<xml-element java-attribute="operationalStatus" name="operational-status" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="Indicator for whether the resource is considered operational" />
 					</xml-properties>
@@ -2940,10 +2976,10 @@
 						<xml-property name="description" value="OBSOLETE -  see child relationships" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="portGroups" name="port-groups" type="inventory.aai.openecomp.org.v10.PortGroups" />
-				<xml-element java-attribute="licenses" name="licenses" type="inventory.aai.openecomp.org.v10.Licenses" />
-				<xml-element java-attribute="entitlements" name="entitlements" type="inventory.aai.openecomp.org.v10.Entitlements" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="portGroups" name="port-groups" type="inventory.aai.onap.org.v10.PortGroups" />
+				<xml-element java-attribute="licenses" name="licenses" type="inventory.aai.onap.org.v10.Licenses" />
+				<xml-element java-attribute="entitlements" name="entitlements" type="inventory.aai.onap.org.v10.Entitlements" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Virtual Customer Edge Router, used specifically for Gamma.  This object is deprecated." />
@@ -2960,7 +2996,7 @@
 		<java-type name="PortGroups">
 			<xml-root-element name="port-groups" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="portGroup" name="port-group" type="inventory.aai.openecomp.org.v10.PortGroup" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="portGroup" name="port-group" type="inventory.aai.onap.org.v10.PortGroup" />
 			</java-attributes>
 		</java-type>
 
@@ -3022,8 +3058,8 @@
 						<xml-property name="description" value="Corresponds to the SDN-C catalog id used to configure this VCE" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="cvlanTags" name="cvlan-tags" type="inventory.aai.openecomp.org.v10.CvlanTags" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="cvlanTags" name="cvlan-tags" type="inventory.aai.onap.org.v10.CvlanTags" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Used to capture the network interfaces of this VCE" />
@@ -3037,7 +3073,7 @@
 		<java-type name="CvlanTags">
 			<xml-root-element name="cvlan-tags" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="cvlanTagEntry" name="cvlan-tag-entry" type="inventory.aai.openecomp.org.v10.CvlanTagEntry" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="cvlanTagEntry" name="cvlan-tag-entry" type="inventory.aai.onap.org.v10.CvlanTagEntry" />
 			</java-attributes>
 		</java-type>
 
@@ -3054,7 +3090,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="dependentOn" value="port-group" />
@@ -3071,7 +3107,7 @@
 			</xml-properties>
 			<xml-root-element name="vnfcs" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vnfc" name="vnfc" type="inventory.aai.openecomp.org.v10.Vnfc" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vnfc" name="vnfc" type="inventory.aai.onap.org.v10.Vnfc" />
 			</java-attributes>
 		</java-type>
 
@@ -3086,11 +3122,13 @@
 				<xml-element java-attribute="vnfcFunctionCode" name="vnfc-function-code" required="true" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="function code" />
+						<xml-property name="dbAlias" value="nfc-naming-code" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="vnfcType" name="vnfc-type" required="true" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="type" />
+						<xml-property name="dbAlias" value="nfc-function" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="provStatus" name="prov-status" type="java.lang.String">
@@ -3130,7 +3168,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="indexedProps" value="vnfc-name,prov-status,vnfc-type,vnfc-function-code,ipaddress-v4-oam-vip,in-maint,is-closed-loop-disabled,group-notation" />
@@ -3143,7 +3181,7 @@
 		<java-type name="L3Networks">
 			<xml-root-element name="l3-networks" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="l3Network" name="l3-network" type="inventory.aai.openecomp.org.v10.L3Network" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="l3Network" name="l3-network" type="inventory.aai.onap.org.v10.L3Network" />
 			</java-attributes>
 		</java-type>
 
@@ -3225,6 +3263,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-version-id" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -3232,6 +3271,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-invariant-id" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -3239,7 +3279,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="internal" />
-						<xml-property name="dataLocation" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
+						<xml-property name="dataCopy" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="modelCustomizationId" name="model-customization-id" type="java.lang.String">
@@ -3290,10 +3330,10 @@
 						<xml-property name="description" value="Indicator for whether the resource is considered operational." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="subnets" name="subnets" type="inventory.aai.openecomp.org.v10.Subnets" />
-				<xml-element java-attribute="ctagAssignments" name="ctag-assignments" type="inventory.aai.openecomp.org.v10.CtagAssignments" />
-				<xml-element java-attribute="segmentationAssignments" name="segmentation-assignments" type="inventory.aai.openecomp.org.v10.SegmentationAssignments" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" >
+				<xml-element java-attribute="subnets" name="subnets" type="inventory.aai.onap.org.v10.Subnets" />
+				<xml-element java-attribute="ctagAssignments" name="ctag-assignments" type="inventory.aai.onap.org.v10.CtagAssignments" />
+				<xml-element java-attribute="segmentationAssignments" name="segmentation-assignments" type="inventory.aai.onap.org.v10.SegmentationAssignments" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" >
 					<xml-properties>
 						<xml-property name="description" value="Relates to tenant (or is it a child of tenant), complex, service, vpn-binding" />
 					</xml-properties>
@@ -3312,7 +3352,7 @@
 		<java-type name="NetworkPolicies">
 			<xml-root-element name="network-policies" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="networkPolicy" name="network-policy" type="inventory.aai.openecomp.org.v10.NetworkPolicy" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="networkPolicy" name="network-policy" type="inventory.aai.onap.org.v10.NetworkPolicy" />
 			</java-attributes>
 		</java-type>
 		<java-type name="NetworkPolicy">
@@ -3338,7 +3378,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="nameProps" value="network-policy-fqdn" />
@@ -3352,7 +3392,7 @@
 		<java-type name="CtagAssignments">
 			<xml-root-element name="ctag-assignments" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="ctagAssignment" name="ctag-assignment" type="inventory.aai.openecomp.org.v10.CtagAssignment" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="ctagAssignment" name="ctag-assignment" type="inventory.aai.onap.org.v10.CtagAssignment" />
 			</java-attributes>
 		</java-type>
 
@@ -3369,7 +3409,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="indexedProps" value="vlan-id-inner" />
@@ -3381,7 +3421,7 @@
 		<java-type name="Subnets">
 			<xml-root-element name="subnets" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="subnet" name="subnet" type="inventory.aai.openecomp.org.v10.Subnet" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="subnet" name="subnet" type="inventory.aai.onap.org.v10.Subnet" />
 			</java-attributes>
 		</java-type>
 
@@ -3449,7 +3489,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="indexedProps" value="subnet-id,subnet-name" />
@@ -3466,7 +3506,7 @@
 			</xml-properties>
 			<xml-root-element name="generic-vnfs" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="genericVnf" name="generic-vnf" type="inventory.aai.openecomp.org.v10.GenericVnf" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="genericVnf" name="generic-vnf" type="inventory.aai.onap.org.v10.GenericVnf" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -3509,9 +3549,10 @@
 				<xml-element java-attribute="provStatus" name="prov-status" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="Trigger for operational monitoring of this resource by Service Assurance systems." />
+						<xml-property name="suggestibleOnSearch" value="true"/>
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="operationalState" name="operational-state" type="java.lang.String">
+				<xml-element java-attribute="operationalStatus" name="operational-status" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="Indicator for whether the resource is considered operational.  Valid values are in-service-path and out-of-service-path." />
 					</xml-properties>
@@ -3529,6 +3570,7 @@
 				<xml-element java-attribute="orchestrationStatus" name="orchestration-status" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="Orchestration status of this VNF, used by MSO." />
+						<xml-property name="suggestibleOnSearch" value="true"/>
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="heatStackId" name="heat-stack-id" type="java.lang.String">
@@ -3543,7 +3585,7 @@
 				</xml-element>
 				<xml-element java-attribute="managementOption" name="management-option" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="identifier of managed by company or customer" />
+						<xml-property name="description" value="identifier of managed by ATT or customer" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="ipv4OamAddress" name="ipv4-oam-address" type="java.lang.String">
@@ -3568,32 +3610,32 @@
 				</xml-element>
 				<xml-element java-attribute="vcpu" name="vcpu" type="java.lang.Long">
 					<xml-properties>
-						<xml-property name="description" value="number of vcpus ordered for this instance of VNF, used for VNFs with no vservers/flavors, to be used only in some usecases" />
+						<xml-property name="description" value="number of vcpus ordered for this instance of VNF, used for VNFs with no vservers/flavors, to be used only by uCPE" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="vcpuUnits" name="vcpu-units" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="units associated with vcpu, used for VNFs with no vservers/flavors, to be used only in some usecases" />
+						<xml-property name="description" value="units associated with vcpu, used for VNFs with no vservers/flavors, to be used only by uCPE" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="vmemory" name="vmemory" type="java.lang.Long">
 					<xml-properties>
-						<xml-property name="description" value="number of GB of memory ordered for this instance of VNF, used for VNFs with no vservers/flavors, to be used only in some usecases" />
+						<xml-property name="description" value="number of GB of memory ordered for this instance of VNF, used for VNFs with no vservers/flavors, to be used only by uCPE" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="vmemoryUnits" name="vmemory-units" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="units associated with vmemory, used for VNFs with no vservers/flavors, to be used only in some usecases" />
+						<xml-property name="description" value="units associated with vmemory, used for VNFs with no vservers/flavors, to be used only by uCPE" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="vdisk" name="vdisk" type="java.lang.Long">
 					<xml-properties>
-						<xml-property name="description" value="number of vdisks ordered for this instance of VNF, used for VNFs with no vservers/flavors, to be used only in some usecases" />
+						<xml-property name="description" value="number of vdisks ordered for this instance of VNF, used for VNFs with no vservers/flavors, to be used only uCPE" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="vdiskUnits" name="vdisk-units" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="units associated with vdisk, used for VNFs with no vservers/flavors, to be used only in some usecases" />
+						<xml-property name="description" value="units associated with vdisk, used for VNFs with no vservers/flavors, to be used only by uCPE" />
 					</xml-properties>
 				</xml-element>
 				<xml-element default-value="false" required="true" java-attribute="inMaint" name="in-maint" type="java.lang.Boolean">
@@ -3647,6 +3689,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-version-id" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -3654,6 +3697,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-invariant-id" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -3661,7 +3705,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="internal" />
-						<xml-property name="dataLocation" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
+						<xml-property name="dataCopy" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="modelCustomizationId" name="model-customization-id" type="java.lang.String">
@@ -3714,12 +3758,12 @@
 						<xml-property name="description" value="Path to the controller object." />
 					</xml-properties>
 				</xml-element>				
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.openecomp.org.v10.LInterfaces" />
-				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.openecomp.org.v10.LagInterfaces" />
-				<xml-element java-attribute="vfModules" name="vf-modules" type="inventory.aai.openecomp.org.v10.VfModules" />
-				<xml-element java-attribute="licenses" name="licenses" type="inventory.aai.openecomp.org.v10.Licenses" />
-				<xml-element java-attribute="entitlements" name="entitlements" type="inventory.aai.openecomp.org.v10.Entitlements" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.onap.org.v10.LInterfaces" />
+				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.onap.org.v10.LagInterfaces" />
+				<xml-element java-attribute="vfModules" name="vf-modules" type="inventory.aai.onap.org.v10.VfModules" />
+				<xml-element java-attribute="licenses" name="licenses" type="inventory.aai.onap.org.v10.Licenses" />
+				<xml-element java-attribute="entitlements" name="entitlements" type="inventory.aai.onap.org.v10.Entitlements" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="General purpose VNF" />
@@ -3730,6 +3774,8 @@
 				<xml-property name="container" value="generic-vnfs" />
 				<xml-property name="namespace" value="network" />
 				<xml-property name="extends" value="vnf" />
+				<xml-property name="containsSuggestibleProps" value="true"/>
+				<xml-property name="suggestionAliases" value="VNFs"/>
 			</xml-properties>
 		</java-type>
 
@@ -3739,7 +3785,7 @@
 			</xml-properties>
 			<xml-root-element name="vf-modules" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vfModule" name="vf-module" type="inventory.aai.openecomp.org.v10.VfModule" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vfModule" name="vf-module" type="inventory.aai.onap.org.v10.VfModule" />
 			</java-attributes>
 		</java-type>
 
@@ -3781,6 +3827,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-version-id" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -3788,6 +3835,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-invariant-id" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -3795,7 +3843,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="internal" />
-						<xml-property name="dataLocation" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
+						<xml-property name="dataCopy" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="modelCustomizationId" name="model-customization-id" type="java.lang.String">
@@ -3828,7 +3876,7 @@
 						<xml-property name="description" value="Path to the controller object." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="a deployment unit of VNFCs" />
@@ -3846,7 +3894,7 @@
 			</xml-properties>
 			<xml-root-element name="lag-links" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="lagLink" name="lag-link" type="inventory.aai.openecomp.org.v10.LagLink" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="lagLink" name="lag-link" type="inventory.aai.onap.org.v10.LagLink" />
 			</java-attributes>
 		</java-type>
 
@@ -3863,7 +3911,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="LAG links can connect lag-interfaces" />
@@ -3879,7 +3927,7 @@
 			</xml-properties>
 			<xml-root-element name="newvces" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="newvce" name="newvce" type="inventory.aai.openecomp.org.v10.Newvce" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="newvce" name="newvce" type="inventory.aai.onap.org.v10.Newvce" />
 			</java-attributes>
 		</java-type>
 
@@ -3911,7 +3959,7 @@
 						<xml-property name="description" value="Trigger for operational monitoring of this VNF by BAU Service Assurance systems." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="operationalState" name="operational-state" type="java.lang.String">
+				<xml-element java-attribute="operationalStatus" name="operational-status" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="Indicator for whether the resource is considered operational" />
 					</xml-properties>
@@ -3956,8 +4004,8 @@
 						<xml-property name="description" value="Corresponds to the SDN-C catalog id used to configure this VCE" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.openecomp.org.v10.LInterfaces" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="lInterfaces" name="l-interfaces" type="inventory.aai.onap.org.v10.LInterfaces" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="This object fills in the gaps from vce that were incorporated into generic-vnf.  This object will be retired with vce." />
@@ -3976,7 +4024,7 @@
 			</xml-properties>
 			<xml-root-element name="pnfs" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="pnf" name="pnf" type="inventory.aai.openecomp.org.v10.Pnf" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="pnf" name="pnf" type="inventory.aai.onap.org.v10.Pnf" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -4023,7 +4071,7 @@
 				</xml-element>
 				<xml-element java-attribute="managementOption" name="management-option" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="identifier of managed by company or customer" />
+						<xml-property name="description" value="identifier of managed by ATT or customer" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="ipaddressV4Oam" name="ipaddress-v4-oam" type="java.lang.String">
@@ -4097,12 +4145,12 @@
 						<xml-property name="description" value="Nf Role is the role performed by this instance in the network." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="pInterfaces" name="p-interfaces" type="inventory.aai.openecomp.org.v10.PInterfaces" />
-				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.openecomp.org.v10.LagInterfaces" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="pInterfaces" name="p-interfaces" type="inventory.aai.onap.org.v10.PInterfaces" />
+				<xml-element java-attribute="lagInterfaces" name="lag-interfaces" type="inventory.aai.onap.org.v10.LagInterfaces" />
 			</java-attributes>
 			<xml-properties>
-				<xml-property name="description" value="PNF represents a physical network function. typically equipment used in the D1 world." />
+				<xml-property name="description" value="PNF represents a physical network function. typically equipment used in the D1 world. in 1607, this will be populated by SDN-C to represent a premises router that a uCPE connects to. But this can be used to represent any physical device that is not an AIC node or uCPE." />
 				<xml-property name="indexedProps" value="pnf-name,orchestration-status,inv-status" />
 				<xml-property name="searchable" value="pnf-name" />
 				<xml-property name="uniqueProps" value="pnf-name" />
@@ -4117,7 +4165,7 @@
 			</xml-properties>
 			<xml-root-element name="physical-links" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="physicalLink" name="physical-link" type="inventory.aai.openecomp.org.v10.PhysicalLink" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="physicalLink" name="physical-link" type="inventory.aai.onap.org.v10.PhysicalLink" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="maximumDepth" value="0" />
@@ -4167,7 +4215,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Collection of physical connections, typically between p-interfaces" />
@@ -4182,7 +4230,7 @@
 		<java-type name="VigServers">
 			<xml-root-element name="vig-servers" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="vigServer" name="vig-server" type="inventory.aai.openecomp.org.v10.VigServer" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="vigServer" name="vig-server" type="inventory.aai.onap.org.v10.VigServer" />
 			</java-attributes>
 		</java-type>
 
@@ -4209,7 +4257,7 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="vig-server contains information about a vig server used for IPSec-configuration. Populated by SDN-C from 1607" />
@@ -4222,7 +4270,7 @@
 		<java-type name="IpsecConfigurations">
 			<xml-root-element name="ipsec-configurations" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="ipsecConfiguration" name="ipsec-configuration" type="inventory.aai.openecomp.org.v10.IpsecConfiguration" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="ipsecConfiguration" name="ipsec-configuration" type="inventory.aai.onap.org.v10.IpsecConfiguration" />
 			</java-attributes>
 		</java-type>
 
@@ -4246,7 +4294,7 @@
 				</xml-element>
 				<xml-element java-attribute="requestedDmzType" name="requested-dmz-type" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="can offer a shared DMZ or a DMZ specific to a customer" />
+						<xml-property name="description" value="ATT can offer a shared DMZ or a DMZ specific to a customer" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="sharedDmzNetworkAddress" name="shared-dmz-network-address" type="java.lang.String">
@@ -4271,7 +4319,7 @@
 				</xml-element>
 				<xml-element java-attribute="ikev1Encryption" name="ikev1-encryption" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="Encyption values like 3des-cbc, des-cbc, aes-128-cbc,?aes-192-cbc, aes-265-cbc" />
+						<xml-property name="description" value="Encyption values like 3des-cbc, des-cbc, aes-128-cbc,Â aes-192-cbc, aes-265-cbc" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="ikev1DhGroup" name="ikev1-dh-group" type="java.lang.String">
@@ -4301,7 +4349,7 @@
 				</xml-element>
 				<xml-element java-attribute="ipsecEncryption" name="ipsec-encryption" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="3des-cbc, des-cbc, aes-128-cbc,?aes-192-cbc, aes-265-cbc" />
+						<xml-property name="description" value="3des-cbc, des-cbc, aes-128-cbc,Â aes-192-cbc, aes-265-cbc" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="ipsecSaLifetime" name="ipsec-sa-lifetime" type="java.lang.String">
@@ -4316,7 +4364,7 @@
 				</xml-element>
 				<xml-element java-attribute="xauthUserId" name="xauth-userid" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="user ID for xAuth, sm-user, ,nmteHostName" />
+						<xml-property name="description" value="user ID for xAuth, sm-user,ucpeHostName,nmteHostName" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="xauthUserPassword" name="xauth-user-password" type="java.lang.String">
@@ -4339,8 +4387,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
-				<xml-element java-attribute="vigServers" name="vig-servers" type="inventory.aai.openecomp.org.v10.VigServers" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+				<xml-element java-attribute="vigServers" name="vig-servers" type="inventory.aai.onap.org.v10.VigServers" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="IPSec configuration node will contain various configuration data for the NMTE VNF. This node will have an edge to the generic-vnf (vnf type = TE). Starting 1607, this data will be populated by SDN-C" />
@@ -4356,7 +4404,7 @@
 			<xml-root-element name="notification-event" />
 			<java-attributes>
 				<xml-element java-attribute="cambriaPartition" name="cambria.partition" type="java.lang.String" />
-				<xml-element java-attribute="eventHeader" name="event-header" type="inventory.aai.openecomp.org.v10.NotificationEventHeader" />
+				<xml-element java-attribute="eventHeader" name="event-header" type="inventory.aai.onap.org.v10.NotificationEventHeader" />
 				<xml-any-element java-attribute="entity" />
 			</java-attributes>
 		</java-type>
@@ -4381,8 +4429,8 @@
 		<java-type name="AaiInternal">
 			<xml-root-element name="aai-internal" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="reservedPropNames" name="reserved-prop-names" type="inventory.aai.openecomp.org.v10.ReservedPropNames" />
-				<xml-element container-type="java.util.ArrayList" java-attribute="edgePropNames" name="edge-prop-names" type="inventory.aai.openecomp.org.v10.EdgePropNames" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="reservedPropNames" name="reserved-prop-names" type="inventory.aai.onap.org.v10.ReservedPropNames" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="edgePropNames" name="edge-prop-names" type="inventory.aai.onap.org.v10.EdgePropNames" />
 			</java-attributes>
 		</java-type>
 		<java-type name="ReservedPropNames">
@@ -4413,11 +4461,10 @@
 				<xml-element java-attribute="edgeLabel" name="edgeLabel" type="java.lang.String" />
 				<xml-element java-attribute="direction" name="direction" type="java.lang.String" />
 				<xml-element java-attribute="multiplicityRule" name="multiplicityRule" type="java.lang.String" />
-				<xml-element java-attribute="isParent" name="isParent" type="java.lang.Boolean" />
-				<xml-element java-attribute="usesResource" name="usesResource" type="java.lang.Boolean" />
-				<xml-element java-attribute="hasDelTarget" name="hasDelTarget" type="java.lang.Boolean" />
-				<xml-element java-attribute="SVC-INFRA" name="SVC-INFRA" type="java.lang.String" />
-				<xml-element java-attribute="SVC-INFRA-REV" name="SVC-INFRA-REV" type="java.lang.String" />
+				<xml-element java-attribute="containsOtherV" name="contains-other-v" type="java.lang.String" />
+				<xml-element java-attribute="deleteOtherV" name="delete-other-v" type="java.lang.String" />
+				<xml-element java-attribute="svcinfra" name="SVC-INFRA" type="java.lang.String" />
+				<xml-element java-attribute="preventDelete" name="prevent-delete" type="java.lang.String" />
 			</java-attributes>
 		</java-type>
 
@@ -4427,7 +4474,7 @@
 			</xml-properties>
 			<xml-root-element name="models" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="model" name="model" type="inventory.aai.openecomp.org.v10.Model" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="model" name="model" type="inventory.aai.onap.org.v10.Model" />
 			</java-attributes>
 		</java-type>
 
@@ -4457,8 +4504,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="modelVers" name="model-vers" type="inventory.aai.openecomp.org.v10.ModelVers" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="modelVers" name="model-vers" type="inventory.aai.onap.org.v10.ModelVers" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
@@ -4466,7 +4513,7 @@
 		<java-type name="ModelVers">
 			<xml-root-element name="model-vers" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="modelVer" name="model-ver" type="inventory.aai.openecomp.org.v10.ModelVer" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="modelVer" name="model-ver" type="inventory.aai.onap.org.v10.ModelVer" />
 			</java-attributes>
 		</java-type>
 		
@@ -4505,16 +4552,16 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="modelElements" name="model-elements" type="inventory.aai.openecomp.org.v10.ModelElements" />
-				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.openecomp.org.v10.Metadata" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="modelElements" name="model-elements" type="inventory.aai.onap.org.v10.ModelElements" />
+				<xml-element java-attribute="metadata" name="metadata" type="inventory.aai.onap.org.v10.Metadata" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="ModelElements">
 			<xml-root-element name="model-elements" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="modelElement" name="model-element" type="inventory.aai.openecomp.org.v10.ModelElement" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="modelElement" name="model-element" type="inventory.aai.onap.org.v10.ModelElement" />
 			</java-attributes>
 		</java-type>
 
@@ -4551,24 +4598,24 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="modelElements" name="model-elements" type="inventory.aai.openecomp.org.v10.ModelElements">
+				<xml-element java-attribute="modelElements" name="model-elements" type="inventory.aai.onap.org.v10.ModelElements">
 					<xml-properties>
 						<xml-property name="description" value="Defines how other models combine to make up a higher-level model" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="modelConstraints" name="model-constraints" type="inventory.aai.openecomp.org.v10.ModelConstraints">
+				<xml-element java-attribute="modelConstraints" name="model-constraints" type="inventory.aai.onap.org.v10.ModelConstraints">
 					<xml-properties>
 						<xml-property name="description" value="Describes new constraints on this model element that are not part of that model's definition" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="ModelConstraints">
 			<xml-root-element name="model-constraints" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="modelConstraint" name="model-constraint" type="inventory.aai.openecomp.org.v10.ModelConstraint" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="modelConstraint" name="model-constraint" type="inventory.aai.onap.org.v10.ModelConstraint" />
 			</java-attributes>
 		</java-type>
 
@@ -4589,7 +4636,7 @@
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="constrainedElementSetUuidToReplace" name="constrained-element-set-uuid-to-replace" required="true" type="java.lang.String" />
-				<xml-element java-attribute="constrainedElementSets" name="constrained-element-sets" type="inventory.aai.openecomp.org.v10.ConstrainedElementSets" />
+				<xml-element java-attribute="constrainedElementSets" name="constrained-element-sets" type="inventory.aai.onap.org.v10.ConstrainedElementSets" />
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String">
 					<xml-properties>
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
@@ -4601,7 +4648,7 @@
 		<java-type name="ConstrainedElementSets">
 			<xml-root-element name="constrained-element-sets" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="constrainedElementSet" name="constrained-element-set" type="inventory.aai.openecomp.org.v10.ConstrainedElementSet" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="constrainedElementSet" name="constrained-element-set" type="inventory.aai.onap.org.v10.ConstrainedElementSet" />
 			</java-attributes>
 		</java-type>
 
@@ -4624,15 +4671,15 @@
 				<xml-element java-attribute="constraintType" name="constraint-type" required="true" type="java.lang.String" />
 				<xml-element java-attribute="checkType" name="check-type" required="true" type="java.lang.String" />
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String" />
-				<xml-element java-attribute="elementChoiceSets" name="element-choice-sets" type="inventory.aai.openecomp.org.v10.ElementChoiceSets" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="elementChoiceSets" name="element-choice-sets" type="inventory.aai.onap.org.v10.ElementChoiceSets" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="ElementChoiceSets">
 			<xml-root-element name="element-choice-sets" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="elementChoiceSet" name="element-choice-set" type="inventory.aai.openecomp.org.v10.ElementChoiceSet" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="elementChoiceSet" name="element-choice-set" type="inventory.aai.onap.org.v10.ElementChoiceSet" />
 			</java-attributes>
 		</java-type>
 
@@ -4655,15 +4702,15 @@
 				<xml-element java-attribute="elementChoiceSetName" name="element-choice-set-name" required="true" type="java.lang.String" />
 				<xml-element java-attribute="cardinality" name="cardinality" type="java.lang.String" />
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String" />
-				<xml-element java-attribute="modelElements" name="model-elements" type="inventory.aai.openecomp.org.v10.ModelElements" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="modelElements" name="model-elements" type="inventory.aai.onap.org.v10.ModelElements" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="NamedQueries">
 			<xml-root-element name="named-queries" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="namedQuery" name="named-query" type="inventory.aai.openecomp.org.v10.NamedQuery" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="namedQuery" name="named-query" type="inventory.aai.onap.org.v10.NamedQuery" />
 			</java-attributes>
 		</java-type>
 
@@ -4686,15 +4733,15 @@
 				</xml-element>
 				<xml-element java-attribute="description" name="description" type="java.lang.String" />
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String" />
-				<xml-element java-attribute="namedQueryElements" name="named-query-elements" type="inventory.aai.openecomp.org.v10.NamedQueryElements" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="namedQueryElements" name="named-query-elements" type="inventory.aai.onap.org.v10.NamedQueryElements" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="NamedQueryElements">
 			<xml-root-element name="named-query-elements" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="namedQueryElement" name="named-query-element" type="inventory.aai.openecomp.org.v10.NamedQueryElement" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="namedQueryElement" name="named-query-element" type="inventory.aai.onap.org.v10.NamedQueryElement" />
 			</java-attributes>
 		</java-type>
 
@@ -4718,17 +4765,17 @@
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String" />
 				<xml-element java-attribute="propertyLimitDesc" name="property-limit-desc" type="java.lang.String" />
 				<xml-element java-attribute="doNotOutput" name="do-not-output" type="java.lang.String" />
-				<xml-element java-attribute="namedQueryElements" name="named-query-elements" type="inventory.aai.openecomp.org.v10.NamedQueryElements" />
-				<xml-element java-attribute="relatedLookups" name="related-lookups" type="inventory.aai.openecomp.org.v10.RelatedLookups" />
-				<xml-element java-attribute="propertyConstraints" name="property-constraints" type="inventory.aai.openecomp.org.v10.PropertyConstraints" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="namedQueryElements" name="named-query-elements" type="inventory.aai.onap.org.v10.NamedQueryElements" />
+				<xml-element java-attribute="relatedLookups" name="related-lookups" type="inventory.aai.onap.org.v10.RelatedLookups" />
+				<xml-element java-attribute="propertyConstraints" name="property-constraints" type="inventory.aai.onap.org.v10.PropertyConstraints" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="RelatedLookups">
 			<xml-root-element name="related-lookups" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="relatedLookup" name="related-lookup" type="inventory.aai.openecomp.org.v10.RelatedLookup" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="relatedLookup" name="related-lookup" type="inventory.aai.onap.org.v10.RelatedLookup" />
 			</java-attributes>
 		</java-type>
 
@@ -4754,14 +4801,14 @@
 				<xml-element java-attribute="targetNodeProperty" name="target-node-property" required="true" type="java.lang.String" />
 				<xml-element container-type="java.util.ArrayList" java-attribute="propertyCollectList" name="property-collect-list" type="java.lang.String" />
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
 		<java-type name="PropertyConstraints">
 			<xml-root-element name="property-constraints" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="propertyConstraint" name="property-constraint" type="inventory.aai.openecomp.org.v10.PropertyConstraint" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="propertyConstraint" name="property-constraint" type="inventory.aai.onap.org.v10.PropertyConstraint" />
 			</java-attributes>
 		</java-type>
 
@@ -4794,9 +4841,9 @@
 			</xml-properties>
 			<xml-root-element name="model-and-named-query-search" />
 			<java-attributes>
-				<xml-element java-attribute="queryParameters" name="query-parameters" type="inventory.aai.openecomp.org.v10.QueryParameters" />
-				<xml-element java-attribute="instanceFilters" name="instance-filters" type="inventory.aai.openecomp.org.v10.InstanceFilters" />
-				<xml-element java-attribute="secondaryFilts" name="secondary-filts" type="inventory.aai.openecomp.org.v10.SecondaryFilts" />
+				<xml-element java-attribute="queryParameters" name="query-parameters" type="inventory.aai.onap.org.v10.QueryParameters" />
+				<xml-element java-attribute="instanceFilters" name="instance-filters" type="inventory.aai.onap.org.v10.InstanceFilters" />
+				<xml-element java-attribute="secondaryFilts" name="secondary-filts" type="inventory.aai.onap.org.v10.SecondaryFilts" />
 				<xml-element java-attribute="topNodeType" name="top-node-type" type="java.lang.String" />
 				<xml-element java-attribute="secondaryFilterCutPoint" name="secondary-filter-cut-point" type="java.lang.String" />
 			</java-attributes>
@@ -4808,8 +4855,8 @@
 			</xml-properties>
 			<xml-root-element name="query-parameters" />
 			<java-attributes>
-				<xml-element java-attribute="namedQuery" name="named-query" type="inventory.aai.openecomp.org.v10.NamedQuery" />
-				<xml-element java-attribute="model" name="model" type="inventory.aai.openecomp.org.v10.OverloadedModel" />
+				<xml-element java-attribute="namedQuery" name="named-query" type="inventory.aai.onap.org.v10.NamedQuery" />
+				<xml-element java-attribute="model" name="model" type="inventory.aai.onap.org.v10.OverloadedModel" />
 			</java-attributes>
 		</java-type>
 
@@ -4859,8 +4906,8 @@
 						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="modelVers" name="model-vers" type="inventory.aai.openecomp.org.v10.ModelVers" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="modelVers" name="model-vers" type="inventory.aai.onap.org.v10.ModelVers" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 		</java-type>
 
@@ -4870,7 +4917,7 @@
 			</xml-properties>
 			<xml-root-element name="instance-filters" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="instanceFilter" name="instance-filter" type="inventory.aai.openecomp.org.v10.InstanceFilter" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="instanceFilter" name="instance-filter" type="inventory.aai.onap.org.v10.InstanceFilter" />
 			</java-attributes>
 		</java-type>
 
@@ -4891,7 +4938,7 @@
 			</xml-properties>
 			<xml-root-element name="secondary-filts" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="secondaryFilt" name="secondary-filt" type="inventory.aai.openecomp.org.v10.SecondaryFilt" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="secondaryFilt" name="secondary-filt" type="inventory.aai.onap.org.v10.SecondaryFilt" />
 			</java-attributes>
 		</java-type>
 		
@@ -4922,7 +4969,7 @@
 			</xml-properties>
 			<xml-root-element name="response-list" />
 			<java-attributes>
-				<xml-element java-attribute="inventoryResponseItems" name="inventory-response-items" type="inventory.aai.openecomp.org.v10.InventoryResponseItems" />
+				<xml-element java-attribute="inventoryResponseItems" name="inventory-response-items" type="inventory.aai.onap.org.v10.InventoryResponseItems" />
 			</java-attributes>
 		</java-type>
 
@@ -4933,7 +4980,7 @@
 			</xml-properties>
 			<xml-root-element name="inventory-response-items" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="inventoryResponseItem" name="inventory-response-item" type="inventory.aai.openecomp.org.v10.InventoryResponseItem" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="inventoryResponseItem" name="inventory-response-item" type="inventory.aai.onap.org.v10.InventoryResponseItem" />
 			</java-attributes>
 		</java-type>
 
@@ -4946,8 +4993,8 @@
 			<java-attributes>
 				<xml-element java-attribute="modelName" name="model-name" type="java.lang.String" />
 				<xml-any-element java-attribute="item" />
-				<xml-element java-attribute="extraProperties" name="extra-properties" type="inventory.aai.openecomp.org.v10.ExtraProperties" />
-				<xml-element java-attribute="inventoryResponseItems" name="inventory-response-items" type="inventory.aai.openecomp.org.v10.InventoryResponseItems" />
+				<xml-element java-attribute="extraProperties" name="extra-properties" type="inventory.aai.onap.org.v10.ExtraProperties" />
+				<xml-element java-attribute="inventoryResponseItems" name="inventory-response-items" type="inventory.aai.onap.org.v10.InventoryResponseItems" />
 			</java-attributes>
 		</java-type>
 
@@ -4957,7 +5004,7 @@
 			</xml-properties>
 			<xml-root-element name="extra-properties" />
 			<java-attributes>
-				<xml-any-element container-type="java.util.ArrayList" java-attribute="extraProperty" name="extra-property" type="inventory.aai.openecomp.org.v10.ExtraProperty" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="extraProperty" name="extra-property" type="inventory.aai.onap.org.v10.ExtraProperty" />
 			</java-attributes>
 		</java-type>
 
@@ -4965,7 +5012,7 @@
 			<xml-root-element name="extra-property" />
 			<java-attributes>
 				<xml-element java-attribute="propertyName" name="property-name" type="java.lang.String" />
-				<xml-any-element java-attribute="propertyValue" lax="true" name="property-value" />
+				<xml-element java-attribute="propertyValue" name="property-value" type="java.lang.String" />
 			</java-attributes>
 		</java-type>
 		
@@ -4975,7 +5022,7 @@
 			</xml-properties>
 			<xml-root-element name="route-table-references" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="routeTableReference" name="route-table-reference" type="inventory.aai.openecomp.org.v10.RouteTableReference" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="routeTableReference" name="route-table-reference" type="inventory.aai.onap.org.v10.RouteTableReference" />
 			</java-attributes>
 		</java-type>
 		
@@ -4997,7 +5044,7 @@
 						<xml-property name="description" value="Concurrency value" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			
 			<xml-properties>
@@ -5016,7 +5063,7 @@
 			</xml-properties>
 			<xml-root-element name="instance-groups" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="instanceGroup" name="instance-group" type="inventory.aai.openecomp.org.v10.InstanceGroup" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="instanceGroup" name="instance-group" type="inventory.aai.onap.org.v10.InstanceGroup" />
 			</java-attributes>
 		</java-type>
 		
@@ -5048,13 +5095,14 @@
 						<xml-property name="description" value="Concurrency value" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			
 			<xml-properties>
 				<xml-property name="description" value="General mechanism for grouping instances" />
 				<xml-property name="nameProps" value="description" />
 				<xml-property name="uniqueProps" value="id" />
+				<xml-property name="searchable" value="id,description"/>
 				<xml-property name="indexedProps" value="id,description,type,sub-type" />
 				<xml-property name="container" value="instance-groups" />
 				<xml-property name="namespace" value="network" />
@@ -5068,7 +5116,7 @@
 			</xml-properties>
 			<xml-root-element name="segmentation-assignments" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="segmentationAssignment" name="segmentation-assignment" type="inventory.aai.openecomp.org.v10.SegmentationAssignment" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="segmentationAssignment" name="segmentation-assignment" type="inventory.aai.onap.org.v10.SegmentationAssignment" />
 			</java-attributes>
 		</java-type>
 				
@@ -5085,7 +5133,7 @@
 						<xml-property name="description" value="Concurrency value" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Openstack segmentation assignment." />
@@ -5101,7 +5149,7 @@
 			</xml-properties>
 			<xml-root-element name="allotted-resources" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="allottedResource" name="allotted-resource" type="inventory.aai.openecomp.org.v10.AllottedResource" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="allottedResource" name="allotted-resource" type="inventory.aai.onap.org.v10.AllottedResource" />
 			</java-attributes>
 		</java-type>
 		
@@ -5127,6 +5175,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model id for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-version-id" />
 						<xml-property name="dbAlias" value="model-invariant-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -5134,6 +5183,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="deployment" />
+						<xml-property name="requires" value="model-invariant-id" />
 						<xml-property name="dbAlias" value="model-version-id-local" />
 					</xml-properties>
 				</xml-element>
@@ -5141,7 +5191,7 @@
 					<xml-properties>
 						<xml-property name="description" value="the ASDC model version for this resource or service model." />
 						<xml-property name="visibility" value="internal" />
-						<xml-property name="dataLocation" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
+						<xml-property name="dataCopy" value="service-design-and-creation/models/model/{model-invariant-id}/model-vers/model-ver/{model-version-id}#model-version" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String">
@@ -5169,8 +5219,8 @@
 						<xml-property name="description" value="role in the network that this resource will be providing." />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="tunnelXconnects" name="tunnel-xconnects" type="inventory.aai.openecomp.org.v10.TunnelXconnects" />
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="tunnelXconnects" name="tunnel-xconnects" type="inventory.aai.onap.org.v10.TunnelXconnects" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			
 			<xml-properties>
@@ -5190,7 +5240,7 @@
 			</xml-properties>
 			<xml-root-element name="tunnel-xconnects" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="tunnelXconnect" name="tunnel-xconnect" type="inventory.aai.openecomp.org.v10.TunnelXconnect" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="tunnelXconnect" name="tunnel-xconnect" type="inventory.aai.onap.org.v10.TunnelXconnect" />
 			</java-attributes>
 		</java-type>
 		
@@ -5227,7 +5277,7 @@
 						<xml-property name="description" value="Concurrency value" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			
 			<xml-properties>
@@ -5246,7 +5296,7 @@
 			</xml-properties>
 			<xml-root-element name="entitlements" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="entitlement" name="entitlement" type="inventory.aai.openecomp.org.v10.Entitlement" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="entitlement" name="entitlement" type="inventory.aai.onap.org.v10.Entitlement" />
 			</java-attributes>
 		</java-type>
 				
@@ -5268,7 +5318,7 @@
 						<xml-property name="description" value="Concurrency value" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Metadata for entitlement group." />
@@ -5285,7 +5335,7 @@
 			</xml-properties>
 			<xml-root-element name="licenses" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="license" name="license" type="inventory.aai.openecomp.org.v10.License" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="license" name="license" type="inventory.aai.onap.org.v10.License" />
 			</java-attributes>
 		</java-type>
 				
@@ -5307,7 +5357,7 @@
 						<xml-property name="description" value="Concurrency value" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="Metadata for license group." />
@@ -5341,7 +5391,7 @@
 			</xml-properties>
 			<xml-root-element name="zones" />
 			<java-attributes>
-				<xml-element container-type="java.util.ArrayList" java-attribute="zone" name="zone" type="inventory.aai.openecomp.org.v10.Zone" />
+				<xml-element container-type="java.util.ArrayList" java-attribute="zone" name="zone" type="inventory.aai.onap.org.v10.Zone" />
 			</java-attributes>
 		</java-type>
 
@@ -5360,7 +5410,7 @@
 				</xml-element>
 				<xml-element java-attribute="designType" name="design-type" required="true" type="java.lang.String">
 					<xml-properties>
-						<xml-property name="description" value="Design of zone [Medium/Large?]" />
+						<xml-property name="description" value="Design of zone [Medium/Large…]" />
 					</xml-properties>
 				</xml-element>
 				<xml-element java-attribute="zoneContext" name="zone-context" required="true" type="java.lang.String">
@@ -5378,7 +5428,7 @@
 						<xml-property name="description" value="Concurrency value" />
 					</xml-properties>
 				</xml-element>
-				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.openecomp.org.v10.RelationshipList" />
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
 			</java-attributes>
 			<xml-properties>
 				<xml-property name="description" value="A zone is a grouping of assets in a location homing to the same connections into the CBB" />
@@ -5389,6 +5439,41 @@
 				<xml-property name="namespace" value="network" />
 			</xml-properties>
 		</java-type>
-		
+		<java-type name="RouteTargets">
+			<xml-properties>
+				<xml-property name="description" value="Collection of route target information" />
+			</xml-properties>
+			<xml-root-element name="route-targets" />
+			<java-attributes>
+				<xml-element container-type="java.util.ArrayList" java-attribute="routeTarget" name="route-target" type="inventory.aai.onap.org.v10.RouteTarget" />
+			</java-attributes>
+		</java-type>
+		<java-type name="RouteTarget">
+			<xml-root-element name="route-target" />
+			<java-attributes>
+				<xml-element java-attribute="globalRouteTarget" name="global-route-target" required="true" xml-key="true" type="java.lang.String">
+					<xml-properties>
+						<xml-property name="description" value="Number used to identify an RT, globally unique in the network" />
+					</xml-properties>
+				</xml-element>
+				<xml-element java-attribute="routeTargetRole" name="route-target-role" required="true" xml-key="true" type="java.lang.String">
+					<xml-properties>
+						<xml-property name="description" value="Role assigned to this route target" />
+					</xml-properties>
+				</xml-element>
+				<xml-element java-attribute="resourceVersion" name="resource-version" type="java.lang.String">
+					<xml-properties>
+						<xml-property name="description" value="Used for optimistic concurrency.  Must be empty on create, valid on update and delete." />
+					</xml-properties>
+				</xml-element>
+				<xml-element java-attribute="relationshipList" name="relationship-list" type="inventory.aai.onap.org.v10.RelationshipList" />
+			</java-attributes>
+			<xml-properties>
+				<xml-property name="description" value="Route target information" />
+				<xml-property name="container" value="route-targets" />
+				<xml-property name="dependentOn" value="vpn-binding" />
+				<xml-property name="canBeLinked" value="true" />
+			</xml-properties>
+		</java-type>
 	</java-types>
 </xml-bindings>

@@ -21,9 +21,10 @@
 package org.openecomp.aai.util;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.openecomp.aai.AAISetup;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -38,26 +39,16 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.openecomp.aai.exceptions.AAIException;
+import static org.junit.Assert.*;
 
 @Ignore
-public class AAIRSyncUtilityTest {
+public class AAIRSyncUtilityTest extends AAISetup {
 
   AAIRSyncUtility syncUtil; 
   AAIRSyncUtility syncUtilOmitDoCommand;
   AAIConfig aaiConfig;
   String hostName;
   String transId = UUID.randomUUID().toString();
-
-  @BeforeClass
-  public static void configure() throws AAIException {
-    System.setProperty("AJSC_HOME", "./src/test/resources/");
-    System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");; //fake prop file for testing
-  }
 
   /**
    * Initialize.

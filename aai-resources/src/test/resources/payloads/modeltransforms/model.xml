@@ -1,0 +1,22 @@
+<model xmlns="http://org.openecomp.aai.inventory/v8">
+<model-id>fe8aac07-ce6c-4f9f-aa0d-b561c77da9e8-test01</model-id>
+<model-type>resource</model-type>
+<model-name>vDbe</model-name>
+<model-version>v1.0</model-version>
+<model-name-version-id>0d23052d-8ffe-433e-a25d-da5da027bb7c</model-name-version-id>
+<model-elements>
+    <model-element>
+        <new-data-del-flag>F</new-data-del-flag>
+        <cardinality>unbounded</cardinality>
+        <relationship-list>
+            <relationship>
+                <related-to>model</related-to>
+                <relationship-data>
+                    <relationship-key>model.model-name-version-id</relationship-key>
+                    <relationship-value>22382f81-70cb-470d-8ab2-3e1b9fad10df</relationship-value>
+                </relationship-data>
+            </relationship>
+        </relationship-list>
+    </model-element>
+</model-elements>
+</model>

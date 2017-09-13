@@ -20,17 +20,9 @@
 
 package org.openecomp.aai.util;
 
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.TimerTask;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Timer;
+import java.io.*;
 import java.net.InetAddress;
+import java.util.*;
 
 public class DbTestConfig {
 

@@ -20,36 +20,25 @@
 
 package org.openecomp.aai.schema.db;
 
-import java.io.IOException;
-
+import com.thinkaurelius.titan.core.TitanFactory;
+import com.thinkaurelius.titan.core.TitanGraph;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
+import org.openecomp.aai.AAISetup;
 import org.openecomp.aai.db.schema.AuditDoc;
 import org.openecomp.aai.db.schema.AuditOXM;
 import org.openecomp.aai.db.schema.Auditor;
 import org.openecomp.aai.db.schema.AuditorFactory;
 import org.openecomp.aai.introspection.Version;
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
+
+import java.io.IOException;
 
 @Ignore("not ready for testing")
-public class AuditOXMTest {
-	
-	/**
-	 * Before.
-	 */
-	@BeforeClass
-	public static void before() {
-		System.setProperty("AJSC_HOME", ".");
-		System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");
-	
-	}
-	
+public class AuditOXMTest extends AAISetup {
+
 	
 	/**
 	 * Gets the graph audit.
