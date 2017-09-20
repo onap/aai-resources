@@ -285,7 +285,7 @@ public class ModelVersionTransformer extends RESTAPI {
 							oldVal = oldRelationshipDatum.getValue("relationship-value");
 						}
 
-						if (oldProp.equals("model.model-name-version-id")) { 
+						if ("model.model-name-version-id".equals(oldProp)) {
 							// make two new relationshipDatum for use w/ the new style model
 
 							// you should have the model in the list of models we collected earlier
