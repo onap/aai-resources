@@ -301,7 +301,7 @@ public abstract class BulkConsumer extends RESTAPI {
 					actionElement = item.get("delete");
 				}
 				
-				if (!actionElement.isJsonArray()) {
+				if ((actionElement == null) || !actionElement.isJsonArray()) {
 					throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
 				}
 				JsonArray httpArray = actionElement.getAsJsonArray();
