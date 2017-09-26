@@ -11,7 +11,7 @@
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${logDirectory}/provTool/error.log.%d{yyyy-MM-dd}</fileNamePattern>
 		</rollingPolicy>
-		<encoder>
+		<encoder class="org.openecomp.aai.logging.EcompEncoder">
 			<pattern>${eelfLogPattern}</pattern>
 		</encoder>
 	</appender>
@@ -26,7 +26,7 @@
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${logDirectory}/provTool/debug.log.%d{yyyy-MM-dd}</fileNamePattern>
 		</rollingPolicy>
-		<encoder>
+		<encoder class="org.openecomp.aai.logging.EcompEncoder">
 			<pattern>${eelfLogPattern}</pattern>
 		</encoder>
 	</appender>
@@ -41,7 +41,7 @@
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${logDirectory}/provTool/metrics.log.%d{yyyy-MM-dd}</fileNamePattern>
 		</rollingPolicy>
-		<encoder>
+		<encoder class="org.openecomp.aai.logging.EcompEncoder">
 			<pattern>${eelfMetricLogPattern}</pattern>
 		</encoder>
 	</appender>

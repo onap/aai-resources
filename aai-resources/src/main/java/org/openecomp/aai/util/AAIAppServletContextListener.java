@@ -85,5 +85,9 @@ public class AAIAppServletContextListener implements ServletContextListener {
 			LOGGER.error("Unknown failure while initializing A&AI Server", e);
 			throw new RuntimeException("Unknown failure while initializing A&AI server", e);
 		}
+
+		LOGGER.info("Resources MicroService Started");
+		LOGGER.error("Resources MicroService Started");
+		LOGGER.debug("Resources MicroService Started");
 	}
 }
