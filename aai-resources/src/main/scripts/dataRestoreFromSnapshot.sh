@@ -1,24 +1,25 @@
 #!/bin/ksh
-
-###
+#
 # ============LICENSE_START=======================================================
-# org.openecomp.aai
+# org.onap.aai
 # ================================================================================
-# Copyright (C) 2017 AT&T Intellectual Property. All rights reserved.
+# Copyright © 2017 AT&T Intellectual Property. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
-#      http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============LICENSE_END=========================================================
-###
+#
+# ECOMP is a trademark and service mark of AT&T Intellectual Property.
+#
 
 #
 # This script uses the dataSnapshot and SchemaGenerator (via GenTester) java classes to restore 
@@ -60,7 +61,7 @@ done
 
 #### Step 1) clear out the database
 $JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.openecomp.aai.dbgen.DataSnapshot CLEAR_ENTIRE_DATABASE $1
+ org.onap.aai.dbgen.DataSnapshot CLEAR_ENTIRE_DATABASE $1
 if [ "$?" -ne "0" ]; then
     echo "Problem clearing out database."
     exit 1
@@ -68,7 +69,7 @@ fi
  
 #### Step 2) rebuild the db-schema
 $JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.openecomp.aai.dbgen.GenTester GEN_DB_WITH_NO_DEFAULT_CR
+ org.onap.aai.dbgen.GenTester GEN_DB_WITH_NO_DEFAULT_CR
 if [ "$?" -ne "0" ]; then
     echo "Problem rebuilding the schema (SchemaGenerator)."
     exit 1
@@ -76,7 +77,7 @@ fi
 
 #### Step 3) reload the data from a snapshot file
 $JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.openecomp.aai.dbgen.DataSnapshot RELOAD_DATA $1
+ org.onap.aai.dbgen.DataSnapshot RELOAD_DATA $1
 if [ "$?" -ne "0" ]; then
     echo "Problem reloading data into the database."
     exit 1

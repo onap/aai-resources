@@ -1,24 +1,25 @@
 #!/bin/ksh
-
-###
+#
 # ============LICENSE_START=======================================================
-# org.openecomp.aai
+# org.onap.aai
 # ================================================================================
-# Copyright (C) 2017 AT&T Intellectual Property. All rights reserved.
+# Copyright © 2017 AT&T Intellectual Property. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
-#      http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============LICENSE_END=========================================================
-###
+#
+# ECOMP is a trademark and service mark of AT&T Intellectual Property.
+#
 
 #
 # This script is used to synch-up the data in the database with the "edge-tags" definitions found in the  DbEdgeRules.java file.  
@@ -86,7 +87,7 @@ done
 
 $JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
  -Dcom.att.eelf.logging.file=default-logback.xml -Dcom.att.eelf.logging.path="$PROJECT_HOME/bundleconfig/etc/appprops/" \
- org.openecomp.aai.dbgen.UpdateEdgeTags $1
+ org.onap.aai.dbgen.UpdateEdgeTags $1
 if [ "$?" -ne "0" ]; then
     echo "Problem executing UpdateEdgeTags "
     exit 1
