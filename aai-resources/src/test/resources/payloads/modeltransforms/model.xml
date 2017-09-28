@@ -1,4 +1,4 @@
-<model xmlns="http://org.openecomp.aai.inventory/v8">
+<model xmlns="http://org.onap.aai.inventory/v8">
 <model-id>fe8aac07-ce6c-4f9f-aa0d-b561c77da9e8-test01</model-id>
 <model-type>resource</model-type>
 <model-name>vDbe</model-name>

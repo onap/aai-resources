@@ -1,24 +1,25 @@
 #!/bin/sh
-
-###
+#
 # ============LICENSE_START=======================================================
-# org.openecomp.aai
+# org.onap.aai
 # ================================================================================
-# Copyright (C) 2017 AT&T Intellectual Property. All rights reserved.
+# Copyright © 2017 AT&T Intellectual Property. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
-#      http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============LICENSE_END=========================================================
-###
+#
+# ECOMP is a trademark and service mark of AT&T Intellectual Property.
+#
 
 userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
 if [ "${userid}" != "aaiadmin" ]; then
@@ -45,4 +46,4 @@ do
      CLASSPATH=$CLASSPATH:$JAR
 done
 
-$JAVA -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME -cp $CLASSPATH org.openecomp.aai.db.schema.ScriptDriver $@
+$JAVA -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME -cp $CLASSPATH org.onap.aai.db.schema.ScriptDriver $@
