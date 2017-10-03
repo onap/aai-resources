@@ -59,6 +59,40 @@ chef-solo \
    -j /var/chef/aai-config/cookbooks/runlist-aai-resources.json \
    -E ${AAI_CHEF_ENV};
 
+TITAN_REALTIME="/opt/app/aai-resources/bundleconfig/etc/appprops/titan-realtime.properties";
+
+if [ ! -f ${TITAN_REALTIME} ]; then
+	echo "Unable to find the titan realtime file";
+	exit 1;
+fi
+
+HBASE_HOSTNAME=$(grep "storage.hostname" ${TITAN_REALTIME} | cut -d"=" -f2-);
+HBASE_PORT="${HBASE_PORT:-2181}";
+NUM_OF_RETRIES=${NUM_OF_RETRIES:-500};
+retry=0;
+
+while ! nc -z ${HBASE_HOSTNAME} ${HBASE_PORT} ;
+do
+	if [ $retry -eq $NUM_OF_RETRIES ]; then
+		echo "Unable to connect to hbase after $NUM_OF_RETRIES retries, please check if hbase server is properly configured and be able to connect"; 
+		exit 1;
+	fi;
+
+	echo "Waiting for hbase to be up";
+	sleep 5;
+
+	retry=$((retry + 1));
+done
+
+HBASE_STARTUP_ARTIFIIAL_DELAY=${HBASE_STARTUP_ARTIFIIAL_DELAY:-50};
+
+# By default the artificial delay will be introduced
+# the user can override it by set DISABLE_HBASE_STARTUP_ARTIFICIAL_DELAY to some string
+
+if [ -z "${DISABLE_HBASE_STARTUP_ARTIFICIAL_DELAY}" ]; then
+	sleep ${HBASE_STARTUP_ARTIFIIAL_DELAY};
+fi;
+
 /opt/app/aai-resources/bin/createDBSchema.sh || {
     echo "Error: Unable to create the db schema, please check if the hbase host is configured and up";
     exit 1;
