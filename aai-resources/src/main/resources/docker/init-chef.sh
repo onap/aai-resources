@@ -32,7 +32,7 @@ if [ ! -d "aai-config" ]; then
 
     git clone --depth 1 -b ${CHEF_BRANCH} --single-branch ${CHEF_CONFIG_GIT_URL}/${CHEF_CONFIG_REPO}.git aai-config || {
         echo "Error: Unable to clone the aai-config repo with url: ${CHEF_GIT_URL}/${CHEF_CONFIG_REPO}.git";
-        exit 1;
+        exit;
     }
 
 fi
@@ -49,7 +49,7 @@ if [ ! -d "aai-data" ]; then
 
     git clone --depth 1 -b ${CHEF_BRANCH} --single-branch ${CHEF_DATA_GIT_URL}/aai-data.git aai-data || {
         echo "Error: Unable to clone the aai-data repo with url: ${CHEF_GIT_URL}";
-        exit 1;
+        exit;
     }
 
 fi
@@ -59,7 +59,25 @@ chef-solo \
    -j /var/chef/aai-config/cookbooks/runlist-aai-resources.json \
    -E ${AAI_CHEF_ENV};
 
+TITAN_REALTIME="/opt/app/aai-resources/bundleconfig/etc/appprops/titan-realtime.properties";
+
+if [ ! -f ${TITAN_REALTIME} ]; then
+	echo "Unable to find the titan realtime file";
+	exit 1;
+fi
+
+HBASE_HOSTNAME=$(grep "storage.hostname" ${TITAN_REALTIME} | cut -d"=" -f2-);
+HBASE_PORT="${HBASE_PORT:-2181}";
+
+while ! nc -z ${HBASE_HOSTNAME} ${HBASE_PORT} ;
+do
+	echo "Waiting for hbase to be up";
+	sleep 5;
+done
+
+sleep 30;
+
 /opt/app/aai-resources/bin/createDBSchema.sh || {
     echo "Error: Unable to create the db schema, please check if the hbase host is configured and up";
-    exit 1;
+    exit;
 }
