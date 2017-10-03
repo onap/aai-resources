@@ -27,7 +27,8 @@ import org.mockito.Mockito;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 
 public class PreAaiAjscInterceptorTest {
