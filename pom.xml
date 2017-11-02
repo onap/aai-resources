@@ -50,7 +50,6 @@
         <!-- For using CXF with Maven -->
         <cxf.version>3.0.4</cxf.version>
         <snapshot.file>int1-data.graphson</snapshot.file>
-        <aai-core.version>1.1.0-SNAPSHOT</aai-core.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
@@ -183,7 +182,7 @@
                                         <additionalClasspathElement>${runAjscHome}/extJars/logback-core-1.1.7.jar
                                         </additionalClasspathElement>
                                         <additionalClasspathElement>
-                                            ${runAjscHome}/extJars/aai-core-${aai-core.version}.jar
+                                            ${runAjscHome}/extJars/aai-core-${project.version}.jar
                                         </additionalClasspathElement>
                                     </additionalClasspathElements>
 
@@ -255,7 +254,7 @@
                                         </systemProperty>
                                         <systemProperty>
                                             <key>aai-core.version</key>
-                                            <value>${aai-core.version}</value>
+                                            <value>${project.version}</value>
                                         </systemProperty>
                                     </systemProperties>
 
