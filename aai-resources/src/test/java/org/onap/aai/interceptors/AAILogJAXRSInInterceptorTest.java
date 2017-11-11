@@ -26,6 +26,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.junit.Before;
 import org.junit.Test;
+import org.onap.aai.AAISetup;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
-public class AAILogJAXRSInInterceptorTest {
+public class AAILogJAXRSInInterceptorTest extends AAISetup {
 
     private AAILogJAXRSInInterceptor aaiLogJAXRSInInterceptor;
 
