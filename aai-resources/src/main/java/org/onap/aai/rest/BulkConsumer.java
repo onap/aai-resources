@@ -108,7 +108,6 @@ public abstract class BulkConsumer extends RESTAPI {
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		Version version = Version.valueOf(versionParam);
-		DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
 
 		Response response = null;
 		
@@ -121,7 +120,7 @@ public abstract class BulkConsumer extends RESTAPI {
 		
 		try {
 			//TODO add auth check when this endpoint added to that auth properties files
-			
+			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
 			
 			JsonArray transactions = getTransactions(content);
 			
