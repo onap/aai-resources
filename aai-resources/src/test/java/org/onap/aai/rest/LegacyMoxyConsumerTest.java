@@ -192,7 +192,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         queryParameters.add("resource-version", resourceVersion);
 
         response = legacyMoxyConsumer.delete(
-                "v11",
+                Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
