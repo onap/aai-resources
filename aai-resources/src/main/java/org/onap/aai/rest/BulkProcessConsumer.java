@@ -25,7 +25,7 @@ import javax.ws.rs.Path;
 
 import org.onap.aai.restcore.HttpMethod;
 
-@Path("{version: v[2789]|v1[01]}/bulkprocess")
+@Path("{version: v[2789]|v1[012]}/bulkprocess")
 public class BulkProcessConsumer extends BulkConsumer {
 
 	@Override
