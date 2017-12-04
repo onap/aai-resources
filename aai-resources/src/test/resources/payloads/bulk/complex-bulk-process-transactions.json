@@ -1,0 +1,11 @@
+{
+	"transactions": [
+		{
+			"delete": [
+				{
+					"uri": "/cloud-infrastructure/complexes/complex/complex-bulk-process-transactions-2-<UUID>"
+				}
+			]
+		}
+	]
+}

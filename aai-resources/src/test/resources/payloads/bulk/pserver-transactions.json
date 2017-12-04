@@ -1,35 +1,33 @@
 {
-  "transactions": [
-    {
-      "put": [
-        {
-          "uri": "/cloud-infrastructure/pservers/pserver/pserver-hostname-11",
-          "body": {
-            "hostname": "pserver-hostname-11",
-            "fqdn": "fake-fqdn-11"
-          }
-        }
-      ]
-    },
-    {
-      "patch": [
-        {
-          "uri": "/cloud-infrastructure/pservers/pserver/pserver-hostname-11",
-          "body": {
-            "fqdn": "fake-fqdn-12"
-          }
-        }
-      ]
-    },
-    {
-      "delete": [
-        {
-          "uri": "/cloud-infrastructure/pservers/pserver/pserver-hostname-11",
-          "body": {
-            "hostname": "pserver-hostname-11"
-          }
-        }
-      ]
-    }
-  ]
+	"transactions": [
+		{
+			"put": [
+				{
+					"uri": "/cloud-infrastructure/pservers/pserver/pserver-transactions-1-<UUID>",
+					"body": {
+						"hostname": "pserver-transactions-1-<UUID>",
+						"fqdn": "fake-fqdn-1"
+					}
+				},
+				{
+					"uri": "/cloud-infrastructure/pservers/pserver/pserver-transactions-2-<UUID>",
+					"body": {
+						"hostname": "pserver-transactions-2-<UUID>",
+						"fqdn": "fake-fqdn-2"
+					}
+				}
+			]
+		},
+		{
+			"put": [
+				{
+					"uri": "/cloud-infrastructure/pservers/pserver/pserver-transactions-3-<UUID>",
+					"body": {
+						"hostname": "pserver-transactions-3-<UUID>",
+						"fqdn": "fake-fqdn-3"
+					}
+				}
+			]
+		}
+	]
 }

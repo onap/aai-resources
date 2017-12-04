@@ -25,6 +25,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -40,8 +42,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.javatuples.Pair;
-import org.javatuples.Triplet;
-
 import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
@@ -51,6 +51,8 @@ import org.onap.aai.introspection.Version;
 import org.onap.aai.introspection.exceptions.AAIUnmarshallingException;
 import org.onap.aai.logging.ErrorObjectNotFoundException;
 import org.onap.aai.parsers.query.QueryParser;
+import org.onap.aai.rest.bulk.BulkOperation;
+import org.onap.aai.rest.bulk.BulkOperationResponse;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
 import org.onap.aai.rest.util.ValidateEncoding;
@@ -58,6 +60,9 @@ import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -81,6 +86,10 @@ import com.google.gson.JsonSyntaxException;
  */
 public abstract class BulkConsumer extends RESTAPI {
 
+	private static final String BULK_PATCH_METHOD = "patch";
+	private static final String BULK_DELETE_METHOD = "delete";
+	private static final String BULK_PUT_METHOD = "put";
+
 	/** The introspector factory type. */
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	
@@ -101,7 +110,7 @@ public abstract class BulkConsumer extends RESTAPI {
 	@PUT
 	@Consumes({ MediaType.APPLICATION_JSON})
 	@Produces({ MediaType.APPLICATION_JSON})
-	public Response bulkAdd(String content, @PathParam("version")String versionParam, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req){
+	public Response bulkProcessor(String content, @PathParam("version")String versionParam, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req){
 		
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
@@ -114,14 +123,12 @@ public abstract class BulkConsumer extends RESTAPI {
 		/* A Response will be generated for each object in each transaction.
 		 * To keep track of what came from where to give organized feedback to the client,
 		 * we keep responses from a given transaction together in one list (hence all being a list of lists)
-		 * and pair each response with its matching URI (which will be null if there wasn't one).
+		 * and BulkOperationResponse each response with its matching URI (which will be null if there wasn't one).
 		 */ 
- 		List<List<Pair<URI, Response>>> allResponses = new ArrayList<List<Pair<URI, Response>>>();
-		
+ 		List<List<BulkOperationResponse>> allResponses = new ArrayList<>();
 		try {
-			//TODO add auth check when this endpoint added to that auth properties files
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-			
+		
 			JsonArray transactions = getTransactions(content);
 			
 			for (int i = 0; i < transactions.size(); i++){
@@ -129,17 +136,17 @@ public abstract class BulkConsumer extends RESTAPI {
 				Loader loader = httpEntry.getLoader();
 				TransactionalGraphEngine dbEngine = httpEntry.getDbEngine();
 				URI thisUri = null;
-				List<Triplet<URI, Introspector,HttpMethod>> triplet = new ArrayList<Triplet<URI, Introspector,HttpMethod>>();
+				List<BulkOperation> bulkOperations = new ArrayList<>();
 				HttpMethod method = null;
+				JsonElement transObj = new JsonObject();
 				try {
-					JsonElement transObj = transactions.get(i);
-					if (!(transObj instanceof JsonObject)) {
-						throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
+					transObj = transactions.get(i);
+					if (!transObj.isJsonObject()) {
+						throw new AAIException("AAI_6111", "input payload does not follow bulk interface");
 					}
-					//JsonObject transaction = transObj.getAsJsonObject();
 					
-					fillObjectTuplesFromTransaction(triplet, transObj.getAsJsonObject(), loader, dbEngine, outputMediaType);
-					if (triplet.size() == 0) {
+					fillBulkOperationObjectFromTransaction(bulkOperations, transObj.getAsJsonObject(), loader, dbEngine, outputMediaType);
+					if (bulkOperations.isEmpty()) {
 						//case where user sends a validly formatted transactions object but
 						//which has no actual things in it for A&AI to do anything with
 						//assuming we should count this as a user error
@@ -147,16 +154,16 @@ public abstract class BulkConsumer extends RESTAPI {
 					}
 				
 					List<DBRequest> requests = new ArrayList<>();
-					for (Triplet<URI, Introspector, HttpMethod> tuple : triplet){
-						thisUri = tuple.getValue0(); 
-						method = tuple.getValue2();
+					for (BulkOperation bulkOperation : bulkOperations){
+						thisUri = bulkOperation.getUri(); 
+						method = bulkOperation.getHttpMethod();
 						QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(thisUri);
-						DBRequest request = new DBRequest.Builder(method, thisUri, uriQuery, tuple.getValue1(), headers, info, transId).build();
+						DBRequest request = new DBRequest.Builder(method, thisUri, uriQuery, bulkOperation.getIntrospector(), headers, bulkOperation.getUriInfo(), transId).rawRequestContent(bulkOperation.getRawReq()).build();
 						requests.add(request);
 					}
 					
 					Pair<Boolean, List<Pair<URI, Response>>> results = httpEntry.process(requests, sourceOfTruth, this.enableResourceVersion());
-					List<Pair<URI,    Response>> responses = results.getValue1();
+					List<BulkOperationResponse> responses = BulkOperationResponse.processPairList(method, results.getValue1());
 					allResponses.add(responses);
 					if (results.getValue0()) { //everything was processed without error
 						dbEngine.commit();
@@ -168,15 +175,29 @@ public abstract class BulkConsumer extends RESTAPI {
 					 * bubbles up to here. As we want to tie error messages to the URI of the object that caused
 					 * them, we catch here, generate a Response, bundle it with that URI, and move on.
 					 */
-					method = HttpMethod.PUT;
-					if (triplet.size() != 0) { //failed somewhere in the middle of tuple-filling
-						Triplet<URI, Introspector, HttpMethod> lastTuple = triplet.get(triplet.size()-1); //last one in there was the problem
-						if (lastTuple.getValue1() == null){
-							//failed out before thisUri could be set but after tuples started being filled
-							thisUri = lastTuple.getValue0();
-							method = lastTuple.getValue2();
+					if (!bulkOperations.isEmpty()) { //failed somewhere in the middle of bulkOperation-filling
+						BulkOperation lastBulkOperation = bulkOperations.get(bulkOperations.size()-1); //last one in there was the problem
+						if (lastBulkOperation.getIntrospector() == null){
+							//failed out before thisUri could be set but after bulkOperation started being filled
+							thisUri = lastBulkOperation.getUri();
+							method = lastBulkOperation.getHttpMethod();
 						}
-					} //else failed out on empty payload so tuples never filled (or failed out even earlier than tuple-filling)
+					} //else failed out on empty payload so bulkOperations never filled (or failed out even earlier than bulkOperations-filling)
+					
+					if (method == null) {
+						List<String> methods = transObj.getAsJsonObject().entrySet().stream().map(Entry::getKey).collect(Collectors.toCollection(ArrayList::new));
+						
+						if (methods.contains(BULK_PUT_METHOD)) {
+							method = HttpMethod.PUT; 
+						} else if (methods.contains(BULK_DELETE_METHOD)) {
+							method = HttpMethod.DELETE;
+						} else if (methods.contains(BULK_PATCH_METHOD)) {
+							method = HttpMethod.MERGE_PATCH;
+						} else {
+							method = HttpMethod.PUT;
+						}
+					}
+					
 					addExceptionCaseFailureResponse(allResponses, e, i, thisUri, headers, info, method);
 					dbEngine.rollback();
 					continue; /* if an exception gets thrown within a transaction we want to keep going to 
@@ -238,38 +259,41 @@ public abstract class BulkConsumer extends RESTAPI {
 	}
 	
 	/**
-	 * Fill object tuples from transaction.
+	 * Fill object bulkOperations from transaction.
 	 *
-	 * @param tuples the tuples
+	 * @param bulkOperations the bulk Operations
 	 * @param transaction - JSON body containing the objects to be added
 	 * 							each object must have a URI and an object body
 	 * @param loader the loader
 	 * @param dbEngine the db engine
 	 * @param inputMediaType the input media type
-	 * @return list of tuples containing each introspector-wrapped object and its given URI
+	 * @return list of bulkOperations containing each introspector-wrapped object and its given URI
 	 * @throws AAIException the AAI exception
 	 * @throws JsonSyntaxException the json syntax exception
 	 * @throws UnsupportedEncodingException Walks through the given transaction and unmarshals each object in it, then bundles each
 	 * with its URI.
 	 */
-	private void fillObjectTuplesFromTransaction(List<Triplet<URI, Introspector, HttpMethod>> triplet,
+	private void fillBulkOperationObjectFromTransaction(List<BulkOperation> bulkOperations,
 			JsonObject transaction, Loader loader, TransactionalGraphEngine dbEngine, String inputMediaType)
 			throws AAIException, JsonSyntaxException, UnsupportedEncodingException {
 
 	
-			if (transaction.has("put") && this.functionAllowed(HttpMethod.PUT)) {
-				pairUp(triplet, transaction, loader, dbEngine, inputMediaType, HttpMethod.PUT);
-			}
-			else if (transaction.has("delete") && this.functionAllowed(HttpMethod.DELETE)) {
-				pairUp(triplet, transaction, loader, dbEngine, inputMediaType, HttpMethod.DELETE);
-			}
-			else if (transaction.has("patch") && this.functionAllowed(HttpMethod.MERGE_PATCH)) {
-				pairUp(triplet, transaction, loader, dbEngine, inputMediaType, HttpMethod.MERGE_PATCH);
-			}
-							
-			else{
+			if (transaction.has(BULK_PUT_METHOD) && this.functionAllowed(HttpMethod.PUT)) {
+				populateBulkOperations(bulkOperations, transaction, loader, dbEngine, inputMediaType, HttpMethod.PUT);
+			} else if (transaction.has(BULK_DELETE_METHOD) && this.functionAllowed(HttpMethod.DELETE)) {
+				populateBulkOperations(bulkOperations, transaction, loader, dbEngine, inputMediaType, HttpMethod.DELETE);
+			} else if (transaction.has(BULK_PATCH_METHOD) && this.functionAllowed(HttpMethod.MERGE_PATCH)) {
+				populateBulkOperations(bulkOperations, transaction, loader, dbEngine, inputMediaType, HttpMethod.MERGE_PATCH);
+			} else {
+				String msg = "input payload does not follow bulk %s interface - missing %s";
+				String type = "process";
+				String operations = "put delete or patch";
 				
-				throw new AAIException("AAI_6118", "input payload does not follow bulk add interface - missing put delete or patch");                                                    
+				if (this instanceof BulkAddConsumer) {
+					type = "add";
+					operations = BULK_PUT_METHOD;
+				}
+				throw new AAIException("AAI_6118", String.format(msg, type, operations));                                                    
 			}
 
 			
@@ -278,74 +302,83 @@ public abstract class BulkConsumer extends RESTAPI {
 
 	
 	
-	private void pairUp(List<Triplet<URI, Introspector, HttpMethod>> triplet, JsonObject item, Loader loader, TransactionalGraphEngine dbEngine, String inputMediaType, HttpMethod method) throws AAIException, JsonSyntaxException, UnsupportedEncodingException{
+	private void populateBulkOperations(List<BulkOperation> bulkOperations, JsonObject item, Loader loader, TransactionalGraphEngine dbEngine, String inputMediaType, HttpMethod method) throws AAIException, JsonSyntaxException, UnsupportedEncodingException{
 	
-		
 		for (int i=0; i<item.size(); i++) {
-			Triplet<URI, Introspector, HttpMethod> tuple =  Triplet.with(null, null,null);
-			
-			tuple = tuple.setAt2(method);
+			BulkOperation bulkOperation = new BulkOperation();
 			try {
+				
 				if (!(item.isJsonObject())) {
 					throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
 				}
 				
-				
 				JsonElement actionElement = null;
 				
-				if(item.has("put")){
-					actionElement = item.get("put");
-				} else if(item.has("patch")){
-					actionElement = item.get("patch");
-				} else if(item.has("delete")){
-					actionElement = item.get("delete");
+				if(item.has(BULK_PUT_METHOD)){
+					actionElement = item.get(BULK_PUT_METHOD);
+				} else if(item.has(BULK_PATCH_METHOD)){
+					actionElement = item.get(BULK_PATCH_METHOD);
+				} else if(item.has(BULK_DELETE_METHOD)){
+					actionElement = item.get(BULK_DELETE_METHOD);
 				}
 				
 				if ((actionElement == null) || !actionElement.isJsonArray()) {
 					throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
 				}
+				
 				JsonArray httpArray = actionElement.getAsJsonArray();
-				for(int j = 0; j < httpArray.size(); ++j){
+				for (int j = 0; j < httpArray.size(); ++j) {
+					
+					bulkOperation = new BulkOperation();
+					bulkOperation.setHttpMethod(method);
+					
 					JsonObject it = httpArray.get(j).getAsJsonObject();
 					JsonElement itemURIfield = it.get("uri");
 					if (itemURIfield == null) {
 						throw new AAIException("AAI_6118", "must include object uri");
 					}
-					String uriStr = itemURIfield.getAsString();
-					if (uriStr.endsWith("/relationship-list/relationship")) {
+					
+					UriComponents uriComponents = UriComponentsBuilder.fromUriString(itemURIfield.getAsString()).build();
+					if (uriComponents.getPath().endsWith("/relationship-list/relationship")) {
 						if (method.equals(HttpMethod.PUT)) {
-							tuple = tuple.setAt2(HttpMethod.PUT_EDGE);
+							bulkOperation.setHttpMethod(HttpMethod.PUT_EDGE);
 						} else if (method.equals(HttpMethod.DELETE)) {
-							tuple = tuple.setAt2(HttpMethod.DELETE_EDGE);
+							bulkOperation.setHttpMethod(HttpMethod.DELETE_EDGE);
 						}
 					} else {
-						tuple = tuple.setAt2(method);
+						bulkOperation.setHttpMethod(method);
 					}
 									
-					URI uri = UriBuilder.fromPath(uriStr).build();
+					URI uri = UriBuilder.fromPath(uriComponents.getPath()).build();
 					
 					/* adding the uri as soon as we have one (valid or not) lets us
 					 * keep any errors with their corresponding uris for client feedback  
 					 */
-					tuple = tuple.setAt0(uri);
+					bulkOperation.setUri(uri);
+					
+					bulkOperation.addUriInfoQueryParams(uriComponents.getQueryParams());
 					
 					if (!ValidateEncoding.getInstance().validate(uri)) {
 						throw new AAIException("AAI_3008", "uri=" + uri.getPath());
 					}
 					
-					if (!(it.has("body"))){
-						throw new AAIException("AAI_6118", "input payload does not follow bulk add interface - missing \"body\"");
-					}
-					JsonElement bodyObj = it.get("body");
-					if (!(bodyObj.isJsonObject())) {
-						throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
+					JsonElement bodyObj = new JsonObject();
+					if (!bulkOperation.getHttpMethod().equals(HttpMethod.DELETE)) {
+						if (!(it.has("body"))){
+							throw new AAIException("AAI_6118", "input payload does not follow bulk interface - missing \"body\"");
+						}
+						bodyObj = it.get("body");
+						if (!(bodyObj.isJsonObject())) {
+							throw new AAIException("AAI_6111", "input payload does not follow bulk interface");
+						} 
 					}
 					
 					Gson gson = new Gson();
 					
 					String bodyStr = gson.toJson(bodyObj);
+					bulkOperation.setRawReq(bodyStr);
 					
-					if (tuple.getValue2().equals(HttpMethod.PUT_EDGE)) {
+					if (bulkOperation.getHttpMethod().equals(HttpMethod.PUT_EDGE)) {
 						Introspector obj;
 						try {
 							obj = loader.unmarshal("relationship", bodyStr, org.onap.aai.restcore.MediaType.getEnum(inputMediaType));
@@ -355,31 +388,36 @@ public abstract class BulkConsumer extends RESTAPI {
 						}
 						
 					
-						tuple = tuple.setAt1(obj);
+						bulkOperation.setIntrospector(obj);
 
 					} else {
 						QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uri);
 						String objName = uriQuery.getResultType();
 						
 						Introspector obj;
-						try {
-							obj = loader.unmarshal(objName, bodyStr, org.onap.aai.restcore.MediaType.getEnum(inputMediaType));
-						} catch (AAIUnmarshallingException e) {
-							throw new AAIException("AAI_3000", "object could not be unmarshalled:" + bodyStr);
+						
+						if (bulkOperation.getHttpMethod().equals(HttpMethod.DELETE)) {
+							obj = loader.introspectorFromName(objName);
+						} else {
+							try {
+								obj = loader.unmarshal(objName, bodyStr, org.onap.aai.restcore.MediaType.getEnum(inputMediaType));
+							} catch (AAIUnmarshallingException e) {
+								throw new AAIException("AAI_3000", "object could not be unmarshalled:" + bodyStr);
+	
+							}
+							this.validateIntrospector(obj, loader, uri, bulkOperation.getHttpMethod());
 
 						}
 					
-						this.validateIntrospector(obj, loader, uri, tuple.getValue2());
-						tuple = tuple.setAt1(obj);
+						bulkOperation.setIntrospector(obj);
 					}
-					triplet.add(tuple);
+					bulkOperations.add(bulkOperation);
 				}
-//				JsonElement itemURIfield = item.get("uri");
 				
 			} catch (AAIException e) {
-				// even if tuple doesn't have a uri or body, this way we keep all information associated with this error together
+				// even if bulkOperations doesn't have a uri or body, this way we keep all information associated with this error together
 				// even if both are null, that indicates how the input was messed up, so still useful to carry around like this
-				triplet.add(tuple);
+				bulkOperations.add(bulkOperation);
 				throw e; //rethrow so the right response is generated on the level above
 			}
 		}
@@ -396,18 +434,21 @@ public abstract class BulkConsumer extends RESTAPI {
 	 * 
 	 * Creates the payload for a single unified response from all responses generated
 	 */
-	private String generateResponsePayload(List<List<Pair<URI,Response>>> allResponses){
+	private String generateResponsePayload(List<List<BulkOperationResponse>> allResponses){
 		JsonObject ret = new JsonObject();
 		JsonArray retArr = new JsonArray();
 		
-		for(List<Pair<URI,Response>> responses : allResponses){
+		for(List<BulkOperationResponse> responses : allResponses){
 			JsonObject tResp = new JsonObject();
 			JsonArray tArrResp = new JsonArray();
+			HttpMethod method = HttpMethod.PUT;
 			
-			for (Pair<URI,Response> r : responses) {
-				JsonObject indPayload = new JsonObject();
+			for (BulkOperationResponse r : responses) {
 				
-				URI origURI = r.getValue0();
+				JsonObject indPayload = new JsonObject();
+				method = r.getHttpMethod();
+				
+				URI origURI = r.getUri();
 				if (origURI != null) {
 					indPayload.addProperty("uri", origURI.getPath());
 				} else {
@@ -416,26 +457,38 @@ public abstract class BulkConsumer extends RESTAPI {
 				
 				JsonObject body = new JsonObject();
 				
-				int rStatus = r.getValue1().getStatus();
+				int rStatus = r.getResponse().getStatus();
 				String rContents = null;
 				
-				rContents = (String)r.getValue1().getEntity();
+				rContents = (String)r.getResponse().getEntity();
 				
-				body.addProperty(new Integer(rStatus).toString(), rContents);
+				body.addProperty(Integer.toString(rStatus), rContents);
 				indPayload.add("body", body);
 				
 				tArrResp.add(indPayload);
 			}
 			
-			tResp.add("put", tArrResp);
+			tResp.add(this.mapHttpMethodToBulkMethod(method), tArrResp);
 			retArr.add(tResp);
 		}
 		ret.add("transaction", retArr);
 		Gson gson = new GsonBuilder().serializeNulls().create();
-		String jsonStr = gson.toJson(ret);
-		return jsonStr;
+		return gson.toJson(ret);
 	}
 	
+	private String mapHttpMethodToBulkMethod(HttpMethod method) {
+		if (HttpMethod.PUT.equals(method) || HttpMethod.PUT_EDGE.equals(method)) {
+			return BULK_PUT_METHOD;
+		} else if (HttpMethod.DELETE.equals(method) || HttpMethod.DELETE_EDGE.equals(method)) {
+			return BULK_DELETE_METHOD;
+		} else if (HttpMethod.MERGE_PATCH.equals(method)) {
+			return BULK_PATCH_METHOD;
+		} else {
+			return "";
+		}
+	}
+
+
 	/**
 	 * Adds the exception case failure response.
 	 *
@@ -449,7 +502,7 @@ public abstract class BulkConsumer extends RESTAPI {
 	 * @param logline Generates a Response based on the given exception and adds it to the collection of responses for this request.
 	 * @throws ErrorObjectNotFoundException 
 	 */
-	private void addExceptionCaseFailureResponse(List<List<Pair<URI, Response>>> allResponses, Exception e, int index, URI thisUri, HttpHeaders headers, UriInfo info, HttpMethod templateAction) {
+	private void addExceptionCaseFailureResponse(List<List<BulkOperationResponse>> allResponses, Exception e, int index, URI thisUri, HttpHeaders headers, UriInfo info, HttpMethod templateAction) {
 		AAIException ex = null;
 		
 		if (!(e instanceof AAIException)){
@@ -464,15 +517,15 @@ public abstract class BulkConsumer extends RESTAPI {
 			
 			//this transaction doesn't have a response list yet, so create one
 			Response failResp = consumerExceptionResponseGenerator(headers, info, templateAction, ex);
-			Pair<URI, Response> uriResp = Pair.with(thisUri, failResp);
-			List<Pair<URI, Response>> transRespList = new ArrayList<Pair<URI,Response>>();
+			BulkOperationResponse uriResp =  new BulkOperationResponse(templateAction, thisUri, failResp);
+			List<BulkOperationResponse> transRespList = new ArrayList<>();
 			transRespList.add(uriResp);
 			allResponses.add(transRespList);
 		} else {
 			//this transaction already has a response list, so add this failure response to it
 			Response failResp = consumerExceptionResponseGenerator(headers, info, templateAction, ex);
-			Pair<URI, Response> uriResp = Pair.with(thisUri, failResp);
-			List<Pair<URI, Response>> tResps = allResponses.get(index);
+			BulkOperationResponse uriResp = new BulkOperationResponse(templateAction, thisUri, failResp);
+			List<BulkOperationResponse> tResps = allResponses.get(index);
 			tResps.add(uriResp);
 		}
 	}

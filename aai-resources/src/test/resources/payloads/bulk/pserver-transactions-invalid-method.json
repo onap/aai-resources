@@ -1,0 +1,15 @@
+{
+	"transactions": [
+		{
+			"foo": [
+				{
+					"uri": "/cloud-infrastructure/pservers/pserver/pserver-transactions-invalid-method-1-<UUID>",
+					"body": {
+						"hostname": "pserver-transactions-invalid-method-1-<UUID>",
+						"fqdn": "pserver-transactions-invalid-method-1-fqdn"
+					}
+				}
+			]
+		}
+	]
+}

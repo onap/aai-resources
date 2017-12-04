@@ -21,55 +21,117 @@
  */
 package org.onap.aai.rest;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.onap.aai.AAISetup;
-import org.onap.aai.dbmap.AAIGraph;
-import org.onap.aai.introspection.ModelInjestor;
-import org.onap.aai.introspection.Version;
-
-import javax.ws.rs.core.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 
-public class BulkProcessConsumerTest extends BulkAddConsumerTest {
+import java.io.IOException;
+
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+import org.onap.aai.introspection.Version;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
+
+public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
 
     private static final EELFLogger logger = EELFManager.getInstance().getLogger(BulkProcessConsumerTest.class.getName());
 
-    @Test
-    public void testBulkAddCreatedWhenOneTransactionInPayloadContainsNotAllowedVerb() throws IOException {
 
-        String uri = "/aai/v11/bulkadd";
+	@Test
+    public void bulkAddPayloadInBulkProcessTest() throws IOException {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
-        String payload = getBulkPayload("pserver-transactions-invalid");
-        Response response = bulkConsumer.bulkAdd(
-                payload,
-                Version.getLatest().toString(),
-                httpHeaders,
-                uriInfo,
-                null
-        );
+        String payload = getBulkPayload("pserver-transactions");
+        Response response = executeRequest(payload);
 
-        System.out.println("Code: " + response.getStatus() + "\tResponse: " + response.getEntity());
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Contains 3 {\"201\":null}", 3, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+    }
+	
+	@Test
+    public void bulkProcessPayloadTest() throws IOException {
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("pserver-bulk-process-transactions");
+        Response response = executeRequest(payload);
+
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Contains 1 {\"201\":null}", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals("Contains 1 {\"404\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"404\":\"{"));
+        assertEquals("Contains 1 ERR.5.4.6114", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6114"));
+    }
+	
+	@Test
+    public void bulkProcessComplexDeletePayloadTest() throws IOException {
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("complex-bulk-process-transactions");
+        Response response = executeRequest(payload);
+
+        System.out.println(response.getEntity().toString());
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Contains 0 {\"201\":null}", 0, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals("Contains 1 {\"404\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"404\":\"{"));
+        assertEquals("Contains 1 ERR.5.4.6114", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6114"));
+    }
+	
+	
+	@Test
+    public void bulkAddInvalidMethodTest() throws IOException {
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("pserver-transactions-invalid-method");
+        Response response = executeRequest(payload);
+
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Contains 1 {\"400\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
+        assertEquals("Contains 1 ERR.5.4.6118", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
     }
 
+    @Test
+    public void bulkAddThrowExceptionWhenPayloadContainsNoTransactionsTest(){
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = "{\"transactions\":[]}";
+        Response response = executeRequest(payload);
+
+        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6118"));
+    }
+
+    @Test
+    public void bulkAddThrowExceptionWhenInvalidJsonTest() throws IOException {
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = "{";
+        Response response = executeRequest(payload);
+
+        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6111"));
+    }
+    
     @Override
-    public BulkConsumer getConsumer(){
+    protected BulkConsumer getConsumer(){
         return new BulkProcessConsumer();
     }
+  
+    @Override
+    protected String getUri() {
+		return "/aai/" + Version.getLatest().toString() + "/bulkprocess";
+	}
 }

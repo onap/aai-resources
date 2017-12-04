@@ -1,0 +1,25 @@
+{
+	"transactions": [
+		{
+			"put": [
+				{
+					"uri": "/cloud-infrastructure/pservers/pserver/pserver-bulk-process-transactions-1-<UUID>",
+					"body": {
+						"hostname": "pserver-bulk-process-transactions-1-<UUID>",
+						"fqdn": "pserver-bulk-process-transactions-1-fqdn"
+					}
+				}
+			]
+		},
+		{
+			"delete": [
+				{
+					"uri": "/cloud-infrastructure/pservers/pserver/pserver-bulk-process-transactions-2-<UUID>",
+					"body": {
+						"hostname": "pserver-bulk-process-transactions-2-<UUID>"
+					}
+				}
+			]
+		}
+	]
+}

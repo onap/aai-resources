@@ -21,169 +21,100 @@
  */
 package org.onap.aai.rest;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.onap.aai.AAISetup;
-import org.onap.aai.dbmap.AAIGraph;
-import org.onap.aai.introspection.ModelInjestor;
-import org.onap.aai.introspection.Version;
-
-import javax.ws.rs.core.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 
-public class BulkAddConsumerTest extends AAISetup {
+import java.io.IOException;
 
-    protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
+import javax.ws.rs.core.Response;
 
-    protected static final Set<Integer> VALID_HTTP_STATUS_CODES = new HashSet<>();
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+import org.onap.aai.introspection.Version;
 
-    static {
-        VALID_HTTP_STATUS_CODES.add(200);
-        VALID_HTTP_STATUS_CODES.add(201);
-        VALID_HTTP_STATUS_CODES.add(204);
-    }
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
-    protected BulkConsumer bulkConsumer;
-
-    protected HttpHeaders httpHeaders;
-
-    protected UriInfo uriInfo;
-
-    protected MultivaluedMap<String, String> headersMultiMap;
-    protected MultivaluedMap<String, String> queryParameters;
-
-    protected List<String> aaiRequestContextList;
-
-    protected List<MediaType> outputMediaTypes;
+public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
 
     private static final EELFLogger logger = EELFManager.getInstance().getLogger(BulkAddConsumerTest.class.getName());
 
-    @BeforeClass
-    public static void setupRest(){
-        AAIGraph.getInstance();
-        ModelInjestor.getInstance();
-    }
 
-    @Before
-    public void setup(){
-        logger.info("Starting the setup for the integration tests of Rest Endpoints");
-
-        bulkConsumer     = getConsumer();
-        httpHeaders         = Mockito.mock(HttpHeaders.class);
-        uriInfo             = Mockito.mock(UriInfo.class);
-
-        headersMultiMap     = new MultivaluedHashMap<>();
-        queryParameters     = Mockito.spy(new MultivaluedHashMap<>());
-
-        headersMultiMap.add("X-FromAppId", "JUNIT");
-        headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
-        headersMultiMap.add("Real-Time", "true");
-        headersMultiMap.add("Accept", "application/json");
-        headersMultiMap.add("aai-request-context", "");
-
-        outputMediaTypes = new ArrayList<>();
-        outputMediaTypes.add(APPLICATION_JSON);
-
-        aaiRequestContextList = new ArrayList<>();
-        aaiRequestContextList.add("");
-
-        when(httpHeaders.getAcceptableMediaTypes()).thenReturn(outputMediaTypes);
-        when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
-
-        when(httpHeaders.getRequestHeader("aai-request-context")).thenReturn(aaiRequestContextList);
-
-
-        when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
-        when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
-
-        // TODO - Check if this is valid since RemoveDME2QueryParameters seems to be very unreasonable
-        Mockito.doReturn(null).when(queryParameters).remove(anyObject());
-
-        when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
-    }
-
-    @Test
-    public void testBulkAdd() throws IOException {
-
-        String uri = "/aai/v11/bulkadd";
+	@Test
+    public void validBulkAddTest() throws IOException {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         String payload = getBulkPayload("pserver-transactions");
-        Response response = bulkConsumer.bulkAdd(
-                payload,
-                Version.getLatest().toString(),
-                httpHeaders,
-                uriInfo,
-                null
-        );
+        Response response = executeRequest(payload);
 
-        System.out.println("Code: " + response.getStatus() + "\tResponse: " + response.getEntity());
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Contains 3 {\"201\":null}", 3, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+    }
+	
+	@Test
+    public void bulkProcessPayloadInBulkAddTest() throws IOException {
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("pserver-bulk-process-transactions");
+        Response response = executeRequest(payload);
+
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Contains 1 {\"201\":null}", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals("Contains 1 {\"400\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
+        assertEquals("Contains 1 ERR.5.4.6118", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
+    }
+	
+	@Test
+    public void bulkAddInvalidMethodTest() throws IOException {
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("pserver-transactions-invalid-method");
+        Response response = executeRequest(payload);
+
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals("Contains 1 {\"400\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
+        assertEquals("Contains 1 ERR.5.4.6118", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
     }
 
     @Test
-    public void testBulkAddThrowExceptionWhenPayloadContainsNoTransactions(){
-
-        String uri = "/aai/v11/bulkadd";
+    public void bulkAddThrowExceptionWhenPayloadContainsNoTransactionsTest(){
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         String payload = "{\"transactions\":[]}";
-        Response response = bulkConsumer.bulkAdd(
-                payload,
-                Version.getLatest().toString(),
-                httpHeaders,
-                uriInfo,
-                null
-        );
+        Response response = executeRequest(payload);
 
-        System.out.println("Code: " + response.getStatus() + "\tResponse: " + response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6118"));
     }
 
     @Test
-    public void testBulkAddThrowExceptionWhenInvalidJson() throws IOException {
-
-        String uri = "/aai/v11/bulkadd";
+    public void bulkAddThrowExceptionWhenInvalidJsonTest() throws IOException {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         String payload = "{";
-        Response response = bulkConsumer.bulkAdd(
-                payload,
-                Version.getLatest().toString(),
-                httpHeaders,
-                uriInfo,
-                null
-        );
+        Response response = executeRequest(payload);
 
-        System.out.println("Code: " + response.getStatus() + "\tResponse: " + response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
-        // TODO - Verify the result output and check if it contains an 400 in the list
+        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6111"));
     }
-
-    public String getBulkPayload(String bulkName) throws IOException {
-        return getPayload("payloads/bulk/" + bulkName + ".json");
-    }
-
-    public BulkConsumer getConsumer(){
+    
+    @Override
+    protected BulkConsumer getConsumer(){
         return new BulkAddConsumer();
     }
+  
+    @Override
+    protected String getUri() {
+		return "/aai/" + Version.getLatest().toString() + "/bulkadd";
+	}
 }
