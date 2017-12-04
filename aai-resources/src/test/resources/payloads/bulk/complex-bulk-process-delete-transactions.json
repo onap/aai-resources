@@ -1,0 +1,20 @@
+{
+	"transactions": [
+		{
+			"delete": [
+				{
+					"uri": "/cloud-infrastructure/pservers/pserver/pserver-9876543210-77-jenkins/relationship-list/relationship",
+					"body": {
+						"related-to": "complex",
+						"relationship-data": [
+							{
+								"relationship-key": "complex.physical-location-id",
+								"relationship-value": "complex-987654321-77-jenkins"
+							}
+						]
+					}
+				}
+			]
+		}
+	]
+}

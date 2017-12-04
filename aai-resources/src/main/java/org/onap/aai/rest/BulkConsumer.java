@@ -378,7 +378,7 @@ public abstract class BulkConsumer extends RESTAPI {
 					String bodyStr = gson.toJson(bodyObj);
 					bulkOperation.setRawReq(bodyStr);
 					
-					if (bulkOperation.getHttpMethod().equals(HttpMethod.PUT_EDGE)) {
+					if (bulkOperation.getHttpMethod().equals(HttpMethod.PUT_EDGE) || bulkOperation.getHttpMethod().equals(HttpMethod.DELETE_EDGE)) {
 						Introspector obj;
 						try {
 							obj = loader.unmarshal("relationship", bodyStr, org.onap.aai.restcore.MediaType.getEnum(inputMediaType));
