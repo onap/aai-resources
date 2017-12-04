@@ -246,6 +246,30 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6111"));
     }
+    @Test
+    public void bulkProcessCheckMeetsLimit() throws IOException{
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("pserver-bulk-limit-meet");
+        Response response = executeRequest(payload);
+
+        assertEquals("Created", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        //assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6147"));
+        assertEquals("Contains 30 {\"201\":null}", 30, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+    }
+
+    @Test
+    public void bulkProcessCheckExceedsLimit() throws IOException{
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("pserver-bulk-limit-exceed");
+        Response response = executeRequest(payload);
+
+        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6147"));
+    }
     
     @Override
     protected BulkConsumer getConsumer(){

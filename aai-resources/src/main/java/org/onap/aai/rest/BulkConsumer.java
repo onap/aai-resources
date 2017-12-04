@@ -24,8 +24,11 @@ package org.onap.aai.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +63,8 @@ import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.onap.aai.util.AAIConfig;
+import org.onap.aai.util.AAIConstants;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -250,12 +255,7 @@ public abstract class BulkConsumer extends RESTAPI {
 			throw new AAIException("AAI_6111", String.format("input payload does not follow %s interface", module));
 		}
 		JsonArray transactions = transactionsObj.getAsJsonArray();
-		if (transactions.size() == 0) {
-			//case where user sends a validly formatted transactions object but
-			//which has no actual things in it for A&AI to do anything with
-			//assuming we should count this as a user error
-			throw new AAIException("AAI_6118", "payload had no objects to operate on");
-		}
+		validateRequest(transactions);
 		return transactions;
 	}
 	
@@ -528,6 +528,49 @@ public abstract class BulkConsumer extends RESTAPI {
 			BulkOperationResponse uriResp = new BulkOperationResponse(templateAction, thisUri, failResp);
 			List<BulkOperationResponse> tResps = allResponses.get(index);
 			tResps.add(uriResp);
+		}
+	}
+
+	/**
+	 * Pulls the config value for the limit of operations allowed in a bulk add/process request
+	 *
+	 * @throws AAIException
+	 */
+	private int getPayLoadLimit() throws AAIException{
+		return Integer.parseInt(AAIConfig.get(AAIConstants.AAI_BULKCONSUMER_LIMIT));
+	}
+
+	/**
+	 * Validates the amount of operations in a request payload is allowed
+	 *
+	 * @param transactions - a JsonArray of all the transactions in the request payload
+	 * @throws AAIException
+	 */
+	private void validateRequest(JsonArray transactions) throws AAIException{
+		if (transactions.size() == 0) {
+			//case where user sends a validly formatted transactions object but
+			//which has no actual things in it for A&AI to do anything with
+			//assuming we should count this as a user error
+			throw new AAIException("AAI_6118", "payload had no objects to operate on");
+		}else if(transactions.size() > getPayLoadLimit()) {
+			throw new AAIException("AAI_6147", String.format("Payload limit of %s reached, please reduce payload.", getPayLoadLimit()));
+		}
+		int operationCount = 0;
+		int payLoadLimit = getPayLoadLimit();
+		for(int i = 0; i < transactions.size(); i++){
+			Set<Entry<String, JsonElement>> entrySet = transactions.get(i).getAsJsonObject().entrySet();
+			Iterator<Entry<String, JsonElement>> it = entrySet.iterator();
+			while(it.hasNext()){
+				Map.Entry<String, JsonElement> element = it.next();
+				if(element.getValue() instanceof JsonArray) {
+					operationCount += ((JsonArray) element.getValue()).size();
+				}else{
+					operationCount++;
+				}
+			}
+			if(operationCount > payLoadLimit){
+				throw new AAIException("AAI_6147", String.format("Payload limit of %s reached, please reduce payload.", payLoadLimit));
+			}
 		}
 	}
 
