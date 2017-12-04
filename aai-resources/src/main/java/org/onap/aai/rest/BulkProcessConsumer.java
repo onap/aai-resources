@@ -35,6 +35,11 @@ public class BulkProcessConsumer extends BulkConsumer {
 	}
 
 	@Override
+	protected String getModule(){
+		return "bulk process";
+	}
+
+	@Override
 	protected boolean enableResourceVersion() {
 		// TODO Auto-generated method stub
 		return true;

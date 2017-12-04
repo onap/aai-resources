@@ -34,6 +34,11 @@ public class BulkAddConsumer extends BulkConsumer {
 		return method.equals(HttpMethod.PUT);
 
 	}
+
+	@Override
+	protected String getModule(){
+		return "bulk add";
+	}
 	
 	@Override
 	protected boolean enableResourceVersion() {

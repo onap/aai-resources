@@ -239,14 +239,15 @@ public abstract class BulkConsumer extends RESTAPI {
 		JsonParser parser = new JsonParser();
 		
 		JsonObject input = parser.parse(content).getAsJsonObject();
-		
+		String module = getModule();
+
 		if (!(input.has("transactions"))) {
-			throw new AAIException("AAI_6118", "input payload does not follow bulk add interface - missing \"transactions\"");
+			throw new AAIException("AAI_6118", String.format("input payload does not follow %s interface - missing \"transactions\"", module));
 		}
 		JsonElement transactionsObj = input.get("transactions");
 		
 		if (!(transactionsObj.isJsonArray())){
-			throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
+			throw new AAIException("AAI_6111", String.format("input payload does not follow %s interface", module));
 		}
 		JsonArray transactions = transactionsObj.getAsJsonArray();
 		if (transactions.size() == 0) {
@@ -303,13 +304,13 @@ public abstract class BulkConsumer extends RESTAPI {
 	
 	
 	private void populateBulkOperations(List<BulkOperation> bulkOperations, JsonObject item, Loader loader, TransactionalGraphEngine dbEngine, String inputMediaType, HttpMethod method) throws AAIException, JsonSyntaxException, UnsupportedEncodingException{
-	
+		String module = getModule();
 		for (int i=0; i<item.size(); i++) {
 			BulkOperation bulkOperation = new BulkOperation();
 			try {
 				
 				if (!(item.isJsonObject())) {
-					throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
+					throw new AAIException("AAI_6111", String.format("input payload does not follow %s interface", module));
 				}
 				
 				JsonElement actionElement = null;
@@ -323,7 +324,7 @@ public abstract class BulkConsumer extends RESTAPI {
 				}
 				
 				if ((actionElement == null) || !actionElement.isJsonArray()) {
-					throw new AAIException("AAI_6111", "input payload does not follow bulk add interface");
+					throw new AAIException("AAI_6111", String.format("input payload does not follow %s interface", module));
 				}
 				
 				JsonArray httpArray = actionElement.getAsJsonArray();
@@ -365,11 +366,11 @@ public abstract class BulkConsumer extends RESTAPI {
 					JsonElement bodyObj = new JsonObject();
 					if (!bulkOperation.getHttpMethod().equals(HttpMethod.DELETE)) {
 						if (!(it.has("body"))){
-							throw new AAIException("AAI_6118", "input payload does not follow bulk interface - missing \"body\"");
+							throw new AAIException("AAI_6118", String.format("input payload does not follow %s interface - missing \"body\"", module));
 						}
 						bodyObj = it.get("body");
 						if (!(bodyObj.isJsonObject())) {
-							throw new AAIException("AAI_6111", "input payload does not follow bulk interface");
+							throw new AAIException("AAI_6111", String.format("input payload does not follow %s interface", module));
 						} 
 					}
 					
@@ -529,6 +530,8 @@ public abstract class BulkConsumer extends RESTAPI {
 			tResps.add(uriResp);
 		}
 	}
+
+	protected abstract String getModule();
 	
 	protected abstract boolean functionAllowed(HttpMethod method);
 	
