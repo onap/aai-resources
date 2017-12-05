@@ -134,7 +134,7 @@ public abstract class BulkConsumer extends RESTAPI {
 		try {
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
 		
-			JsonArray transactions = getTransactions(content);
+			JsonArray transactions = getTransactions(content, headers);
 			
 			for (int i = 0; i < transactions.size(); i++){
 				HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
@@ -240,7 +240,7 @@ public abstract class BulkConsumer extends RESTAPI {
 	 * @throws JsonSyntaxException Parses and breaks the single payload into an array of individual transaction 
 	 * bodies to be processed.
 	 */
-	private JsonArray getTransactions(String content) throws AAIException, JsonSyntaxException {
+	private JsonArray getTransactions(String content, HttpHeaders headers) throws AAIException, JsonSyntaxException {
 		JsonParser parser = new JsonParser();
 		
 		JsonObject input = parser.parse(content).getAsJsonObject();
@@ -255,7 +255,7 @@ public abstract class BulkConsumer extends RESTAPI {
 			throw new AAIException("AAI_6111", String.format("input payload does not follow %s interface", module));
 		}
 		JsonArray transactions = transactionsObj.getAsJsonArray();
-		validateRequest(transactions);
+		validateRequest(transactions, headers);
 		return transactions;
 	}
 	
@@ -546,30 +546,35 @@ public abstract class BulkConsumer extends RESTAPI {
 	 * @param transactions - a JsonArray of all the transactions in the request payload
 	 * @throws AAIException
 	 */
-	private void validateRequest(JsonArray transactions) throws AAIException{
+	private void validateRequest(JsonArray transactions, HttpHeaders headers) throws AAIException{
+		String overrideLimit = headers.getRequestHeaders().getFirst("X-OverrideLimit");
+		boolean isOverride = overrideLimit != null && !AAIConfig.get(AAIConstants.AAI_BULKCONSUMER_OVERRIDE_LIMIT).equals("false")
+				&& overrideLimit.equals(AAIConfig.get(AAIConstants.AAI_BULKCONSUMER_OVERRIDE_LIMIT));
 		if (transactions.size() == 0) {
 			//case where user sends a validly formatted transactions object but
 			//which has no actual things in it for A&AI to do anything with
 			//assuming we should count this as a user error
 			throw new AAIException("AAI_6118", "payload had no objects to operate on");
-		}else if(transactions.size() > getPayLoadLimit()) {
+		}else if(!isOverride && transactions.size() > getPayLoadLimit()) {
 			throw new AAIException("AAI_6147", String.format("Payload limit of %s reached, please reduce payload.", getPayLoadLimit()));
 		}
-		int operationCount = 0;
-		int payLoadLimit = getPayLoadLimit();
-		for(int i = 0; i < transactions.size(); i++){
-			Set<Entry<String, JsonElement>> entrySet = transactions.get(i).getAsJsonObject().entrySet();
-			Iterator<Entry<String, JsonElement>> it = entrySet.iterator();
-			while(it.hasNext()){
-				Map.Entry<String, JsonElement> element = it.next();
-				if(element.getValue() instanceof JsonArray) {
-					operationCount += ((JsonArray) element.getValue()).size();
-				}else{
-					operationCount++;
+		if(!isOverride) {
+			int operationCount = 0;
+			int payLoadLimit = getPayLoadLimit();
+			for (int i = 0; i < transactions.size(); i++) {
+				Set<Entry<String, JsonElement>> entrySet = transactions.get(i).getAsJsonObject().entrySet();
+				Iterator<Entry<String, JsonElement>> it = entrySet.iterator();
+				while (it.hasNext()) {
+					Map.Entry<String, JsonElement> element = it.next();
+					if (element.getValue() instanceof JsonArray) {
+						operationCount += ((JsonArray) element.getValue()).size();
+					} else {
+						operationCount++;
+					}
 				}
-			}
-			if(operationCount > payLoadLimit){
-				throw new AAIException("AAI_6147", String.format("Payload limit of %s reached, please reduce payload.", payLoadLimit));
+				if (operationCount > payLoadLimit) {
+					throw new AAIException("AAI_6147", String.format("Payload limit of %s reached, please reduce payload.", payLoadLimit));
+				}
 			}
 		}
 	}

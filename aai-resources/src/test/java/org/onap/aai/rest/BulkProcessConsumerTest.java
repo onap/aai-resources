@@ -255,7 +255,6 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         Response response = executeRequest(payload);
 
         assertEquals("Created", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        //assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6147"));
         assertEquals("Contains 30 {\"201\":null}", 30, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
     }
 
