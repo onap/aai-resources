@@ -350,8 +350,7 @@ public class ModelVersionTransformer extends RESTAPI {
 				}
 			}
 		} catch (NoSuchElementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NoSuchElementException();
 		} catch (Exception e1) { 
 			e1.printStackTrace();
 		}
