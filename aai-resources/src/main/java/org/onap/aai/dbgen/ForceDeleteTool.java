@@ -239,7 +239,7 @@ public class ForceDeleteTool {
 		  			qStringForMsg = qStringForMsg + ".has(" + propName + "," + propVal + ")";
 		  		}
 	  		}
-	  	   	if( (g != null)){
+	  	   	if(g != null){
 	        	Iterator<Vertex> vertItor = g;
 	           	while( vertItor.hasNext() ){
 	        		resCount++;
