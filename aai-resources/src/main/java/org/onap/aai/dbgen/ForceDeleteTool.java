@@ -339,7 +339,7 @@ public class ForceDeleteTool {
 	
 	public static class ForceDelete {
 		
-		private final int MAXDESCENDENTDEPTH = 15;
+		private static final int MAXDESCENDENTDEPTH = 15;
 		private final TitanGraph graph;
 		public ForceDelete(TitanGraph graph) {
 			this.graph = graph;
