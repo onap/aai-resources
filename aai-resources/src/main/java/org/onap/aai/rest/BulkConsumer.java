@@ -276,7 +276,7 @@ public abstract class BulkConsumer extends RESTAPI {
 	 */
 	private void fillBulkOperationObjectFromTransaction(List<BulkOperation> bulkOperations,
 			JsonObject transaction, Loader loader, TransactionalGraphEngine dbEngine, String inputMediaType)
-			throws AAIException, JsonSyntaxException, UnsupportedEncodingException {
+			throws AAIException,UnsupportedEncodingException {
 
 	
 			if (transaction.has(BULK_PUT_METHOD) && this.functionAllowed(HttpMethod.PUT)) {
