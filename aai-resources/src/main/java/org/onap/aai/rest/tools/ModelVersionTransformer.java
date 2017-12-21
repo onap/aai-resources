@@ -329,7 +329,7 @@ public class ModelVersionTransformer extends RESTAPI {
 
 	}
 
-	private Map<String, String> getCurrentModelsFromGraph(HttpHeaders headers, String transactionId, UriInfo info) throws NoEdgeRuleFoundException, AAIException {
+	private Map<String, String> getCurrentModelsFromGraph(HttpHeaders headers, String transactionId, UriInfo info) throws  AAIException {
 
 		TransactionalGraphEngine dbEngine = null;
 		Map<String, String> modelVerModelMap = new HashMap<String,String>() ;
