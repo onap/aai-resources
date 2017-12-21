@@ -79,6 +79,7 @@ public class ModelVersionTransformer extends RESTAPI {
 	protected static String authPolicyFunctionName = "REST";
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
+	private static final String RELATIONSHIP_LST="relationship-list";
 
 
 	/**
@@ -255,11 +256,11 @@ public class ModelVersionTransformer extends RESTAPI {
 				}
 			}
 			
-			if (oldModelElement.hasProperty("relationship-list")) { 
+			if (oldModelElement.hasProperty(RELATIONSHIP_LST)) { 
 				
-				Introspector oldRelationshipList = oldModelElement.getWrappedValue("relationship-list");
-				Introspector newRelationshipList = newModelElements.getLoader().introspectorFromName("relationship-list");
-				newModelElement.setValue("relationship-list", newRelationshipList.getUnderlyingObject());
+				Introspector oldRelationshipList = oldModelElement.getWrappedValue(RELATIONSHIP_LST);
+				Introspector newRelationshipList = newModelElements.getLoader().introspectorFromName(RELATIONSHIP_LST);
+				newModelElement.setValue(RELATIONSHIP_LST, newRelationshipList.getUnderlyingObject());
 
 				List<Introspector> oldRelationshipListList = oldRelationshipList.getWrappedListValue("relationship");
 				List<Object> newRelationshipListList = (List<Object>)newRelationshipList.getValue("relationship");
