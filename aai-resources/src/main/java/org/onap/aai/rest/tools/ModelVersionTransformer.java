@@ -332,7 +332,7 @@ public class ModelVersionTransformer extends RESTAPI {
 	private Map<String, String> getCurrentModelsFromGraph(HttpHeaders headers, String transactionId, UriInfo info) throws NoEdgeRuleFoundException, AAIException {
 
 		TransactionalGraphEngine dbEngine = null;
-		Map<String, String> modelVerModelMap = new HashMap<String,String>() ;
+		Map<String, String> modelVerModelMap = new HashMap<>() ;
 		try {
 
 			Version version = AAIProperties.LATEST;
