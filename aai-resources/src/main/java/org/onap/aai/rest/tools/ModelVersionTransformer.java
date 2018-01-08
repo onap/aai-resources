@@ -79,7 +79,7 @@ public class ModelVersionTransformer extends RESTAPI {
 	protected static String authPolicyFunctionName = "REST";
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
-
+	protected static String MODEL_ELEMENTS = "model-elements";
 
 	/**
 	 * POST for model transformation.
@@ -180,11 +180,11 @@ public class ModelVersionTransformer extends RESTAPI {
 			modelVerObj.setValue("model-version", oldModelVersion);
 
 
-			if (obj.hasProperty("model-elements")) { 
-				Introspector oldModelElements = obj.getWrappedValue("model-elements");
+			if (obj.hasProperty(MODEL_ELEMENTS)) { 
+				Introspector oldModelElements = obj.getWrappedValue(MODEL_ELEMENTS);
 				if (oldModelElements != null) {
-					Introspector newModelElements = modelVerObj.newIntrospectorInstanceOfProperty("model-elements");
-					modelVerObj.setValue("model-elements", newModelElements.getUnderlyingObject());
+					Introspector newModelElements = modelVerObj.newIntrospectorInstanceOfProperty(MODEL_ELEMENTS);
+					modelVerObj.setValue(MODEL_ELEMENTS, newModelElements.getUnderlyingObject());
 					repackModelElements(oldModelElements, newModelElements, modelVersionIdToModelInvariantIdMap);
 				}
 			}
@@ -315,11 +315,11 @@ public class ModelVersionTransformer extends RESTAPI {
 				}
 			}
 
-			if (oldModelElement.hasProperty("model-elements")) {
-				Introspector nextOldModelElements = oldModelElement.getWrappedValue("model-elements");
+			if (oldModelElement.hasProperty(MODEL_ELEMENTS)) {
+				Introspector nextOldModelElements = oldModelElement.getWrappedValue(MODEL_ELEMENTS);
 				if (nextOldModelElements != null) {
-					Introspector nextNewModelElements = newModelElement.newIntrospectorInstanceOfProperty("model-elements");
-					newModelElement.setValue("model-elements", nextNewModelElements.getUnderlyingObject());
+					Introspector nextNewModelElements = newModelElement.newIntrospectorInstanceOfProperty(MODEL_ELEMENTS);
+					newModelElement.setValue(MODEL_ELEMENTS, nextNewModelElements.getUnderlyingObject());
 					repackModelElements(nextOldModelElements, nextNewModelElements, modelVersionIdToModelInvariantIdMap);
 				}
 			}
