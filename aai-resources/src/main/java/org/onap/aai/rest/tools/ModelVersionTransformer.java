@@ -393,7 +393,7 @@ public class ModelVersionTransformer extends RESTAPI {
 			}
 		}
 		String queryParams = Joiner.on("&").join(parmList);
-		if (map.keySet().size() > 0) {
+		if (map.keySet().isEmpty()) {
 			path += params + queryParams;
 		}
 
