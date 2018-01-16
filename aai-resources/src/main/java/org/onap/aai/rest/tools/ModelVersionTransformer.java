@@ -136,7 +136,7 @@ public class ModelVersionTransformer extends RESTAPI {
 			Set<String> properties = obj.getProperties();
 			java.util.Iterator<String> propItr = properties.iterator();
 
-			Map<String, Object> v8PropMap = new HashMap<String, Object>();
+			Map<String, Object> v8PropMap = new HashMap<>();
 			while (propItr.hasNext()){
 				String property = propItr.next();
 				Object propertyValue = obj.getValue(property);
