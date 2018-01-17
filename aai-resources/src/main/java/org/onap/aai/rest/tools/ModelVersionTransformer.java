@@ -80,6 +80,8 @@ public class ModelVersionTransformer extends RESTAPI {
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
 	protected static String MODEL_ELEMENTS = "model-elements";
+	private static final String RELATIONSHIP="relationship";
+
 
 	/**
 	 * POST for model transformation.
@@ -261,15 +263,15 @@ public class ModelVersionTransformer extends RESTAPI {
 				Introspector newRelationshipList = newModelElements.getLoader().introspectorFromName("relationship-list");
 				newModelElement.setValue("relationship-list", newRelationshipList.getUnderlyingObject());
 
-				List<Introspector> oldRelationshipListList = oldRelationshipList.getWrappedListValue("relationship");
-				List<Object> newRelationshipListList = (List<Object>)newRelationshipList.getValue("relationship");
+				List<Introspector> oldRelationshipListList = oldRelationshipList.getWrappedListValue(RELATIONSHIP);
+				List<Object> newRelationshipListList = (List<Object>)newRelationshipList.getValue(RELATIONSHIP);
 
 				for (Introspector oldRelationship : oldRelationshipListList) { 
 
-					Introspector newRelationship = newModelElements.getLoader().introspectorFromName("relationship");
+					Introspector newRelationship = newModelElements.getLoader().introspectorFromName(RELATIONSHIP);
 					newRelationshipListList.add(newRelationship.getUnderlyingObject());
 
-					List<Introspector> oldRelationshipData = oldRelationship.getWrappedListValue("relationship-data");
+					List<Introspector> oldRelationshipData = oldRelationship.getWrappedListValue(RELATIONSHIP);
 					List<Object> newRelationshipData = (List<Object>)newRelationship.getValue("relationship-data");
 
 					newRelationship.setValue("related-to", "model-ver");
