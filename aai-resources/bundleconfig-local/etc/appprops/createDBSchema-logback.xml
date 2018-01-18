@@ -34,7 +34,7 @@
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${logDirectory}/createDBSchema/error.log.%d{yyyy-MM-dd}</fileNamePattern>
 		</rollingPolicy>
-		<encoder  class="org.onap.aai.logging.EcompEncoder">
+		<encoder class="org.onap.aai.logging.EcompEncoder">
 			<pattern>${eelfLogPattern}</pattern>
 		</encoder>
 	</appender>

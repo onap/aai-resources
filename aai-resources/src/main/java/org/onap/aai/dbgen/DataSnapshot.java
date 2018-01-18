@@ -35,6 +35,7 @@ import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
+import org.onap.aai.util.AAISystemExitUtil;
 import org.onap.aai.util.FormatDate;
 
 import com.att.eelf.configuration.Configuration;
@@ -54,6 +55,7 @@ public class DataSnapshot {
 	 */
 	public static void main(String[] args) {
 		// Set the logging file properties to be used by EELFManager
+		System.setProperty("aai.service.name", DataSnapshot.class.getSimpleName());
 		Properties props = System.getProperties();
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_DATA_SNAPSHOT_LOGBACK_PROPS);
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
@@ -90,7 +92,7 @@ public class DataSnapshot {
 			if (graph == null) {
 				String emsg = "Not able to get a graph object in DataSnapshot.java\n";
 				System.out.println(emsg);
-				System.exit(1);
+				AAISystemExitUtil.systemExitCloseAAIGraph(1);
 			}
 
 			if (command.equals("JUST_TAKE_SNAPSHOT")) {
@@ -123,22 +125,22 @@ public class DataSnapshot {
 				if (oldSnapshotFileName.equals("")) {
 					String emsg = "No oldSnapshotFileName passed to DataSnapshot.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 				String oldSnapshotFullFname = targetDir + AAIConstants.AAI_FILESEP + oldSnapshotFileName;
 				File f = new File(oldSnapshotFullFname);
 				if (!f.exists()) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be found.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (!f.canRead()) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be read.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (f.length() == 0) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " had no data.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 
 				System.out.println("\n>>> WARNING <<<< ");
@@ -151,7 +153,7 @@ public class DataSnapshot {
 					Thread.sleep(5000);
 				} catch (java.lang.InterruptedException ie) {
 					System.out.println(" DB Clearing has been aborted. ");
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 
 				System.out.println(" Begin clearing out old data. ");
@@ -169,22 +171,22 @@ public class DataSnapshot {
 				if (oldSnapshotFileName.equals("")) {
 					String emsg = "No oldSnapshotFileName passed to DataSnapshot when RELOAD_LEGACY_DATA used.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 				String oldSnapshotFullFname = targetDir + AAIConstants.AAI_FILESEP + oldSnapshotFileName;
 				File f = new File(oldSnapshotFullFname);
 				if (!f.exists()) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be found.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (!f.canRead()) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be read.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (f.length() == 0) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " had no data.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 
 				System.out.println("We will load data IN from the file = " + oldSnapshotFullFname);
@@ -207,22 +209,22 @@ public class DataSnapshot {
 				if (oldSnapshotFileName.equals("")) {
 					String emsg = "No oldSnapshotFileName passed to DataSnapshot when RELOAD_DATA used.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 				String oldSnapshotFullFname = targetDir + AAIConstants.AAI_FILESEP + oldSnapshotFileName;
 				File f = new File(oldSnapshotFullFname);
 				if (!f.exists()) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be found.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (!f.canRead()) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be read.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (f.length() == 0) {
 					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " had no data.";
 					System.out.println(emsg);
-					System.exit(1);
+					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 
 				System.out.println("We will load data IN from the file = " + oldSnapshotFullFname);
@@ -238,7 +240,7 @@ public class DataSnapshot {
 			} else {
 				String emsg = "Bad command passed to DataSnapshot: [" + command + "]";
 				System.out.println(emsg);
-				System.exit(1);
+				AAISystemExitUtil.systemExitCloseAAIGraph(1);
 			}
 
 		} catch (AAIException e) {
@@ -260,7 +262,7 @@ public class DataSnapshot {
 			}
 		}
 
-		System.exit(0);
+		AAISystemExitUtil.systemExitCloseAAIGraph(0);
 
 	}// End of main()
 

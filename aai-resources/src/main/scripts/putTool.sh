@@ -46,9 +46,10 @@ display_usage() {
         cat <<EOF
         Usage: $0 [options]
 
-        1. Usage: putTool.sh <resource-path> <json payload file>
+        1. Usage: putTool.sh <resource-path> <json payload file> <optional -display>
         2. This script requires two arguments, a resource path and a file path to a json file containing the payload.
         3. Example: resource-path and payload for a particular customer is: business/customers/customer/JohnDoe customerpayload.json
+        4. Adding the optional "-display" argument will display all data returned from the request.
 EOF
 }
 if [ $# -eq 0 ]; then
@@ -87,6 +88,13 @@ prop_file=$PROJECT_HOME/bundleconfig/etc/appprops/aaiconfig.properties
 log_dir=$PROJECT_HOME/logs/misc
 today=$(date +\%Y-\%m-\%d)
 
+RETURNRESPONSE=false
+if [ ${#} -ne 2 ]; then
+    if [ "$3" = "-display" ]; then
+        RETURNRESPONSE=true
+    fi
+fi
+
 MISSING_PROP=false
 RESTURL=`grep ^aai.server.url= $prop_file |cut -d'=' -f2 |tr -d "\015"`
 if [ -z $RESTURL ]; then
@@ -117,10 +125,14 @@ if [ $MISSING_PROP = false ]; then
         else
                 AUTHSTRING="-u $CURLUSER:$CURLPASSWORD"
         fi
-        result=`curl --request PUT -sL -w "%{http_code}" -o /dev/null -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -T $JSONFILE $RESTURL$RESOURCE`
-        #echo "result is $result."
-        RC=0;
-        if [ $? -eq 0 ]; then
+        if [ $RETURNRESPONSE = true ]; then
+			curl --request PUT -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -T $JSONFILE $RESTURL$RESOURCE | python -mjson.tool
+			RC=$?
+		else
+        	result=`curl --request PUT -sL -w "%{http_code}" -o /dev/null -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -T $JSONFILE $RESTURL$RESOURCE`
+        	#echo "result is $result."
+        	RC=0;
+        	if [ $? -eq 0 ]; then
                 case $result in
                         +([0-9])?)
                                 if [[ "$result" -ge 200 && $result -lt 300 ]]
@@ -148,10 +160,11 @@ if [ $MISSING_PROP = false ]; then
                                 ;;
 
                 esac
-        else
+        	else
                 echo "FAILED to send request to $RESTURL"
                 RC=-1
-        fi
+        	fi
+        fi	
 else
         echo "usage: $0 resource file [expected-failure-codes]"
         RC=-1
