@@ -53,6 +53,7 @@ import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.Version;
 import org.onap.aai.introspection.exceptions.AAIUnmarshallingException;
 import org.onap.aai.logging.ErrorObjectNotFoundException;
+import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.bulk.BulkOperation;
 import org.onap.aai.rest.bulk.BulkOperationResponse;
@@ -94,6 +95,7 @@ public abstract class BulkConsumer extends RESTAPI {
 	private static final String BULK_PATCH_METHOD = "patch";
 	private static final String BULK_DELETE_METHOD = "delete";
 	private static final String BULK_PUT_METHOD = "put";
+	private static final String TARGET_ENTITY = "aai-resources";
 
 	/** The introspector factory type. */
 	private ModelType introspectorFactoryType = ModelType.MOXY;
@@ -122,18 +124,26 @@ public abstract class BulkConsumer extends RESTAPI {
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		Version version = Version.valueOf(versionParam);
-
 		Response response = null;
-		
-		/* A Response will be generated for each object in each transaction.
-		 * To keep track of what came from where to give organized feedback to the client,
-		 * we keep responses from a given transaction together in one list (hence all being a list of lists)
-		 * and BulkOperationResponse each response with its matching URI (which will be null if there wasn't one).
-		 */ 
- 		List<List<BulkOperationResponse>> allResponses = new ArrayList<>();
+
 		try {
-			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-		
+            DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
+
+            String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
+            LoggingContext.requestId(transId);
+            LoggingContext.partnerName(sourceOfTruth);
+            LoggingContext.serviceName(serviceName);
+            LoggingContext.targetEntity(TARGET_ENTITY);
+            LoggingContext.targetServiceName(serviceName);
+
+
+            /* A Response will be generated for each object in each transaction.
+             * To keep track of what came from where to give organized feedback to the client,
+             * we keep responses from a given transaction together in one list (hence all being a list of lists)
+             * and BulkOperationResponse each response with its matching URI (which will be null if there wasn't one).
+             */
+            List<List<BulkOperationResponse>> allResponses = new ArrayList<>();
+
 			JsonArray transactions = getTransactions(content, headers);
 			
 			for (int i = 0; i < transactions.size(); i++){
@@ -150,7 +160,7 @@ public abstract class BulkConsumer extends RESTAPI {
 						throw new AAIException("AAI_6111", "input payload does not follow bulk interface");
 					}
 					
-					fillBulkOperationObjectFromTransaction(bulkOperations, transObj.getAsJsonObject(), loader, dbEngine, outputMediaType);
+					fillBulkOperationsObjectFromTransaction(bulkOperations, transObj.getAsJsonObject(), loader, dbEngine, outputMediaType);
 					if (bulkOperations.isEmpty()) {
 						//case where user sends a validly formatted transactions object but
 						//which has no actual things in it for A&AI to do anything with
@@ -183,7 +193,7 @@ public abstract class BulkConsumer extends RESTAPI {
 					if (!bulkOperations.isEmpty()) { //failed somewhere in the middle of bulkOperation-filling
 						BulkOperation lastBulkOperation = bulkOperations.get(bulkOperations.size()-1); //last one in there was the problem
 						if (lastBulkOperation.getIntrospector() == null){
-							//failed out before thisUri could be set but after bulkOperation started being filled
+							//failed out before thisUri could be set but after bulkOperations started being filled
 							thisUri = lastBulkOperation.getUri();
 							method = lastBulkOperation.getHttpMethod();
 						}
@@ -262,7 +272,7 @@ public abstract class BulkConsumer extends RESTAPI {
 	/**
 	 * Fill object bulkOperations from transaction.
 	 *
-	 * @param bulkOperations the bulk Operations
+	 * @param bulkOperations the bulkOperations
 	 * @param transaction - JSON body containing the objects to be added
 	 * 							each object must have a URI and an object body
 	 * @param loader the loader
@@ -274,9 +284,9 @@ public abstract class BulkConsumer extends RESTAPI {
 	 * @throws UnsupportedEncodingException Walks through the given transaction and unmarshals each object in it, then bundles each
 	 * with its URI.
 	 */
-	private void fillBulkOperationObjectFromTransaction(List<BulkOperation> bulkOperations,
+	private void fillBulkOperationsObjectFromTransaction(List<BulkOperation> bulkOperations,
 			JsonObject transaction, Loader loader, TransactionalGraphEngine dbEngine, String inputMediaType)
-			throws AAIException,UnsupportedEncodingException {
+			throws AAIException, JsonSyntaxException, UnsupportedEncodingException {
 
 	
 			if (transaction.has(BULK_PUT_METHOD) && this.functionAllowed(HttpMethod.PUT)) {
@@ -416,7 +426,7 @@ public abstract class BulkConsumer extends RESTAPI {
 				}
 				
 			} catch (AAIException e) {
-				// even if bulkOperations doesn't have a uri or body, this way we keep all information associated with this error together
+				// even if bulkOperation doesn't have a uri or body, this way we keep all information associated with this error together
 				// even if both are null, that indicates how the input was messed up, so still useful to carry around like this
 				bulkOperations.add(bulkOperation);
 				throw e; //rethrow so the right response is generated on the level above

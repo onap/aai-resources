@@ -47,20 +47,15 @@ contains() {
 
 display_usage() {
 cat <<EOF
-Usage: $0 [options]
+Usage 1: updateTool.sh <node type> <update node URI> <property name>:<property value>
+[,<property name>:<property value]* | where update node uri is the URI path for that node
+for ex1: ./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX prov-status:NEWSTATUS
+ex2:./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX 'prov-status:NEWSTATUS with space'
+ex3:./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX 'prov-status:NEWSTATUS,attribute2:value'
 
-1. This script needs a resource argument (resource-path), and either a JSON filepath, or directly the property you need to update
-2. Usage 1 (use a Json file): updateTool.sh <node type> <resource> <filepath> <optional arg to ignore HTTP failure codes>
-3. Usage 1 example: ./updateTool.sh customer business/customers/customer/customer-id-1 /tmp/updateTest.json
+Usage 2. using .json file for update: ./updateTool.sh <node type> <update node URI> /tmp/updatepayload.json
+Ex: ./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX /tmp/testpayload.json
 
-4. Usage 2 (update a property directly): updateTool.sh <node type> <resource> '<key name>:<key value>,<property>:<property val>' <optional arg to ignore HTTP failure codes> 
-5. Usage 2 example: ./updateTool.sh complex cloud-infrastructure/complexes/complex/complex-id 'physical-location-id:complex-id, city:New York'
-6. You could try without the <key name>:<key value> (only the property and its new value), but on some servers this did not work: 
-7. ./updateTool.sh complex cloud-infrastructure/complexes/complex/complex-id 'city:New York'
-
-8. Usage 3 (update an attribute on an object that is embedded a level or two levels. Use the full path)
-9. ./updateTool.sh <node type> <embedded resource with full paths> <key name: key value>
-10. ./updateTool.sh p-interface network/pnfs/pnf/pnf-name-1/p-interfaces/p-interface/int-1 'interface-type:int-typei'
 EOF
 }
 
@@ -131,11 +126,10 @@ fi
 #or 
 #'physical-location-id:complex-id, city:New York'
 thirdarg=$3
-isjson = true
+isjson = false
 if [[ "$thirdarg" == *json || "$thirdarg" == *JSON ]]; then 
-	echo "Usage 1(JSON) because the 2nd arg ends with json";
+	isjson = true
 else 
-	echo "Usage 2(Comand Arg) because the 2nd arg does not end with json"; 
 	#For Usage 2, format input into JSON string format
 	JSONSTRING="{"
 	INPUT=$3

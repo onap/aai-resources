@@ -24,7 +24,6 @@ package org.onap.aai.interceptors;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.onap.aai.AAISetup;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,7 +31,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 
-public class PreAaiAjscInterceptorTest extends AAISetup {
+public class PreAaiAjscInterceptorTest {
 
     private PreAaiAjscInterceptor preAaiAjscInterceptor;
 

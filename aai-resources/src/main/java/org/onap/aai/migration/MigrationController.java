@@ -21,10 +21,15 @@
  */
 package org.onap.aai.migration;
 
+import java.util.UUID;
+
 import org.onap.aai.dbmap.AAIGraph;
+import org.onap.aai.logging.LoggingContext;
+import org.onap.aai.logging.LoggingContext.StatusCode;
+import org.onap.aai.util.AAIConstants;
 
 /**
- * Wrapper class to allow {@link com.openecomp.aai.migration.MigrationControllerInternal MigrationControllerInternal}
+ * Wrapper class to allow {@link org.onap.aai.migration.MigrationControllerInternal MigrationControllerInternal}
  * to be run from a shell script
  */
 public class MigrationController {
@@ -36,15 +41,23 @@ public class MigrationController {
 	 *            the arguments
 	 */
 	public static void main(String[] args) {
-		
+		LoggingContext.init();
+		LoggingContext.partnerName("Migration");
+		LoggingContext.serviceName(AAIConstants.AAI_RESOURCES_MS);
+		LoggingContext.component("MigrationController");
+		LoggingContext.targetEntity(AAIConstants.AAI_RESOURCES_MS);
+		LoggingContext.targetServiceName("main");
+		LoggingContext.requestId(UUID.randomUUID().toString());
+		LoggingContext.statusCode(StatusCode.COMPLETE);
+		LoggingContext.responseCode(LoggingContext.SUCCESS);
 		MigrationControllerInternal internal = new MigrationControllerInternal();
 		
 		try {
 			internal.run(args);
 		} catch (Exception e) {
-			//ignore
+			e.printStackTrace();
 		}
-		AAIGraph.getInstance().getGraph().close();
+		AAIGraph.getInstance().graphShutdown();
 		System.exit(0);
 	}
 }

@@ -47,8 +47,7 @@ do
      CLASSPATH=$CLASSPATH:$JAR
 done
 
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.onap.aai.dbgen.GenTester $1
+$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DBUNDLECONFIG_DIR=bundleconfig -DAJSC_HOME=$PROJECT_HOME -Daai.home=$PROJECT_HOME -Dlogback.configurationFile=$PROJECT_HOME/bundleconfig/etc/appprops/createDBSchema-logback.xml  org.onap.aai.dbgen.GenTester $1
 
 echo `date` "   Done $0"
 exit 0
