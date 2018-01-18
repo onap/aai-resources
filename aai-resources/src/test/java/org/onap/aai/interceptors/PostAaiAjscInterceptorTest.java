@@ -24,15 +24,15 @@ package org.onap.aai.interceptors;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.onap.aai.AAISetup;
 import org.onap.aai.logging.LoggingContext;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class PostAaiAjscInterceptorTest extends AAISetup {
+public class PostAaiAjscInterceptorTest {
 
     private PostAaiAjscInterceptor postAaiAjscInterceptor;
 
@@ -51,11 +51,12 @@ public class PostAaiAjscInterceptorTest extends AAISetup {
     public void testAllowOrRejectIfSuccess() throws Exception {
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-
-        LoggingContext.put(LoggingContext.LoggingField.RESPONSE_CODE.toString(), "SUCCESS");
+        HttpServletResponse resp = Mockito.mock(HttpServletResponse.class);
+        resp.setStatus(HttpServletResponse.SC_OK);
+        LoggingContext.put(LoggingContext.LoggingField.RESPONSE_CODE.toString(), "0");
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer("/fadsjoifj"));
 
-        boolean success = postAaiAjscInterceptor.allowOrReject(request, null, null);
+        boolean success = postAaiAjscInterceptor.allowOrReject(request, resp, null);
 
         assertTrue("Expecting the post interceptor to return success regardless", success);
     }
@@ -64,11 +65,12 @@ public class PostAaiAjscInterceptorTest extends AAISetup {
     public void testAllowOrRejectIfFailure() throws Exception {
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-
-        LoggingContext.put(LoggingContext.LoggingField.RESPONSE_CODE.toString(), "ERR.");
+        HttpServletResponse resp = Mockito.mock(HttpServletResponse.class);
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        LoggingContext.put(LoggingContext.LoggingField.RESPONSE_CODE.toString(), "400");
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer("/fadsjoifj"));
 
-        boolean success = postAaiAjscInterceptor.allowOrReject(request, null, null);
+        boolean success = postAaiAjscInterceptor.allowOrReject(request, resp, null);
 
         assertTrue("Expecting the post interceptor to return success regardless", success);
     }

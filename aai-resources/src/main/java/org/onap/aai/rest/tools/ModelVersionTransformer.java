@@ -55,6 +55,7 @@ import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.Version;
 import org.onap.aai.introspection.exceptions.AAIUnknownObjectException;
 import org.onap.aai.logging.ErrorLogHelper;
+import org.onap.aai.logging.LogFormatTools;
 import org.onap.aai.rest.db.HttpEntry;
 import org.onap.aai.rest.exceptions.AAIInvalidXMLNamespace;
 import org.onap.aai.rest.util.ValidateEncoding;
@@ -182,7 +183,7 @@ public class ModelVersionTransformer extends RESTAPI {
 			modelVerObj.setValue("model-version", oldModelVersion);
 
 
-			if (obj.hasProperty(MODEL_ELEMENTS)) { 
+			if (obj.hasProperty(MODEL_ELEMENTS)) {
 				Introspector oldModelElements = obj.getWrappedValue(MODEL_ELEMENTS);
 				if (oldModelElements != null) {
 					Introspector newModelElements = modelVerObj.newIntrospectorInstanceOfProperty(MODEL_ELEMENTS);
@@ -271,7 +272,7 @@ public class ModelVersionTransformer extends RESTAPI {
 					Introspector newRelationship = newModelElements.getLoader().introspectorFromName(RELATIONSHIP);
 					newRelationshipListList.add(newRelationship.getUnderlyingObject());
 
-					List<Introspector> oldRelationshipData = oldRelationship.getWrappedListValue(RELATIONSHIP);
+					List<Introspector> oldRelationshipData = oldRelationship.getWrappedListValue("relationship-data");
 					List<Object> newRelationshipData = (List<Object>)newRelationship.getValue("relationship-data");
 
 					newRelationship.setValue("related-to", "model-ver");
@@ -331,10 +332,10 @@ public class ModelVersionTransformer extends RESTAPI {
 
 	}
 
-	private Map<String, String> getCurrentModelsFromGraph(HttpHeaders headers, String transactionId, UriInfo info) throws  AAIException {
+	private Map<String, String> getCurrentModelsFromGraph(HttpHeaders headers, String transactionId, UriInfo info) throws NoEdgeRuleFoundException, AAIException {
 
 		TransactionalGraphEngine dbEngine = null;
-		Map<String, String> modelVerModelMap = new HashMap<>() ;
+		Map<String, String> modelVerModelMap = new HashMap<String,String>() ;
 		try {
 
 			Version version = AAIProperties.LATEST;
@@ -353,8 +354,8 @@ public class ModelVersionTransformer extends RESTAPI {
 			}
 		} catch (NoSuchElementException e) {
 			throw new NoSuchElementException();
-		} catch (Exception e1) { 
-			LOGGER.error("Exception while getting current models from graph"+e1);
+		} catch (Exception e1) {
+			LOGGER.error("Exception while getting current models from graph"+ LogFormatTools.getStackTop(e1));
 		}
 		return modelVerModelMap;
 
