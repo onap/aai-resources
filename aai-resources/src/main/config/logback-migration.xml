@@ -1,0 +1,56 @@
+<!--
+  ============LICENSE_START=======================================================
+  org.onap.aai
+  ================================================================================
+  Copyright (C) 2017 AT&T Intellectual Property. All rights reserved.
+  ================================================================================
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ============LICENSE_END=========================================================
+  -->
+
+<configuration>
+	<appender name="MIGRATION_FILE_LOG"
+		class="ch.qos.logback.core.FileAppender">
+		<append>true</append>
+		<file>logs/migrationAic3.log</file>
+		<encoder class="org.onap.aai.logging.CustomLogPatternLayoutEncoder">
+			<Pattern>%a %u %z [%t] "%m %U" %s %b</Pattern>
+		</encoder>
+	</appender>
+	<root level="DEBUG">
+	    <appender-ref ref="MIGRATION_FILE_LOG" />
+	</root>
+</configuration>
+
+<!-- 
+%a - Remote IP address
+%A - Local IP address
+%b - Bytes sent, excluding HTTP headers, or '-' if no bytes were sent
+%B - Bytes sent, excluding HTTP headers
+%h - Remote host name
+%H - Request protocol
+%l - Remote logical username from identd (always returns '-')
+%m - Request method
+%p - Local port
+%q - Query string (prepended with a '?' if it exists, otherwise an empty string
+%r - First line of the request
+%s - HTTP status code of the response
+%S - User session ID
+%t - Date and time, in Common Log Format format
+%u - Remote user that was authenticated
+%U - Requested URL path
+%v - Local server name
+%I - current request thread name (can compare later with stacktraces)
+
+%z - Custom pattern that parses the cert for the subject
+ -->

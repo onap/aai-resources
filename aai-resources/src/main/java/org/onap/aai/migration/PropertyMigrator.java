@@ -36,6 +36,8 @@ import com.thinkaurelius.titan.core.schema.TitanManagement;
 /**
  * A migration template for migrating a property from one name to another
  */
+@MigrationPriority(0)
+@MigrationDangerRating(1)
 public abstract class PropertyMigrator extends Migrator {
 
 	protected final String OLD_FIELD;
@@ -43,15 +45,7 @@ public abstract class PropertyMigrator extends Migrator {
 	protected final Class<?> fieldType;
 	protected final Cardinality cardinality;
 	protected final TitanManagement graphMgmt;
-	public PropertyMigrator() {
-		//used for not great reflection implementation
-		super();
-		this.OLD_FIELD = null;
-		this.NEW_FIELD = null;
-		this.fieldType = null;
-		this.cardinality = null;
-		this.graphMgmt = null;
-	}
+
 	public PropertyMigrator(TransactionalGraphEngine engine, String oldName, String newName, Class<?> type, Cardinality cardinality) {
 		super(engine);
 		this.OLD_FIELD = oldName;
@@ -111,17 +105,7 @@ public abstract class PropertyMigrator extends Migrator {
 			return Status.FAILURE;
 		}
 	}
-	
-	@Override
-	public int getPriority() {
-		return 0;
-	}
 
-	@Override
-	public int getDangerRating() {
-		return 1;
-	}
-	
 	protected Optional<PropertyKey> addProperty() {
 
 		if (!graphMgmt.containsPropertyKey(this.NEW_FIELD)) {

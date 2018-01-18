@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.onap.aai.aai-common</groupId>
             <artifactId>aai-core</artifactId>
-            <version>${project.version}</version>
+            <version>${aai.core.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>ajsc-runner</artifactId>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.onap.aai.aai-common</groupId>
             <artifactId>aai-schema</artifactId>
-            <version>${project.version}</version>
+            <version>${aai.schema.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>ajsc-runner</artifactId>
@@ -490,7 +490,7 @@
                             <artifactItem>
                                 <groupId>org.onap.aai.aai-common</groupId>
                                 <artifactId>aai-schema</artifactId>
-                                <version>${project.version}</version>
+                                <version>${aai.core.version}</version>
                                 <outputDirectory>bundleconfig-local/etc</outputDirectory>
                                 <includes>oxm/*.xml</includes>
                             </artifactItem>
@@ -504,6 +504,7 @@
                     <version>2.12.4</version>
                     <configuration>
                         <argLine>-noverify ${argLine}</argLine>
+                        <runOrder>alphabetical</runOrder>
                         <systemPropertyVariables>
                             <AJSC_HOME>.</AJSC_HOME>
                             <BUNDLECONFIG_DIR>bundleconfig-local</BUNDLECONFIG_DIR>

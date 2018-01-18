@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -55,6 +56,7 @@ import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.Version;
+import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
@@ -64,6 +66,7 @@ import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.onap.aai.util.AAIConstants;
 import org.onap.aai.workarounds.RemoveDME2QueryParams;
 
 import com.att.eelf.configuration.EELFLogger;
@@ -74,14 +77,14 @@ import com.google.common.base.Joiner;
 /**
  * The Class LegacyMoxyConsumer.
  */
-@Path("{version: v[2789]|v1[012]}")
+@Path("{version: v[789]|v1[012]}")
 public class LegacyMoxyConsumer extends RESTAPI {
 	
 	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(LegacyMoxyConsumer.class.getName());
 	protected static String authPolicyFunctionName = "REST";
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
-	
+	private final static String TARGET_ENTITY = "aai-resources";
 	/**
 	 * Update.
 	 *
@@ -98,12 +101,17 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response update (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-		
+		String serviceName =  "PUT " + uri.toString();
+		String queryStr = req.getQueryString();
+		if ( queryStr != null ) {
+			serviceName = serviceName + "?" + queryStr;
+		}
+		LoggingContext.serviceName(serviceName);
+		LoggingContext.targetServiceName(serviceName);
 		MediaType mediaType = headers.getMediaType();
-
 		return this.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info);
 	}
-	
+
 	/**
 	 * Update relationship.
 	 *
@@ -120,7 +128,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response updateRelationship (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-		
+
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
@@ -130,6 +138,17 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		TransactionalGraphEngine dbEngine = null;
 		boolean success = true;
 
+		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
+		String queryStr = req.getQueryString();
+		if ( queryStr != null ) {
+			serviceName = serviceName + "?" + queryStr;
+		}
+		LoggingContext.requestId(transId);
+		LoggingContext.partnerName(sourceOfTruth);
+		LoggingContext.serviceName(serviceName);
+		LoggingContext.targetEntity(TARGET_ENTITY);
+		LoggingContext.targetServiceName(serviceName);
+
    	 	try {
 			validateRequest(info);
    			Version version = Version.valueOf(versionParam);
@@ -138,19 +157,19 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
 			loader = httpEntry.getLoader();
 			dbEngine = httpEntry.getDbEngine();
-   			
+
 			URI uriObject = UriBuilder.fromPath(uri).build();
 			this.validateURI(uriObject);
 
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
-			
+
 			Introspector wrappedEntity = loader.unmarshal("relationship", content, org.onap.aai.restcore.MediaType.getEnum(this.getInputMediaType(inputMediaType)));
-			
+
 			DBRequest request = new DBRequest.Builder(HttpMethod.PUT_EDGE, uriObject, uriQuery, wrappedEntity, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
 			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
-	        
+
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
 
@@ -166,13 +185,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				if (success) {
 					dbEngine.commit();
 				} else {
-					LOGGER.warn("Rolling back Titan transaction");
 					dbEngine.rollback();
 				}
 			}
 
 		}
-		
+
 		return response;
 	}
 
@@ -192,11 +210,17 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ "application/merge-patch+json" })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response patch (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-		
+
 		MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
-		
+		String serviceName =  "PATCH " + uri.toString();
+		String queryStr = req.getQueryString();
+		if ( queryStr != null ) {
+			serviceName = serviceName + "?" + queryStr;
+		}
+		LoggingContext.serviceName(serviceName);
+		LoggingContext.targetServiceName(serviceName);
 		return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info);
-	
+
 	}
 	
 	/**
@@ -217,8 +241,19 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response getLegacy (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("all") @QueryParam("depth") String depthParam, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-		
-		return this.getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>());
+		return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED,
+				AAIConstants.AAI_CRUD_TIMEOUT_APP,
+				AAIConstants.AAI_CRUD_TIMEOUT_LIMIT,
+				headers,
+				info,
+				HttpMethod.GET,
+				new Callable<Response>() {
+					@Override
+					public Response call() {
+						return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>());
+					}
+				}
+				);
 	}
 
 	/**
@@ -242,6 +277,17 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
 		Loader loader = null;
+		
+		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
+		String queryStr = req.getQueryString();
+		if ( queryStr != null ) {
+			serviceName = serviceName + "?" + queryStr;
+		}
+		LoggingContext.requestId(transId);
+		LoggingContext.partnerName(sourceOfTruth);
+		LoggingContext.serviceName(serviceName);
+		LoggingContext.targetEntity(TARGET_ENTITY);
+		LoggingContext.targetServiceName(serviceName);
 		
 		try {
 			validateRequest(info);
@@ -289,7 +335,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, e);
 		} catch (Exception e ) {
 			AAIException ex = new AAIException("AAI_4000", e);
-			
+
 			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, ex);
 		} finally {
 			if (dbEngine != null) {
@@ -300,7 +346,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				}
 			}
 		}
-		
+
 		return response;
 	}
 	/**
@@ -318,17 +364,27 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Path("/{uri: .+}")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response delete (@PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @QueryParam("resource-version")String resourceVersion, @Context HttpServletRequest req) {
-		
-		
+
+
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
+		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
+		String queryStr = req.getQueryString();
+		if ( queryStr != null ) {
+			serviceName = serviceName + "?" + queryStr;
+		}
+		LoggingContext.requestId(transId);
+		LoggingContext.partnerName(sourceOfTruth);
+		LoggingContext.serviceName(serviceName);
+		LoggingContext.targetEntity(TARGET_ENTITY);
+		LoggingContext.targetServiceName(serviceName);
 
 		TransactionalGraphEngine dbEngine = null;
 		Response response = Response.status(404)
 				.type(outputMediaType).build();
-				
+
 		boolean success = true;
 
 		try {
@@ -337,7 +393,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			Version version = Version.valueOf(versionParam);
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
 			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-			
+
 			dbEngine = httpEntry.getDbEngine();
 			Loader loader = httpEntry.getLoader();
 
@@ -351,7 +407,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
 			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
-	        
+
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
 
@@ -367,15 +423,14 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				if (success) {
 					dbEngine.commit();
 				} else {
-					LOGGER.warn("Rolling back Titan transaction");
 					dbEngine.rollback();
 				}
 			}
 		}
-		
+
 		return response;
 	}
-	
+
 	/**
 	 * This whole method does nothing because the body is being dropped while fielding the request.
 	 *
@@ -391,8 +446,8 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Path("/{uri: .+}/relationship-list/relationship")
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Response deleteRelationship (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {		
-		
+	public Response deleteRelationship (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
+
 		MediaType inputMediaType = headers.getMediaType();
 
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
@@ -400,11 +455,22 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 
+		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
+		String queryStr = req.getQueryString();
+		if ( queryStr != null ) {
+			serviceName = serviceName + "?" + queryStr;
+		}
+		LoggingContext.requestId(transId);
+		LoggingContext.partnerName(sourceOfTruth);
+		LoggingContext.serviceName(serviceName);
+		LoggingContext.targetEntity(TARGET_ENTITY);
+		LoggingContext.targetServiceName(serviceName);
+
 		Loader loader = null;
 		TransactionalGraphEngine dbEngine = null;
 		Response response = Response.status(404)
 				.type(outputMediaType).build();
-	
+
 		boolean success = true;
 
 		try {
@@ -414,7 +480,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
 			loader = httpEntry.getLoader();
 			dbEngine = httpEntry.getDbEngine();
-			
+
 			if (content.equals("")) {
 				throw new AAIException("AAI_3102", "You must supply a relationship");
 			}
@@ -422,14 +488,14 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			this.validateURI(uriObject);
 
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
-        				
+
 			Introspector wrappedEntity = loader.unmarshal("relationship", content, org.onap.aai.restcore.MediaType.getEnum(this.getInputMediaType(inputMediaType)));
 
     		DBRequest request = new DBRequest.Builder(HttpMethod.DELETE_EDGE, uriObject, uriQuery, wrappedEntity, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
 			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
-	        
+
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
 		} catch (AAIException e) {
@@ -444,22 +510,17 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				if (success) {
 					dbEngine.commit();
 				} else {
-					LOGGER.warn("Rolling back Titan transaction");
 					dbEngine.rollback();
 				}
 			}
 		}
-		
+
 		return response;
 	}
 	
 	/**
 	 * Validate request.
 	 *
-	 * @param uri the uri
-	 * @param headers the headers
-	 * @param req the req
-	 * @param action the action
 	 * @param info the info
 	 * @throws AAIException the AAI exception
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
@@ -499,7 +560,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	/**
 	 * Handle writes.
 	 *
-	 * @param aaiAction the aai action
 	 * @param mediaType the media type
 	 * @param method the method
 	 * @param content the content
@@ -507,11 +567,10 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 * @param uri the uri
 	 * @param headers the headers
 	 * @param info the info
-	 * @param req the req
 	 * @return the response
 	 */
 	private Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam, String uri, HttpHeaders headers, UriInfo info) {
-		
+
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
 		Loader loader = null;
@@ -520,6 +579,11 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		Boolean success = true;
+		
+		//LoggingContext service name and target service name set in calling method
+		LoggingContext.requestId(transId);
+		LoggingContext.partnerName(sourceOfTruth);
+		LoggingContext.targetEntity(TARGET_ENTITY);
 		
 		try {
 			validateRequest(info);
@@ -572,7 +636,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				if (success) {
 					dbEngine.commit();
 				} else {
-					LOGGER.warn("Rolling back Titan transaction");
 					dbEngine.rollback();
 				}
 			}

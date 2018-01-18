@@ -37,6 +37,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
 
@@ -114,7 +115,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 complexToPserverRelationshipUri,
                 httpHeaders,
                 uriInfo,
-                null
+                new MockHttpServletRequest("DELETE", "http://www.test.com")
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -159,7 +160,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                new MockHttpServletRequest("GET", "http://www.test.com")
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -172,7 +173,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                new MockHttpServletRequest("PUT", "http://www.test.com")
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -192,7 +193,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                new MockHttpServletRequest("GET", "http://www.test.com")
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
