@@ -504,6 +504,7 @@
                     <version>2.12.4</version>
                     <configuration>
                         <argLine>-noverify ${argLine}</argLine>
+                        <runOrder>alphabetical</runOrder>
                         <systemPropertyVariables>
                             <AJSC_HOME>.</AJSC_HOME>
                             <BUNDLECONFIG_DIR>bundleconfig-local</BUNDLECONFIG_DIR>

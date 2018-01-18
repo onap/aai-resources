@@ -39,15 +39,12 @@ import org.onap.aai.serialization.db.EdgeRules;
  * A migration template for migrating all edge properties between "from" and "to" node from the DbedgeRules.json
  * 
  */
+@MigrationPriority(0)
+@MigrationDangerRating(1)
 public abstract class EdgeMigrator extends Migrator {
 
 	private boolean success = true;
 	private EdgeRules rules;
-
-	public EdgeMigrator() {
-		// used for not great reflection implementation
-		super();
-	}
 
 	public EdgeMigrator(TransactionalGraphEngine engine) {
 		super(engine);
@@ -138,20 +135,6 @@ public abstract class EdgeMigrator extends Migrator {
 		} else {
 			return Status.FAILURE;
 		}
-	}
-
-	@Override
-	public int getPriority() {
-		return 0;
-	}
-
-	/*
-	 * Higher danger rating of 10  only for all edge property changes 
-	 * or when a quorum of edges change which can be overridden by inheritors
-	 */
-	@Override
-	public int getDangerRating() {
-		return 1;
 	}
 
 	/**

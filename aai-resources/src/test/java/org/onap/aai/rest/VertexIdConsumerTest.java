@@ -41,6 +41,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 public class VertexIdConsumerTest extends AAISetup {
 
@@ -124,7 +125,8 @@ public class VertexIdConsumerTest extends AAISetup {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
-
+        
+        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
                 Version.getLatest().toString(),
@@ -133,18 +135,19 @@ public class VertexIdConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
+        
         response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -168,7 +171,7 @@ public class VertexIdConsumerTest extends AAISetup {
                 "10000",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertNotNull(response);
