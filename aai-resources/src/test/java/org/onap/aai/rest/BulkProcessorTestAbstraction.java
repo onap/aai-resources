@@ -23,7 +23,7 @@ package org.onap.aai.rest;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
-
+import org.springframework.mock.web.MockHttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -124,12 +124,14 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
     }
     
     protected Response executeRequest(String payload) {
+    	MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", "http://www.test.com");
+    	
 		return bulkConsumer.bulkProcessor(
 				payload.replaceAll("<UUID>", UUID.randomUUID().toString()),
                 Version.getLatest().toString(),
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 	}
 

@@ -26,7 +26,6 @@ import com.att.eelf.configuration.EELFManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.onap.aai.AAISetup;
 import org.onap.aai.introspection.Version;
 
 import javax.ws.rs.core.*;
@@ -37,7 +36,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 
-public abstract class RetiredConsumerTest extends AAISetup {
+public abstract class RetiredConsumerTest {
 
     protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
 

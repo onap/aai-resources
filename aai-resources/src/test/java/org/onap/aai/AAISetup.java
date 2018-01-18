@@ -21,26 +21,23 @@
  */
 package org.onap.aai;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.BeforeClass;
-import org.onap.aai.dbmap.AAIGraph;
-import org.onap.aai.introspection.ModelInjestor;
-import org.onap.aai.serialization.queryformats.QueryFormatTestHelper;
-import org.onap.aai.util.AAIConstants;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertNotNull;
+import org.apache.commons.io.IOUtils;
+import org.junit.BeforeClass;
+import org.onap.aai.serialization.queryformats.QueryFormatTestHelper;
+import org.onap.aai.util.AAIConstants;
 
 public abstract class AAISetup {
 
     @BeforeClass
     public static void setupBundleconfig() throws Exception {
         System.setProperty("AJSC_HOME", ".");
-        System.setProperty("BUNDLECONFIG_DIR", "src/test/resources/bundleconfig-local");
-        QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"),
-                "src/test/resources/bundleconfig-local/etc/oxm/");
+        System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");
+        QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"), "bundleconfig-local/etc/oxm/");
     }
 
     public String getPayload(String filename) throws IOException {

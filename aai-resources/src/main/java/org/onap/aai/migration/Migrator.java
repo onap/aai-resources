@@ -21,6 +21,7 @@
  */
 package org.onap.aai.migration;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -50,6 +51,8 @@ import com.att.eelf.configuration.EELFManager;
 /**
  * This class defines an A&AI Migration
  */
+@MigrationPriority(0)
+@MigrationDangerRating(0)
 public abstract class Migrator implements Runnable {
 	
 	protected EELFLogger logger = null;
@@ -59,10 +62,7 @@ public abstract class Migrator implements Runnable {
 
 	protected TransactionalGraphEngine engine;
 	protected NotificationHelper notificationHelper;
-	
-	public Migrator() {
-		//used for not great reflection implementation
-	}
+
 	/**
 	 * Instantiates a new migrator.
 	 *
@@ -97,23 +97,7 @@ public abstract class Migrator implements Runnable {
         engine.commit();
 	}
 
-	/**
-	 * Gets the priority.
-	 *
-	 * Lower number has higher priority
-	 * 
-	 * @return the priority
-	 */
-	public abstract int getPriority();
 
-	/**
-	 * The larger the number, the more danger
-	 * 
-	 * Range is 0-10
-	 * 
-	 * @return danger rating
-	 */
-	public abstract int getDangerRating();
 	/**
 	 * As string.
 	 *
@@ -157,12 +141,48 @@ public abstract class Migrator implements Runnable {
 
 		return result.toString();
 	}
+
+	/**
+	 *
+	 * @param v
+	 * @param numLeadingTabs number of leading \t char's
+	 * @return
+	 */
+	protected String toStringForPrinting(Vertex v, int numLeadingTabs) {
+		String prefix = String.join("", Collections.nCopies(numLeadingTabs, "\t"));
+		if (v == null) {
+			return "";
+		}
+		final StringBuilder sb = new StringBuilder();
+		sb.append(prefix + v + "\n");
+		v.properties().forEachRemaining(prop -> sb.append(prefix + prop + "\n"));
+		return sb.toString();
+	}
+
+	/**
+	 *
+	 * @param e
+	 * @param numLeadingTabs number of leading \t char's
+	 * @return
+	 */
+	protected String toStringForPrinting(Edge e, int numLeadingTabs) {
+		String prefix = String.join("", Collections.nCopies(numLeadingTabs, "\t"));
+		if (e == null) {
+			return "";
+		}
+		final StringBuilder sb = new StringBuilder();
+		sb.append(prefix + e + "\n");
+		sb.append(prefix + e.label() + "\n");
+		e.properties().forEachRemaining(prop -> sb.append(prefix + "\t" + prop + "\n"));
+		return sb.toString();
+	}
+
 	/**
 	 * Checks for edge between.
 	 *
-	 * @param vertex a
-	 * @param vertex b
-	 * @param direction d
+	 * @param a a
+	 * @param b b
+	 * @param d d
 	 * @param edgeLabel the edge label
 	 * @return true, if successful
 	 */
@@ -179,7 +199,7 @@ public abstract class Migrator implements Runnable {
 	/**
 	 * Creates the edge
 	 *
-	 * @param edgeType the edge type - COUSIN or TREE
+	 * @param type the edge type - COUSIN or TREE
 	 * @param out the out
 	 * @param in the in
 	 * @return the edge
