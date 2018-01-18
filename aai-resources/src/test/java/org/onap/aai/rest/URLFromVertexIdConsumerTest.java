@@ -41,6 +41,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 public class URLFromVertexIdConsumerTest extends AAISetup {
 
@@ -125,6 +126,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
+        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
                 Version.getLatest().toString(),
@@ -133,18 +135,18 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -160,14 +162,13 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         assertTrue("Response doesn't contain the key vertexId", responseHeaders.containsKey("vertex-id"));
 
         String vertexId = responseHeaders.get("vertex-id").get(0).toString();
-
         response = urlFromVertexIdConsumer.generateUrlFromVertexId(
                 "",
                 Version.getLatest().toString(),
                 Long.valueOf(vertexId).longValue(),
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
                 );
 
         assertNotNull(response);
@@ -183,14 +184,14 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         String vertexId = "384584";
-
+        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = urlFromVertexIdConsumer.generateUrlFromVertexId(
                 "",
                 Version.getLatest().toString(),
                 Long.valueOf(vertexId).longValue(),
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertNotNull("Check if the response is not null", response);

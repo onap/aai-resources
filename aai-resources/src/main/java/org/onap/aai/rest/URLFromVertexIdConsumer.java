@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@
  *
  * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  */
+
 package org.onap.aai.rest;
 
 import java.net.URI;
@@ -55,7 +56,7 @@ import org.onap.aai.workarounds.LegacyURITransformer;
 /**
  * The Class URLFromVertexIdConsumer.
  */
-@Path("{version: v[2789]|v1[012]}/generateurl")
+@Path("{version: v[789]|v1[012]}/generateurl")
 public class URLFromVertexIdConsumer extends RESTAPI {
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
@@ -73,6 +74,7 @@ public class URLFromVertexIdConsumer extends RESTAPI {
 	 * @param req the req
 	 * @return the response
 	 */
+	@GET
 	@Path(ID_ENDPOINT)
 	@Produces({ MediaType.TEXT_PLAIN })
 	public Response generateUrlFromVertexId(String content, @PathParam("version")String versionParam, @PathParam("vertexid")long vertexid, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
@@ -103,6 +105,11 @@ public class URLFromVertexIdConsumer extends RESTAPI {
 			result.insert(0, AAIConfig.get("aai.server.url.base"));
 			LegacyURITransformer urlTransformer = LegacyURITransformer.getInstance();
 			URI output = new URI(result.toString());
+			/*if (version.compareTo(Version.v2) == 0) {
+				output = urlTransformer.getLegacyURI(output);
+				result = new StringBuilder();
+				result.append(output.toString());
+			}*/
 
 			response = Response.ok().entity(result.toString()).status(Status.OK).type(MediaType.TEXT_PLAIN).build();
 		} catch (AAIException e) {
