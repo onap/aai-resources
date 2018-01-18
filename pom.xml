@@ -50,6 +50,8 @@
         <!-- For using CXF with Maven -->
         <cxf.version>3.0.4</cxf.version>
         <snapshot.file>int1-data.graphson</snapshot.file>
+	<aai.core.version>1.2.0</aai.core.version>
+	<aai.schema.version>1.2.0</aai.core.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>

@@ -29,9 +29,13 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
+import org.onap.aai.logging.LoggingContext;
+import org.onap.aai.logging.LoggingContext.StatusCode;
 import org.onap.aai.serialization.db.EdgeRule;
 import org.onap.aai.serialization.db.EdgeRules;
 import org.onap.aai.util.AAIConfig;
+import org.onap.aai.util.AAISystemExitUtil;
+import org.onap.aai.util.AAIConstants;
 
 import java.util.*;
 
@@ -47,12 +51,24 @@ public class UpdateEdgeTags {
 	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
-	
-	  	if( args == null || args.length != 1 ){
+
+		System.setProperty("aai.service.name", UpdateEdgeTags.class.getSimpleName());
+
+		if( args == null || args.length != 1 ){
 				String msg = "usage:  UpdateEdgeTags edgeRuleKey  (edgeRuleKey can be either, all, or a rule key like 'nodeTypeA|nodeTypeB') \n";
 				System.out.println(msg);
-				System.exit(1);
+				AAISystemExitUtil.systemExitCloseAAIGraph(1);
 		}
+	  	LoggingContext.init();
+		LoggingContext.partnerName(FROMAPPID);
+		LoggingContext.serviceName(AAIConstants.AAI_RESOURCES_MS);
+		LoggingContext.component("updateEdgeTags");
+		LoggingContext.targetEntity(AAIConstants.AAI_RESOURCES_MS);
+		LoggingContext.targetServiceName("main");
+		LoggingContext.requestId(TRANSID);
+		LoggingContext.statusCode(StatusCode.COMPLETE);
+		LoggingContext.responseCode("0");
+
 	  	String edgeRuleKeyVal = args[0];
 
 		TitanGraph graph = null;
@@ -112,7 +128,7 @@ public class UpdateEdgeTags {
     		else {
     			String msg = " Error - Unrecognized edgeRuleKey: [" + edgeRuleKeyVal + "]. ";
     			System.out.println(msg);
-    			System.exit(0);
+    			AAISystemExitUtil.systemExitCloseAAIGraph(0);
     		}
 		}
 		else {
@@ -130,19 +146,19 @@ public class UpdateEdgeTags {
     		if( graph == null ){
     			String emsg = "null graph object in updateEdgeTags() \n";
     			System.out.println(emsg);
-    	 		System.exit(0);
+    	 		AAISystemExitUtil.systemExitCloseAAIGraph(0);
     		}
     	}
 	    catch (AAIException e1) {
 			String msg =  e1.getErrorObject().toString();
 			System.out.println(msg);
-			System.exit(0);
+			AAISystemExitUtil.systemExitCloseAAIGraph(0);
         }
         catch (Exception e2) {
 	 		String msg =  e2.toString();
 	 		System.out.println(msg);
 	 		e2.printStackTrace();
-	 		System.exit(0);
+	 		AAISystemExitUtil.systemExitCloseAAIGraph(0);
         }
 
     	Graph g = graph.newTransaction();
@@ -231,10 +247,10 @@ public class UpdateEdgeTags {
 			if( graph != null ){
 				graph.tx().rollback();
 			}
-			System.exit(0);
+			AAISystemExitUtil.systemExitCloseAAIGraph(0);
 		}
 
-	    System.exit(0);
+	    AAISystemExitUtil.systemExitCloseAAIGraph(0);
     
 	}// end of main()
 
@@ -303,8 +319,6 @@ public class UpdateEdgeTags {
 		
 	} // End of getEdgeTagPropPutHash()
 
-
-	
 }
 
 

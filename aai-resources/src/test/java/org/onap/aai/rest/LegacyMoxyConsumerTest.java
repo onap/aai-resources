@@ -35,7 +35,11 @@ import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.ModelInjestor;
 import org.onap.aai.introspection.Version;
+
+import org.onap.aai.util.AAIConfig;
+import org.onap.aai.util.AAIConstants;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.ws.rs.core.*;
 import java.io.IOException;
@@ -133,6 +137,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
+        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
                 Version.getLatest().toString(),
@@ -141,18 +146,19 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -172,7 +178,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         code = response.getStatus();
@@ -191,13 +197,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         queryParameters.add("resource-version", resourceVersion);
 
+        mockReq = new MockHttpServletRequest("DELETE", uri);
         response = legacyMoxyConsumer.delete(
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
                 "",
-                null
+                mockReq
         );
 
         code = response.getStatus();
@@ -215,7 +222,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -239,14 +246,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship");
         String cloudToPserverRelationshipUri = String.format(
                 "cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
-
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
         Response response = legacyMoxyConsumer.updateRelationship(
                 cloudToPserverRelationshipData,
                 Version.getLatest().toString(),
                 cloudToPserverRelationshipUri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -260,14 +267,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
 
         // TODO - Need to actually verify the relationship between pserver and cloud-region
-
+        mockReq = new MockHttpServletRequest("DELETE", cloudToPserverRelationshipUri);
         response = legacyMoxyConsumer.deleteRelationship(
                 cloudToPserverRelationshipData,
                 Version.getLatest().toString(),
                 cloudToPserverRelationshipUri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         code = response.getStatus();
@@ -300,14 +307,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
-
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         Response response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -323,14 +330,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenThrow(new IllegalArgumentException());
-
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         Response response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -344,14 +351,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         code = response.getStatus();
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
         System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
-
+        mockReq = new MockHttpServletRequest("GET", uri);
         response = legacyMoxyConsumer.getLegacy(
                 "",
                 Version.getLatest().toString(),
@@ -360,19 +367,19 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
-
+        mockReq = new MockHttpServletRequest("DELETE", uri);
         response = legacyMoxyConsumer.delete(
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
                 "",
-                null
+                mockReq
         );
 
         code = response.getStatus();
@@ -384,7 +391,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
         code = response.getStatus();
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
@@ -398,14 +405,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
-
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         Response response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -418,13 +425,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         code = response.getStatus();
         System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
 
+        mockReq = new MockHttpServletRequest("GET", uri);
         response = legacyMoxyConsumer.getLegacy(
                 "",
                 Version.getLatest().toString(),
@@ -433,12 +441,13 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
 
+        mockReq = new MockHttpServletRequest("DELETE", uri);
         queryParameters.add("resource-version", "3434394839483");
         response = legacyMoxyConsumer.delete(
                 Version.getLatest().toString(),
@@ -446,7 +455,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 httpHeaders,
                 uriInfo,
                 "",
-                null
+                mockReq
         );
 
         code = response.getStatus();
@@ -459,7 +468,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
         code = response.getStatus();
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
@@ -479,6 +488,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
                 Version.getLatest().toString(),
@@ -487,18 +497,18 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
+        mockReq = new MockHttpServletRequest("PUT", uri);
         response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -515,13 +525,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         outputMediaTypes.remove(APPLICATION_JSON);
         outputMediaTypes.add(MediaType.valueOf("application/merge-patch+json"));
 
+        mockReq = new MockHttpServletRequest("PATCH", uri);
         response = legacyMoxyConsumer.patch(
                 patchData,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         code = response.getStatus();
@@ -536,6 +547,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
+        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
                 Version.getLatest().toString(),
@@ -544,20 +556,21 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals("Expected to not have the data already in memory",
                 Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         response = legacyMoxyConsumer.update(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -577,7 +590,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                null
+                mockReqGet
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -601,13 +614,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("DELETE", uri);
         Response response = legacyMoxyConsumer.deleteRelationship(
                 payload,
                 Version.getLatest().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                null
+                mockReq
         );
 
         int code = response.getStatus();
@@ -634,5 +648,91 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
     public String getUri(){
         return getUri("pserver-hostname-test");
+    }
+
+    @Test
+    public void legacyMoxyCheckTimeoutEnabled() throws Exception{
+        boolean isTimeoutEnabled = legacyMoxyConsumer.isTimeoutEnabled("JUNITTESTAPP1", AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
+        assertEquals(true, isTimeoutEnabled);
+    }
+
+    @Test
+    public void legacyMoxyCheckTimeoutEnabledOverride() throws Exception{
+        boolean isTimeoutEnabled = legacyMoxyConsumer.isTimeoutEnabled("JUNITTESTAPP2", AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
+        assertEquals(false, isTimeoutEnabled);
+    }
+
+    @Test
+    public void legacyMoxyCheckTimeoutEnabledDefaultLimit() throws Exception{
+        boolean isTimeoutEnabled = legacyMoxyConsumer.isTimeoutEnabled("JUNITTESTAPP3", AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
+        assertEquals(true, isTimeoutEnabled);
+        int timeout = legacyMoxyConsumer.getTimeoutLimit("JUNITTESTAPP3", AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
+        assertEquals(100000, timeout);
+    }
+
+    @Test
+    public void legacyMoxyGetTimeout() throws Exception{
+        int timeout = legacyMoxyConsumer.getTimeoutLimit("JUNITTESTAPP1", AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
+        assertEquals(1, timeout);
+    }
+
+    @Test
+    public void legacyMoxyGetTimeoutOverride() throws Exception{
+        int timeout = legacyMoxyConsumer.getTimeoutLimit("JUNITTESTAPP2", AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
+        assertEquals(-1, timeout);
+    }
+    @Test
+    public void testTimeoutGetCall() throws Exception{
+        String uri = getUri();
+
+        if(uri.length() != 0 && uri.charAt(0) == '/'){
+            uri = uri.substring(1);
+        }
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+        headersMultiMap.putSingle("X-FromAppId", "JUNITTESTAPP1");
+        when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
+
+        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
+        Response response = legacyMoxyConsumer.getLegacy(
+                "",
+                Version.getLatest().toString(),
+                uri,
+                "all",
+                "false",
+                httpHeaders,
+                uriInfo,
+                mockReqGet
+        );
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    @Test
+    public void testBypassTimeoutGetCall() throws Exception{
+        String uri = getUri();
+
+        if(uri.length() != 0 && uri.charAt(0) == '/'){
+            uri = uri.substring(1);
+        }
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+        headersMultiMap.putSingle("X-FromAppId", "JUNITTESTAPP2");
+        when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
+
+        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
+        Response response = legacyMoxyConsumer.getLegacy(
+                "",
+                Version.getLatest().toString(),
+                uri,
+                "all",
+                "false",
+                httpHeaders,
+                uriInfo,
+                mockReqGet
+        );
+
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 }
