@@ -202,7 +202,7 @@ public class ModelVersionTransformer extends RESTAPI {
 
 		} catch (AAIException e) {
 
-			ArrayList<String> templateVars = new ArrayList<String>(2);
+			ArrayList<String> templateVars = new ArrayList<>(2);
 			templateVars.add("POST modeltransform");
 			templateVars.add("model-ver.model-version-id");
 			response = Response
