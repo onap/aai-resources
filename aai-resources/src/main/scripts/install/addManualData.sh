@@ -22,7 +22,7 @@
 
 # this script now requires a release parameter.
 # the tool finds and sorts *.txt files within the
-# bundleconfig/etc/scriptdate/addmanualdata/$release directory containing
+# resources/etc/scriptdata/addmanualdata/$release directory containing
 # one resource to be added to the graph. The directory contains a second
 # file with the same name, but the extension is .json. This json file
 # is passed to the PutTool as the payload. The parameters passed to the
@@ -77,15 +77,15 @@ k=0
 
 if [ "$1" = "tenant_isolation" ]
 then
-	CR_TEXT_PATH=`find $PROJECT_HOME/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/cloud-region -name "*.txt" -print | sort -f`
-    AZ_TEXT_PATH=`find $PROJECT_HOME/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/availability-zone -name "*.txt" -print | sort -f`
-    COMPLEX_TEXT_PATH=`find $PROJECT_HOME/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/complex -name "*.txt" -print | sort -f`
-    ZONE_TEXT_PATH=`find $PROJECT_HOME/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/zone -name "*.txt" -print | sort -f`
-    PSERVER_TEXT_PATH=`find $PROJECT_HOME/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/pserver -name "*.txt" -print | sort -f`
+	CR_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/cloud-region -name "*.txt" -print | sort -f`
+    AZ_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/availability-zone -name "*.txt" -print | sort -f`
+    COMPLEX_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/complex -name "*.txt" -print | sort -f`
+    ZONE_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/zone -name "*.txt" -print | sort -f`
+    PSERVER_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/pserver -name "*.txt" -print | sort -f`
     TEXT_PATH="${CR_TEXT_PATH} ${AZ_TEXT_PATH} ${COMPLEX_TEXT_PATH} ${ZONE_TEXT_PATH} ${PSERVER_TEXT_PATH}"
     COMMAND=${TEXT_PATH}
 else
-	TEXT_PATH=$PROJECT_HOME/bundleconfig/etc/scriptdata/addmanualdata/*/*.txt
+	TEXT_PATH=$PROJECT_HOME/resources/etc/scriptdata/addmanualdata/*/*.txt
 	COMMAND=`ls ${TEXT_PATH} | sort -f`
 fi
 

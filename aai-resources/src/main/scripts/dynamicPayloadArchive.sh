@@ -21,9 +21,12 @@
 ###
 
 #
-# The script is called to tar and gzip the files under /opt/app/aai-resources/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation which are the payload files created by the dynamicPayloadGenerator.sh tool.
+# The script is called to tar and gzip the files under /opt/app/aai-resources/resources/etc/scriptdata/addmanualdata/tenant_isolation which are the payload files created by the dynamicPayloadGenerator.sh tool.
 #
 #
+
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+. ${COMMON_ENV_PATH}/common_functions.sh
 
 . /etc/profile.d/aai.sh
 PROJECT_HOME=/opt/app/aai-resources
@@ -38,7 +41,7 @@ if [ "${userid}" != $CHECK_USER ]; then
     echo "You must be  $CHECK_USER to run $0. The id used $userid."
     exit 1
 fi
-DIRECTORY=${PROJECT_HOME}/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation
+DIRECTORY=${PROJECT_HOME}/resources/etc/scriptdata/addmanualdata/tenant_isolation
 if [ ! -d ${DIRECTORY} ]
 then
 	echo " ${DIRECTORY} doesn't exist"

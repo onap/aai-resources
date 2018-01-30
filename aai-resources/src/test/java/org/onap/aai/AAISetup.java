@@ -35,9 +35,9 @@ public abstract class AAISetup {
 
     @BeforeClass
     public static void setupBundleconfig() throws Exception {
-        System.setProperty("AJSC_HOME", ".");
-        System.setProperty("BUNDLECONFIG_DIR", "bundleconfig-local");
-        QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"), "bundleconfig-local/etc/oxm/");
+        System.setProperty("AJSC_HOME", "./");
+        System.setProperty("BUNDLECONFIG_DIR", "src/main/resources/");
+//        QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"), "bundleconfig-local/etc/oxm/");
     }
 
     public String getPayload(String filename) throws IOException {

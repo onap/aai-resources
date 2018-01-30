@@ -21,29 +21,12 @@
 # ECOMP is a trademark and service mark of AT&T Intellectual Property.
 #
 
-userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
-if [ "${userid}" != "aaiadmin" ]; then
-    echo "You must be aaiadmin to run $0. The id used $userid."
-    exit 1
-fi
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+. ${COMMON_ENV_PATH}/common_functions.sh
 
-if [ -f "/etc/profile.d/aai.sh" ]; then
-    source /etc/profile.d/aai.sh
-else
-    echo "File not found: /etc/profile.d/aai.sh";
-    exit
-fi
-
-JAVA=$JAVA_HOME/bin/java
-
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
-
-$JAVA -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME -cp $CLASSPATH org.onap.aai.db.schema.ScriptDriver $@
+start_date;
+check_user;
+source_profile;
+execute_spring_jar org.onap.aai.db.schema.ScriptDriver "" "$@"
+end_date;
+exit 0

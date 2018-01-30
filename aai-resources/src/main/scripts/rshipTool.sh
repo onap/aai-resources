@@ -113,7 +113,7 @@ fi
 
 . /etc/profile.d/aai.sh
 PROJECT_HOME=/opt/app/aai-resources
-prop_file=$PROJECT_HOME/bundleconfig/etc/appprops/aaiconfig.properties
+prop_file=$PROJECT_HOME/resources/etc/appprops/aaiconfig.properties
 log_dir=$PROJECT_HOME/logs/misc
 today=$(date +\%Y-\%m-\%d)
 
@@ -144,12 +144,12 @@ fi
 
 if [ $MISSING_PROP = false ]; then
         if [ $USEBASICAUTH = false ]; then
-                AUTHSTRING="--cert $PROJECT_HOME/bundleconfig/etc/auth/aaiClientPublicCert.pem --key $PROJECT_HOME/bundleconfig/etc/auth/aaiClientPrivateKey.pem"
+                AUTHSTRING="--cert $PROJECT_HOME/resources/etc/auth/aaiClientPublicCert.pem --key $PROJECT_HOME/resources/etc/auth/aaiClientPrivateKey.pem"
         else
                 AUTHSTRING="-u $CURLUSER:$CURLPASSWORD"
         fi
         
-	RESOURCEVERSION=$(curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | python -c "import sys, json; print json.load(sys.stdin)['resource-version']")
+	RESOURCEVERSION=$(curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | jq -r '.["resource-version"]')
 	if [ $ACTION = "PUT" ]; then
 		result=`curl --request PUT -sL -w "%{http_code}" -o /dev/null -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -T $JSONFILE $RESTURL$RESOURCE$RELATIONSHIP?$RESOURCEVERSION`
         #echo "result is $result."
@@ -161,7 +161,7 @@ if [ $MISSING_PROP = false ]; then
                                 if [[ "$result" -ge 200 && $result -lt 300 ]]
                                 then
                                         echo "PUT result is OK,  $result"
-                                        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | python -mjson.tool
+                                        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | jq '.'
                                 else
                                         if [ -z $ALLOWHTTPRESPONSES ]; then
                                                 echo "PUT request failed, response code was  $result"
@@ -198,7 +198,7 @@ if [ $MISSING_PROP = false ]; then
                                 if [[ "$result" -ge 200 && $result -lt 300 ]]
                                 then
                                         echo "DELETE result is OK,  $result"
-                                        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | python -mjson.tool
+                                        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | jq '.'
                                 else
                                         echo "failed DELETE request, response code was  $result"
                                         RC=$result
