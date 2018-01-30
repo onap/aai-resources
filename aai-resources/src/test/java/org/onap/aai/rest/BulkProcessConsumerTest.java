@@ -154,6 +154,8 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
 
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -187,6 +189,8 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         queryParameters.add("depth", "10000");
         response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",

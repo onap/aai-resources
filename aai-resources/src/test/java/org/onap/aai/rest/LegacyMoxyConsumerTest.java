@@ -140,6 +140,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -172,6 +174,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "10000",
@@ -216,6 +220,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -361,6 +367,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         mockReq = new MockHttpServletRequest("GET", uri);
         response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -417,7 +425,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         int code = response.getStatus();
         System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         response = legacyMoxyConsumer.updateRelationship(
                 payload,
@@ -430,11 +438,13 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         code = response.getStatus();
         System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         mockReq = new MockHttpServletRequest("GET", uri);
         response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -445,7 +455,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         mockReq = new MockHttpServletRequest("DELETE", uri);
         queryParameters.add("resource-version", "3434394839483");
@@ -471,7 +481,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 mockReq
         );
         code = response.getStatus();
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
     }
 
     @Test
@@ -491,6 +501,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         MockHttpServletRequest mockReq = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -550,6 +562,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -584,6 +598,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         queryParameters.add("depth", "10000");
         response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -697,6 +713,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
@@ -724,6 +742,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",
