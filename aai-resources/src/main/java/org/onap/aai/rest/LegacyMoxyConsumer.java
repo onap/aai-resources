@@ -24,9 +24,12 @@ package org.onap.aai.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,12 +46,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.jaxrs.ext.PATCH;
+import io.swagger.jaxrs.PATCH;
 import org.javatuples.Pair;
 import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
@@ -240,7 +244,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Path("/{uri: .+}")
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Response getLegacy (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("all") @QueryParam("depth") String depthParam, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
+	public Response getLegacy (String content, @DefaultValue("-1") @QueryParam("resultIndex") String resultIndex, @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("all") @QueryParam("depth") String depthParam, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
 		return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED,
 				AAIConstants.AAI_CRUD_TIMEOUT_APP,
 				AAIConstants.AAI_CRUD_TIMEOUT_LIMIT,
@@ -250,7 +254,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				new Callable<Response>() {
 					@Override
 					public Response call() {
-						return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>());
+						return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>(), resultIndex, resultSize);
 					}
 				}
 				);
@@ -270,7 +274,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 * @param removeQueryParams
 	 * @return
 	 */
-	public Response getLegacy(String content, String versionParam, String uri, String depthParam, String cleanUp,  HttpHeaders headers, UriInfo info, HttpServletRequest req, Set<String> removeQueryParams) {
+	public Response getLegacy(String content, String versionParam, String uri, String depthParam, String cleanUp,  HttpHeaders headers, UriInfo info, HttpServletRequest req, Set<String> removeQueryParams, String resultIndex, String resultSize) {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
@@ -288,7 +292,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		LoggingContext.serviceName(serviceName);
 		LoggingContext.targetEntity(TARGET_ENTITY);
 		LoggingContext.targetServiceName(serviceName);
-		
+
 		try {
 			validateRequest(info);
 			Version version = Version.valueOf(versionParam);
@@ -298,37 +302,27 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			loader = httpEntry.getLoader();
 			MultivaluedMap<String, String> params = info.getQueryParameters();
 
-			RemoveDME2QueryParams dme2Workaround = new RemoveDME2QueryParams();
-			//clear out all params not used for filtering
-			params.remove("depth");
-			params.remove("cleanup");
-			params.remove("nodes-only");
-			for (String queryParam : removeQueryParams) {
-				params.remove(queryParam);
-			}
-			if (dme2Workaround.shouldRemoveQueryParams(params)) {
-				dme2Workaround.removeQueryParams(params);
-			}
+			params = removeNonFilterableParams(params);
 
 			uri = uri.split("\\?")[0];
-			
+
 			URI uriObject = UriBuilder.fromPath(uri).build();
 
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject, params);
 
 			String objType = "";
-	        if (!uriQuery.getContainerType().equals("")) {
-	        	objType = uriQuery.getContainerType();
-	        } else {
-	        	objType = uriQuery.getResultType();
-	        }
-	        Introspector obj = loader.introspectorFromName(objType);
-			DBRequest request = 
+			if (!uriQuery.getContainerType().equals("")) {
+				objType = uriQuery.getContainerType();
+			} else {
+				objType = uriQuery.getResultType();
+			}
+			Introspector obj = loader.introspectorFromName(objType);
+			DBRequest request =
 					new DBRequest.Builder(HttpMethod.GET, uriObject, uriQuery, obj, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
-	        
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = httpEntry.process(requests, sourceOfTruth);
+
 			response = responsesTuple.getValue1().get(0).getValue1();
 			
 		} catch (AAIException e) {
@@ -348,6 +342,21 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		}
 
 		return response;
+	}
+
+	private MultivaluedMap<String, String> removeNonFilterableParams(MultivaluedMap<String, String> params) {
+
+		String[] toRemove = { "depth", "cleanup", "nodes-only", "format", "resultIndex", "resultSize"};
+		Set<String> toRemoveSet = Arrays.stream(toRemove).collect(Collectors.toSet());
+
+		MultivaluedMap<String, String> cleanedParams = new MultivaluedHashMap<>();
+		params.keySet().stream().forEach(k -> {
+			if (!toRemoveSet.contains(k)) {
+				cleanedParams.addAll(k, params.get(k));
+			}
+		});
+
+		return cleanedParams;
 	}
 	/**
 	 * Delete.
@@ -584,7 +593,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		LoggingContext.requestId(transId);
 		LoggingContext.partnerName(sourceOfTruth);
 		LoggingContext.targetEntity(TARGET_ENTITY);
-		
+
 		try {
 			validateRequest(info);
 

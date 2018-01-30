@@ -38,11 +38,11 @@
 #  
 #  For example (there are many valid ways to use it):
 #  
-#  dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -o '/opt/app/aai-resources/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/' 
+#  dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -o '/opt/app/aai-resources/resources/etc/scriptdata/addmanualdata/tenant_isolation/'
 #              
 #  or
-#  dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -s false -c '/opt/app/aai-resources/bundleconfig/etc/appprops/dynamic.properties' 
-#					-o '/opt/app/aai-resources/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/' -f PAYLOAD -n '/opt/app/aai-resources/bundleconfig/etc/scriptdata/nodes.json'
+#  dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -s false -c '/opt/app/aai-resources/resources/etc/appprops/dynamic.properties'
+#					-o '/opt/app/aai-resources/resources/etc/scriptdata/addmanualdata/tenant_isolation/' -f PAYLOAD -n '/opt/app/aai-resources/resources/etc/scriptdata/nodes.json'
 # 
 
 
@@ -63,10 +63,10 @@ display_usage() {
 		   c.	-f (optional) PAYLOAD or DMAAP-MR
 		   d.	-n (optional) input file for the script
 		4. For example (there are many valid ways to use it):
-			dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -o '/opt/app/aai-resources/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/' 
+			dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -o '/opt/app/aai-resources/resources/etc/scriptdata/addmanualdata/tenant_isolation/'
 				
-			dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -s false -c '/opt/app/aai-resources/bundleconfig/etc/appprops/dynamic.properties' 
-					-o '/opt/app/aai-resources/bundleconfig/etc/scriptdata/addmanualdata/tenant_isolation/' -f PAYLOAD -n '/opt/app/aai-resources/bundleconfig/etc/scriptdata/nodes.json'
+			dynamicPayloadGenerator.sh -d '/opt/app/snapshots/snaphot.graphSON' -s false -c '/opt/app/aai-resources/resources/etc/appprops/dynamic.properties'
+					-o '/opt/app/aai-resources/resources/etc/scriptdata/addmanualdata/tenant_isolation/' -f PAYLOAD -n '/opt/app/aai-resources/resources/etc/scriptdata/nodes.json'
    
 EOF
 }
@@ -75,27 +75,13 @@ if [ $# -eq 0 ]; then
         exit 1
 fi
 
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+. ${COMMON_ENV_PATH}/common_functions.sh
 
-
-. /etc/profile.d/aai.sh
-PROJECT_HOME=/opt/app/aai-resources
-
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
-
-
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DBUNDLECONFIG_DIR=bundleconfig -DAJSC_HOME=$PROJECT_HOME \
- -Daai.home=$PROJECT_HOME -Dlogback.configurationFile=$PROJECT_HOME/bundleconfig/etc/appprops/dynamicPayloadGenerator-logback.xml  -Xmx9000m -Xms9000m \
- org.onap.aai.dbgen.DynamicPayloadGenerator "$@"
-
- 
-echo `date` "   Done $0"
-
+start_date;
+check_user;
+source_profile;
+export JVM_OPTS="-Xmx9000m -Xms9000m"
+execute_spring_jar org.onap.aai.dbgen.DynamicPayloadGenerator ${PROJECT_HOME}/resources/etc/appprops/dynamicPayloadGenerator-logback.xml "$@"
+end_date;
 exit 0

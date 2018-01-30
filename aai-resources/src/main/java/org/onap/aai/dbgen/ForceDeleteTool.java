@@ -20,12 +20,16 @@
  * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  */
 package org.onap.aai.dbgen;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.UUID;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -33,7 +37,9 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.onap.aai.dbmap.AAIGraphConfig;
+import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.logging.LogFormatTools;
 import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.logging.LoggingContext.StatusCode;
 import org.onap.aai.serialization.db.AAIDirection;
@@ -53,6 +59,20 @@ import com.thinkaurelius.titan.core.TitanGraph;
 public class ForceDeleteTool {
 	private static 	final  String    FROMAPPID = "AAI-DB";
 	private static 	final  String    TRANSID   = UUID.randomUUID().toString();
+
+	private static String graphType = "realdb";
+
+	public static boolean SHOULD_EXIT_VM = true;
+
+	public static int EXIT_VM_STATUS_CODE = -1;
+
+	public static void exit(int statusCode){
+		if(SHOULD_EXIT_VM){
+			System.exit(1);
+		}
+		EXIT_VM_STATUS_CODE = statusCode;
+	}
+
 	/*
 	 * The main method.
 	 *
@@ -101,7 +121,7 @@ public class ForceDeleteTool {
 						LoggingContext.statusCode(StatusCode.ERROR);
 						LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 						logger.error(" No value passed with -action option.  ");
-						System.exit(0);
+						exit(0);
 					}
 					actionVal = args[i];
 					argStr4Msg = argStr4Msg + " " + actionVal;
@@ -112,7 +132,7 @@ public class ForceDeleteTool {
 						LoggingContext.statusCode(StatusCode.ERROR);
 						LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 						logger.error(" No value passed with -userId option.  ");
-						System.exit(0);
+						exit(0);
 					}
 					userIdVal = args[i];
 					argStr4Msg = argStr4Msg + " " + userIdVal;
@@ -129,7 +149,7 @@ public class ForceDeleteTool {
 						LoggingContext.statusCode(StatusCode.ERROR);
 						LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 						logger.error(" No value passed with -vertexId option.  ");
-						System.exit(0);
+						exit(0);
 					}
 					String nextArg = args[i];
 					argStr4Msg = argStr4Msg + " " + nextArg;
@@ -140,7 +160,7 @@ public class ForceDeleteTool {
 						LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 						logger.error("Bad value passed with -vertexId option: ["
 										+ nextArg + "]");
-						System.exit(0);
+						exit(0);
 					}
 				}
 				else if (thisArg.equals("-params4Collect")) {
@@ -149,7 +169,7 @@ public class ForceDeleteTool {
 						LoggingContext.statusCode(StatusCode.ERROR);
 						LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 						logger.error(" No value passed with -params4Collect option.  ");
-						System.exit(0);
+						exit(0);
 					}
 					dataString = args[i];
 					argStr4Msg = argStr4Msg + " " + dataString;
@@ -160,7 +180,7 @@ public class ForceDeleteTool {
 						LoggingContext.statusCode(StatusCode.ERROR);
 						LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 						logger.error(" No value passed with -edgeId option.  ");
-						System.exit(0);
+						exit(0);
 					}
 					String nextArg = args[i];
 					argStr4Msg = argStr4Msg + " " + nextArg;
@@ -172,7 +192,7 @@ public class ForceDeleteTool {
 					logger.error(" Unrecognized argument passed to ForceDeleteTool: ["
 									+ thisArg + "]. ");
 					logger.error(" Valid values are: -action -userId -vertexId -edgeId -overRideProtection -params4Collect -DISPLAY_ALL_VIDS");
-					System.exit(0);
+					exit(0);
 				}
 			}
 		}
@@ -183,7 +203,7 @@ public class ForceDeleteTool {
 			LoggingContext.statusCode(StatusCode.ERROR);
 			LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 			logger.error(emsg);
-	 		System.exit(0);
+	 		exit(0);
 	  	}
 	  	
 	  	if( actionVal.equals("DELETE_NODE") && vertexIdLong == 0 ){
@@ -192,7 +212,7 @@ public class ForceDeleteTool {
 			LoggingContext.statusCode(StatusCode.ERROR);
 			LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 			logger.error(emsg);
-	 		System.exit(0);
+	 		exit(0);
 	  	}
 	  	else if( actionVal.equals("DELETE_EDGE") && edgeIdStr.equals("")){
 	 		String emsg = "ERROR: No edge ID passed on DELETE_EDGE request. \n";
@@ -200,7 +220,7 @@ public class ForceDeleteTool {
 			LoggingContext.statusCode(StatusCode.ERROR);
 			LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 			logger.error(emsg);
-	 		System.exit(0);
+	 		exit(0);
 	  	}
 	  	
 	  	
@@ -211,7 +231,7 @@ public class ForceDeleteTool {
 			LoggingContext.statusCode(StatusCode.ERROR);
 			LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 			logger.error(emsg);
-	 		System.exit(0);
+	 		exit(0);
 	  	}
 	  	
 	  	String msg = "";
@@ -219,14 +239,14 @@ public class ForceDeleteTool {
 		try {   
     		AAIConfig.init();
     		System.out.println("    ---- NOTE --- about to open graph (takes a little while)--------\n");
-			graph = TitanFactory.open(new AAIGraphConfig.Builder(AAIConstants.REALTIME_DB_CONFIG).forService(ForceDelete.class.getSimpleName()).withGraphType("realtime1").buildConfiguration());
+			graph = setupGraph(logger);
     		if( graph == null ){
     			String emsg = "could not get graph object in ForceDeleteTool() \n";
     			System.out.println(emsg);
     			LoggingContext.statusCode(StatusCode.ERROR);
     			LoggingContext.responseCode(LoggingContext.AVAILABILITY_TIMEOUT_ERROR);
     			logger.error(emsg);
-    	 		System.exit(0);
+    	 		exit(0);
     		}
     	}
 	    catch (AAIException e1) {
@@ -235,7 +255,7 @@ public class ForceDeleteTool {
 			LoggingContext.statusCode(StatusCode.ERROR);
 			LoggingContext.responseCode(LoggingContext.UNKNOWN_ERROR);
 			logger.error(msg);
-			System.exit(0);
+			exit(0);
 	    }
         catch (Exception e2) {
 	 		msg =  e2.toString();
@@ -243,7 +263,7 @@ public class ForceDeleteTool {
 	 		LoggingContext.statusCode(StatusCode.ERROR);
 	 		LoggingContext.responseCode(LoggingContext.UNKNOWN_ERROR);
 	 		logger.error(msg);
-	 		System.exit(0);
+	 		exit(0);
         }
 	
 		msg = "ForceDelete called by: userId [" + userIdVal + "] with these params: [" + argStr4Msg + "]";
@@ -265,7 +285,7 @@ public class ForceDeleteTool {
 		 		LoggingContext.statusCode(StatusCode.ERROR);
 		 		LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 		 		logger.error(msg);
-		 		System.exit(0);
+		 		exit(0);
 	  		}
 	  		GraphTraversal<Vertex, Vertex> g  = graph.traversal().V();
 	  		String qStringForMsg = " graph.traversal().V()";
@@ -279,7 +299,7 @@ public class ForceDeleteTool {
 			 		LoggingContext.statusCode(StatusCode.ERROR);
 			 		LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 			 		logger.error(msg);
-			 		System.exit(0);
+			 		exit(0);
 	  			}
 	  			else {
 	  				String propName = paramArr[i].substring(0,pipeLoc);
@@ -306,7 +326,7 @@ public class ForceDeleteTool {
 		 		LoggingContext.statusCode(StatusCode.ERROR);
 		 		LoggingContext.responseCode(LoggingContext.DATA_ERROR);
 		 		logger.error(msg);
-		 		System.exit(0);
+		 		exit(0);
 	  		}
 	  		
 	  	   	String infMsg = "\n\n Found: " + resCount + " nodes for this query: [" + qStringForMsg + "]\n";
@@ -360,7 +380,7 @@ public class ForceDeleteTool {
 	  			String infMsg = ">>>>>>>>>> Edge with edgeId = " + edgeIdStr + " not found.";
 		  		logger.info( infMsg );
 		  		System.out.println(infMsg);
-		  		System.exit(0);
+		  		exit(0);
 		  	}
 	  		
 	  		if( fd.getEdgeDelConfirmation(logger, userIdVal, thisEdge, overRideProtection) ){
@@ -375,16 +395,17 @@ public class ForceDeleteTool {
 	  			System.out.println(infMsg);
 	  			logger.info( infMsg );
 	  		}
-	 		System.exit(0);
+	 		exit(0);
 	  	}
 	  	else {
 			String emsg = "Unknown action parameter [" + actionVal + "] passed to ForceDeleteTool().  Valid values = COLLECT_DATA, DELETE_NODE or DELETE_EDGE \n";
 			System.out.println(emsg);
 			logger.info( emsg );
-	 		System.exit(0);
+	 		exit(0);
 	  	}
 
-	  	System.exit(0);
+	  	closeGraph(graph, logger);
+	  	exit(0);
     
 	}// end of main()
 	
@@ -792,7 +813,49 @@ public class ForceDeleteTool {
 		
 		} // End of getNodeDelConfirmation()
 	}
-	
+
+	public static TitanGraph setupGraph(EELFLogger logger){
+
+		TitanGraph titanGraph = null;
+
+		try (InputStream inputStream = new FileInputStream(AAIConstants.REALTIME_DB_CONFIG);){
+
+			Properties properties = new Properties();
+			properties.load(inputStream);
+
+			if("inmemory".equals(properties.get("storage.backend"))){
+				titanGraph = AAIGraph.getInstance().getGraph();
+				graphType = "inmemory";
+			} else {
+				titanGraph = TitanFactory.open(
+						new AAIGraphConfig.Builder(AAIConstants.REALTIME_DB_CONFIG)
+						.forService(ForceDeleteTool.class.getSimpleName())
+						.withGraphType("realtime1")
+						.buildConfiguration()
+				);
+			}
+		} catch (Exception e) {
+			logger.error("Unable to open the graph", LogFormatTools.getStackTop(e));
+		}
+
+		return titanGraph;
+	}
+
+	public static void closeGraph(TitanGraph graph, EELFLogger logger){
+
+		try {
+			if("inmemory".equals(graphType)) {
+				return;
+			}
+			if( graph != null && graph.isOpen() ){
+				graph.tx().close();
+				graph.close();
+			}
+		} catch (Exception ex) {
+			// Don't throw anything because Titan sometimes is just saying that the graph is already closed{
+			logger.warn("WARNING from final graph.shutdown()", ex);
+		}
+	}
 }
 
 

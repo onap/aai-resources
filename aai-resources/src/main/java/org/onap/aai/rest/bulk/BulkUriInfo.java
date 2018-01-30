@@ -3,16 +3,12 @@ package org.onap.aai.rest.bulk;
 import java.net.URI;
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class BulkUriInfo implements UriInfo {
 	
-	private MultivaluedMap<String, String> queryParams= new MultivaluedMapImpl();
+	private MultivaluedMap<String, String> queryParams= new MultivaluedHashMap<>();
 		
 	@Override
 	public String getPath() {
@@ -98,7 +94,17 @@ public class BulkUriInfo implements UriInfo {
 	public List<Object> getMatchedResources() {
 		return null;
 	}
-	
+
+	@Override
+	public URI resolve(URI uri) {
+		return null;
+	}
+
+	@Override
+	public URI relativize(URI uri) {
+		return null;
+	}
+
 	public void addParams(String key, List<String> list) {
 		this.queryParams.put(key, list);
 	}

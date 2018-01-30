@@ -129,6 +129,8 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
+                "-1",
+                "-1",
                 Version.getLatest().toString(),
                 uri,
                 "all",

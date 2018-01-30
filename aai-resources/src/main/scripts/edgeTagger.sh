@@ -62,37 +62,25 @@
 #    or ./edgeTagger.sh "complex|ctag-pool"
 #
 
-echo
-echo `date` "   Starting $0"
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+. ${COMMON_ENV_PATH}/common_functions.sh
 
+start_date;
 
-userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
-if [ "${userid}" != "aaiadmin" ]; then
-    echo "You must be aaiadmin to run $0. The id used $userid."
-    exit 1
-fi 
+echo " NOTE - if you are deleting data, please run the dataSnapshot.sh script first or "
+echo "     at least make a note the details of the node that you are deleting. "
 
-. /etc/profile.d/aai.sh
-PROJECT_HOME=/opt/app/aai-resources
+check_user;
+source_profile;
 
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
+execute_spring_jar org.onap.aai.dbgen.UpdateEdgeTags "" "$@"
 
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
+PROCESS_STATUS=$?;
 
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- -Dcom.att.eelf.logging.file=default-logback.xml -Dcom.att.eelf.logging.path="$PROJECT_HOME/bundleconfig/etc/appprops/" \
- org.onap.aai.dbgen.UpdateEdgeTags $1
-if [ "$?" -ne "0" ]; then
-    echo "Problem executing UpdateEdgeTags "
-    exit 1
-fi
+if [ ${PROCESS_STATUS} -ne 0 ]; then
+    echo "Problem executing UpdateEdgeTags";
+    exit 1;
+fi;
 
- 
-echo `date` "   Done $0"
+end_date;
 exit 0
