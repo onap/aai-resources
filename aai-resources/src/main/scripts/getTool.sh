@@ -60,7 +60,7 @@ fi
 
 . /etc/profile.d/aai.sh
 PROJECT_HOME=/opt/app/aai-resources
-prop_file=$PROJECT_HOME/bundleconfig/etc/appprops/aaiconfig.properties
+prop_file=$PROJECT_HOME/resources/etc/appprops/aaiconfig.properties
 log_dir=$PROJECT_HOME/logs/misc
 today=$(date +\%Y-\%m-\%d)
 
@@ -91,11 +91,11 @@ fi
 
 if [ $MISSING_PROP = false ]; then
         if [ $USEBASICAUTH = false ]; then
-                AUTHSTRING="--cert $PROJECT_HOME/bundleconfig/etc/auth/aaiClientPublicCert.pem --key $PROJECT_HOME/bundleconfig/etc/auth/aaiClientPrivateKey.pem"
+                AUTHSTRING="--cert $PROJECT_HOME/resources/etc/auth/aaiClientPublicCert.pem --key $PROJECT_HOME/resources/etc/auth/aaiClientPrivateKey.pem"
         else
                 AUTHSTRING="-u $CURLUSER:$CURLPASSWORD"
         fi
-        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | python -mjson.tool
+        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | jq '.'
         RC=$?;
 else
         echo "usage: $0 resource"

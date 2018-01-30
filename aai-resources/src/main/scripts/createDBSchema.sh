@@ -30,24 +30,11 @@
 #       Ie. createDbSchema.sh GEN_DB_WITH_NO_SCHEMA
 #
 
-echo
-echo `date` "   Starting $0"
-
-. /etc/profile.d/aai.sh
-PROJECT_HOME=/opt/app/aai-resources
-
-
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
-
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DBUNDLECONFIG_DIR=bundleconfig -DAJSC_HOME=$PROJECT_HOME -Daai.home=$PROJECT_HOME -Dlogback.configurationFile=$PROJECT_HOME/bundleconfig/etc/appprops/createDBSchema-logback.xml  org.onap.aai.dbgen.GenTester $1
-
-echo `date` "   Done $0"
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+. ${COMMON_ENV_PATH}/common_functions.sh
+start_date;
+check_user;
+source_profile;
+execute_spring_jar org.onap.aai.dbgen.GenTester ${PROJECT_HOME}/resources/etc/appprops/createDBSchema-logback.xml "$@"
+end_date;
 exit 0

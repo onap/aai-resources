@@ -21,8 +21,9 @@
  */
 package org.onap.aai.rest.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.logging.ErrorLogHelper;
+import org.onap.aai.restcore.RESTAPI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -34,14 +35,13 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.logging.ErrorLogHelper;
-import org.onap.aai.restcore.RESTAPI;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The Class EchoResponse.
  */
+@Path("/util")
 public class EchoResponse extends RESTAPI {
 	
 	protected static String authPolicyFunctionName = "util";
@@ -60,7 +60,7 @@ public class EchoResponse extends RESTAPI {
 	 */
 	@GET
 	@Produces( { MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-	@Path(echoPath)
+	@Path("/echo")
 	public Response echoResult(@Context HttpHeaders headers, @Context HttpServletRequest req,
 			@QueryParam("action") String myAction) {
 		Response response = null;

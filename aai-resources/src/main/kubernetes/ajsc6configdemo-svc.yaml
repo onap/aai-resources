@@ -1,0 +1,21 @@
+{
+    "kind": "Service",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "ajsc6configdemo",
+         "namespace": "org-onap-aai"
+    },
+    "spec": {
+        "selector": {
+            "app": "ajsc6configdemo"
+        },
+        "ports": [
+            {
+                "protocol": "TCP",
+                "port": 80,
+                "targetPort": 8080
+            }
+        ],
+        "type": "NodePort"
+    }
+}
