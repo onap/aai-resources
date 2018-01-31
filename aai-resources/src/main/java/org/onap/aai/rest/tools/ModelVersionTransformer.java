@@ -352,7 +352,7 @@ public class ModelVersionTransformer extends RESTAPI {
 				}
 			}
 		} catch (NoSuchElementException e) {
-			throw new NoSuchElementException();
+			throw new NoSuchElementException(e.getMessage());
 		} catch (Exception e1) { 
 			LOGGER.error("Exception while getting current models from graph"+e1);
 		}
