@@ -45,8 +45,6 @@ public class AAIAppServletContextListener implements ServletContextListener {
 
 	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(AAIAppServletContextListener.class.getName());	
 	
-	private BrokerService broker = new BrokerService();
-
 	/**
 	 * Destroys Context
 	 *
@@ -87,12 +85,6 @@ public class AAIAppServletContextListener implements ServletContextListener {
 			ModelInjestor.getInstance();
 
 			// Jsm internal broker for aai events
-			broker = new BrokerService();
-			broker.addConnector(ACTIVEMQ_TCP_URL);
-			broker.setPersistent(false);
-			broker.setUseJmx(false);
-			broker.setSchedulerSupport(false);
-			broker.start();
 
 			LOGGER.info("A&AI Server initialization succcessful.");
 			System.setProperty("activemq.tcp.url", ACTIVEMQ_TCP_URL);
@@ -107,11 +99,6 @@ public class AAIAppServletContextListener implements ServletContextListener {
 					LOGGER.info("AAIGraph shutting down");
 					AAIGraph.getInstance().graphShutdown();
 					LOGGER.info("AAIGraph shutdown");
-					try {
-						broker.stop();
-					} catch (Exception e) {
-						LOGGER.error("Issue closing broker "+ LogFormatTools.getStackTop(e));
-					}
 					System.out.println("Shutdown hook triggered.");
 				}
 			});

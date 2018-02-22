@@ -32,7 +32,7 @@ public class DmaapConfig {
     public BrokerService brokerService() throws Exception {
 
         BrokerService broker = new BrokerService();
-        broker.addConnector("tcp://localhost:61447");
+        broker.addConnector(System.getProperty("activemq.tcp.url"));
         broker.setPersistent(false);
         broker.setUseJmx(false);
         broker.setSchedulerSupport(false);
