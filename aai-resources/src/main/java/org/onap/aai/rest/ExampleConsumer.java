@@ -47,7 +47,7 @@ import org.onap.aai.restcore.RESTAPI;
 /**
  * The Class ExampleConsumer.
  */
-@Path("/{version: v[789]|v1[012]}/examples")
+@Path("/{version: v[789]|v1[0123]}/examples")
 public class ExampleConsumer extends RESTAPI {
 
 	

@@ -77,7 +77,7 @@ import com.google.common.base.Joiner;
 /**
  * The Class LegacyMoxyConsumer.
  */
-@Path("{version: v[789]|v1[012]}")
+@Path("{version: v[789]|v1[0123]}")
 public class LegacyMoxyConsumer extends RESTAPI {
 	
 	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(LegacyMoxyConsumer.class.getName());
