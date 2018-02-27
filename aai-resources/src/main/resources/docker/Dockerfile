@@ -5,6 +5,7 @@ RUN mkdir -p /opt/aaihome/aaiadmin /opt/aai/logroot/AAI-RES /opt/app/aai-resourc
 # Add the proper files into the docker image from your build
 ADD ./opt/app/aai-resources /opt/app/aai-resources
 ADD ./commonLibs/           /opt/app/commonLibs/
+ADD init-chef.sh 	    /opt/app/aai-resources/init-chef.sh
 ADD docker-entrypoint.sh    /opt/app/aai-resources/docker-entrypoint.sh
 ADD aai.sh 		    /etc/profile.d/aai.sh
 
