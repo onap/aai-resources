@@ -56,7 +56,7 @@ import org.onap.aai.workarounds.LegacyURITransformer;
 /**
  * The Class URLFromVertexIdConsumer.
  */
-@Path("{version: v[789]|v1[012]}/generateurl")
+@Path("{version: v[789]|v1[0123]}/generateurl")
 public class URLFromVertexIdConsumer extends RESTAPI {
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
