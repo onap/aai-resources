@@ -63,7 +63,7 @@
         <dom4j.version>1.6.1</dom4j.version>
         <commons.lang.version>2.6</commons.lang.version>
         <eelf.core.version>1.0.0</eelf.core.version>
-        <logback.version>1.1.7</logback.version>
+        <logback.version>1.2.3</logback.version>
         <hamcrest.junit.version>2.0.0.0</hamcrest.junit.version>
         <janino.version>2.7.8</janino.version>
         <google.guava.version>16.0</google.guava.version>
@@ -76,7 +76,7 @@
         <powermock.version>1.6.2</powermock.version>
         <jcommander.version>1.48</jcommander.version>
         <json.version>20090211</json.version>
-        <freemarker.version>2.3.14</freemarker.version>
+        <freemarker.version>2.3.21</freemarker.version>
         <jaxb.version>2.2.11</jaxb.version>
         <eclipse.persistence.version>2.6.2</eclipse.persistence.version>
         <json.patch.version>1.9</json.patch.version>
@@ -85,8 +85,8 @@
         <dmaap.client.version>0.2.12</dmaap.client.version>
         <httpcore.version>4.4</httpcore.version>
         <json.path.version>2.2.0</json.path.version>
-        <activemq.version>5.14.3</activemq.version>
-        <httpclient.version>4.5.1</httpclient.version>
+        <activemq.version>5.15.3</activemq.version>
+        <httpclient.version>4.5.3</httpclient.version>
         <spring.jms.version>4.3.2.RELEASE</spring.jms.version>
         <spotify.docker.version>0.4.11</spotify.docker.version>
         <spring.security.version>1.0.3.RELEASE</spring.security.version>
@@ -98,10 +98,10 @@
         <eclipse.jetty.version>9.4.1.v20170120</eclipse.jetty.version>
 
         <docker.fabric.version>0.23.0</docker.fabric.version>
-	<!-- Default docker registry that maven fabric plugin will try to pull from -->
+        <!-- Default docker registry that maven fabric plugin will try to pull from -->
         <docker.registry>docker.io</docker.registry>
-	<!-- Specifying the docker push registry where the image should be pushed -->
-	<!-- This value should be overwritten at runtime to wherever need to be pushed to -->
+        <!-- Specifying the docker push registry where the image should be pushed -->
+        <!-- This value should be overwritten at runtime to wherever need to be pushed to -->
         <docker.push.registry>localhost:5000</docker.push.registry>
 
         <aai.docker.version>1.0.0</aai.docker.version>
@@ -109,13 +109,19 @@
              Location where assembly of our scripts, resources and main jar will be held
 	         Check the aai-resources/src/main/assembly/descriptor.xml for more info
         -->
-        <aai.build.directory>${project.build.directory}/${project.artifactId}-${project.version}-build/</aai.build.directory>
+        <aai.build.directory>${project.build.directory}/${project.artifactId}-${project.version}-build/
+        </aai.build.directory>
         <aai.docker.namespace>onap</aai.docker.namespace>
         <maven.skip.tests>true</maven.skip.tests>
 
         <spring.web.version>4.3.6.RELEASE</spring.web.version>
         <aai.project.version>1.2.0</aai.project.version>
         <aai.docker.version>1.2</aai.docker.version>
+
+        <nexusproxy>https://nexus.onap.org</nexusproxy>
+        <site.path>/content/sites/site/org/onap/aai/resources/${project.artifactId}/${project.version}</site.path>
+        <release.path>/content/repositories/releases/</release.path>
+        <snapshot.path>/content/repositories/snapshots/</snapshot.path>
     </properties>
     <profiles>
         <!-- Docker profile to be used for building docker image and pushing to nexus -->
@@ -144,12 +150,12 @@
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
                                         <assembly>
                                             <inline>
-                                              <fileSets>
-                                                <fileSet>
-                                                  <directory>${aai.build.directory}</directory>
-                                                  <outputDirectory>/${project.artifactId}</outputDirectory>
-                                                </fileSet>
-                                              </fileSets>
+                                                <fileSets>
+                                                    <fileSet>
+                                                        <directory>${aai.build.directory}</directory>
+                                                        <outputDirectory>/${project.artifactId}</outputDirectory>
+                                                    </fileSet>
+                                                </fileSets>
                                             </inline>
                                         </assembly>
                                     </build>
@@ -641,20 +647,20 @@
             <artifactId>aai-client-loadbalancer</artifactId>
             <version>${aai.client.loadbalancer.version}</version>
         </dependency>
-         <dependency>
-             <groupId>org.springframework.boot</groupId>
-             <artifactId>spring-boot-starter-web</artifactId>
-             <exclusions>
-                 <exclusion>
-                     <groupId>org.springframework.boot</groupId>
-                     <artifactId>spring-boot-starter-tomcat</artifactId>
-                 </exclusion>
-             </exclusions>
-         </dependency>
-         <dependency>
-             <groupId>org.springframework.boot</groupId>
-             <artifactId>spring-boot-starter-jetty</artifactId>
-         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -676,7 +682,8 @@
                     <include>logback.xml</include>
                     <include>localhost-access-logback.xml</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig</targetPath>
+                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig
+                </targetPath>
                 <filtering>false</filtering>
             </resource>
             <resource>
@@ -693,7 +700,8 @@
                     <include>titan-cached.properties</include>
                     <include>aaiconfig.properties</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig</targetPath>
+                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig
+                </targetPath>
                 <filtering>false</filtering>
             </resource>
             <resource>
@@ -702,7 +710,8 @@
                     <include>aai-client-cert.p12</include>
                     <include>tomcat_keystore</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig</targetPath>
+                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig
+                </targetPath>
                 <filtering>true</filtering>
             </resource>
             <resource>
@@ -711,7 +720,8 @@
                     <include>logback.xml</include>
                     <include>localhost-access-logback.xml</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig</targetPath>
+                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig
+                </targetPath>
                 <filtering>true</filtering>
             </resource>
             <resource>
@@ -796,6 +806,10 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -937,4 +951,20 @@
             </plugin>
         </plugins>
     </reporting>
+    <distributionManagement>
+        <repository>
+            <id>ecomp-releases</id>
+            <name>ECOMP Release Repository</name>
+            <url>${nexusproxy}${release.path}</url>
+        </repository>
+        <snapshotRepository>
+            <id>ecomp-snapshots</id>
+            <name>ECOMP Snapshot Repository</name>
+            <url>${nexusproxy}${snapshot.path}</url>
+        </snapshotRepository>
+        <site>
+            <id>ecomp-site</id>
+            <url>dav:${nexusproxy}${site.path}</url>
+        </site>
+    </distributionManagement>
 </project>
