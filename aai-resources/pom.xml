@@ -124,7 +124,9 @@
         <snapshot.path>/content/repositories/snapshots/</snapshot.path>
 
         <netty.handler.version>4.1.9.Final</netty.handler.version>
+        <netty.version>4.0.37.Final</netty.version>
         <jackson.core.version>2.8.11.1</jackson.core.version>
+        <groovy.version>2.4.4</groovy.version>
     </properties>
     <profiles>
         <!-- Docker profile to be used for building docker image and pushing to nexus -->
@@ -418,6 +420,14 @@
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>jersey-guice</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>commons-httpclient</groupId>
+                    <artifactId>commons-httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -688,6 +698,16 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.web.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>${groovy.version}</version>
         </dependency>
     </dependencies>
     <build>
