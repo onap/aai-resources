@@ -38,14 +38,6 @@
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
         <!-- End of the jacoco plugin properties -->
 
-        <cxf.version>2.2.3</cxf.version>
-
-        <!-- Start SDK Dependencies Version -->
-        <sdk.java.rest.version>6.2.0.6-oss</sdk.java.rest.version>
-        <sdk.java.common.logging.version>0.0.1</sdk.java.common.logging.version>
-        <sdk.java.spring.cloud.version>0.0.9</sdk.java.spring.cloud.version>
-        <!-- End SDK Dependencies Version -->
-
         <jolt.version>0.0.24</jolt.version>
         <jopt.simple.version>4.9</jopt.simple.version>
 
@@ -104,7 +96,6 @@
         <!-- This value should be overwritten at runtime to wherever need to be pushed to -->
         <docker.push.registry>localhost:5000</docker.push.registry>
 
-        <aai.docker.version>1.0.0</aai.docker.version>
         <!--
              Location where assembly of our scripts, resources and main jar will be held
 	         Check the aai-resources/src/main/assembly/descriptor.xml for more info
@@ -118,13 +109,22 @@
         <aai.project.version>1.2.0</aai.project.version>
         <aai.docker.version>1.2</aai.docker.version>
 
+        <!--
+            Nexus Proxy Properties and Snapshot Locations
+            Ideally this can be overwritten at runtime per internal environment specific values at runtime
+        -->
         <nexusproxy>https://nexus.onap.org</nexusproxy>
         <site.path>/content/sites/site/org/onap/aai/resources/${project.artifactId}/${project.version}</site.path>
         <release.path>/content/repositories/releases/</release.path>
         <snapshot.path>/content/repositories/snapshots/</snapshot.path>
 
         <netty.handler.version>4.1.9.Final</netty.handler.version>
+        <netty.version>4.0.37.Final</netty.version>
         <jackson.core.version>2.8.11.1</jackson.core.version>
+        <groovy.version>2.4.4</groovy.version>
+
+        <!-- This will be used for the docker images as the default format of maven build has issues -->
+        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
     </properties>
     <profiles>
         <!-- Docker profile to be used for building docker image and pushing to nexus -->
@@ -146,7 +146,7 @@
                                         <filter>@</filter>
                                         <tags>
                                             <tag>latest</tag>
-                                            <tag>${project.version}-STAGING-${maven.build.timestamp}</tag>
+                                            <tag>${aai.docker.version}-STAGING-${maven.build.timestamp}</tag>
                                             <tag>${aai.docker.version}-STAGING-latest</tag>
                                         </tags>
                                         <cleanup>try</cleanup>
@@ -195,6 +195,11 @@
                 </plugins>
             </build>
         </profile>
+        <!--
+            Use of this profile is a way to support legacy runAjsc profile seen using AJSC 2
+            and also because spring-boot:run doesn't work with large classpaths in windows
+            so this accommodates the behavior of running the application from maven
+        -->
         <profile>
             <id>runAjsc</id>
             <properties>
@@ -417,6 +422,14 @@
                 <exclusion>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>jersey-guice</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-httpclient</groupId>
+                    <artifactId>commons-httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -688,6 +701,16 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.web.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>${groovy.version}</version>
         </dependency>
     </dependencies>
     <build>
