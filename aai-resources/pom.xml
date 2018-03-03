@@ -7,9 +7,9 @@
     <version>1.2.0-SNAPSHOT</version>
 
     <parent>
-        <groupId>com.att.ajsc</groupId>
-        <artifactId>sdk-java-starter-parent</artifactId>
-        <version>6.1.0.4-oss</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.1.RELEASE</version>
     </parent>
 
     <properties>
@@ -122,6 +122,8 @@
         <netty.version>4.0.37.Final</netty.version>
         <jackson.core.version>2.8.11.1</jackson.core.version>
         <groovy.version>2.4.4</groovy.version>
+
+        <spring.test.version>4.3.6.RELEASE</spring.test.version>
 
         <!-- This will be used for the docker images as the default format of maven build has issues -->
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
@@ -244,6 +246,10 @@
                 <exclusion>
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -374,6 +380,10 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -603,6 +613,10 @@
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -711,6 +725,18 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.test.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -817,6 +843,7 @@
                 <plugin>
                     <groupId>org.codehaus.groovy.maven</groupId>
                     <artifactId>gmaven-plugin</artifactId>
+                    <version>1.0</version>
                     <executions>
                         <execution>
                             <phase>validate</phase>
@@ -856,13 +883,6 @@
             <plugin>
                 <groupId>org.codehaus.groovy.maven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.kongchen</groupId>
-                <artifactId>swagger-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -909,9 +929,12 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.7.201606060606</version>
+                <version>0.7.9</version>
                 <configuration>
                     <dumpOnExit>true</dumpOnExit>
+                    <excludes>
+                        <exclude>**/**/models/**/*.class</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
