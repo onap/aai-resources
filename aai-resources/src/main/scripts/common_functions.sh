@@ -29,7 +29,7 @@ execute_spring_jar(){
 
     shift 2;
 
-    EXECUTABLE_JAR=$(ls ${PROJECT_HOME}/lib/*.jar);
+    EXECUTABLE_JAR=$(ls ${PROJECT_HOME}/lib/aai-resources-*SNAPSHOT.jar);
 
     JAVA_OPTS="${JAVA_PRE_OPTS}";
     JAVA_OPTS="-DAJSC_HOME=$PROJECT_HOME";

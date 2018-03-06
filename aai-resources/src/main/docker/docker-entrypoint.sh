@@ -105,6 +105,6 @@ JAVA_OPTS="${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom";
 JAVA_OPTS="${JAVA_OPTS} -Dloader.path=$APP_HOME/resources";
 JAVA_OPTS="${JAVA_OPTS} ${POST_JAVA_OPTS}";
 
-JAVA_MAIN_JAR=$(ls lib/aai-resources*.jar);
+JAVA_MAIN_JAR=$(ls lib/aai-resources-*SNAPSHOT.jar);
 
 ${JAVA_CMD} ${JVM_OPTS} ${JAVA_OPTS} -jar ${JAVA_MAIN_JAR};
