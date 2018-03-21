@@ -33,7 +33,7 @@
 	<logger name="org.reflections" level="WARN"/>
 	<logger name="org.apache.zookeeper" level="WARN"/>
 	<logger name="org.apache.hadoop" level="WARN"/>
-	<logger name="com.thinkaurelius" level="WARN"/>
+	<logger name="org.janusgraph" level="WARN"/>
 	<logger name="ch.qos.logback.classic" level="WARN" />
 	<logger name="ch.qos.logback.core" level="WARN" />
 
