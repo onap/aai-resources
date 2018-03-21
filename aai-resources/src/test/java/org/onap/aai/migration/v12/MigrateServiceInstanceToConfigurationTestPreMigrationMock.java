@@ -41,12 +41,12 @@ import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.Version;
 import org.onap.aai.serialization.db.EdgeRules;
 import org.onap.aai.serialization.engines.QueryStyle;
-import org.onap.aai.serialization.engines.TitanDBEngine;
+import org.onap.aai.serialization.engines.JanusGraphDBEngine;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanTransaction;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.JanusGraphTransaction;
 
 public class MigrateServiceInstanceToConfigurationTestPreMigrationMock extends AAISetup {
 
@@ -57,19 +57,19 @@ public class MigrateServiceInstanceToConfigurationTestPreMigrationMock extends A
 
 	private static Loader loader;
 	private static TransactionalGraphEngine dbEngine;
-	private static TitanGraph graph;
+	private static JanusGraph graph;
 	private static MigrateServiceInstanceToConfiguration migration;
-	private static TitanTransaction tx;
+	private static JanusGraphTransaction tx;
 	private static GraphTraversalSource g;
 	private static EdgeRules rules;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		graph = TitanFactory.build().set("storage.backend","inmemory").open();
+		graph = JanusGraphFactory.build().set("storage.backend","inmemory").open();
 		tx = graph.newTransaction();
 		g = tx.traversal();
 		loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
-		dbEngine = new TitanDBEngine(
+		dbEngine = new JanusGraphDBEngine(
 				queryStyle,
 				type,
 				loader);

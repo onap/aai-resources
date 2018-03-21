@@ -18,7 +18,7 @@ spec:
         volumeMounts:
         - name: myservice-properties-volume
           mountPath: /etc/config/dynamic
-        image: zlp11313.vci.att.com:5100/com.att.ajsc/ajsc6configdemo:latest
+        image: ajsc6configdemo:latest
         imagePullPolicy: Always
         ports:
          - containerPort: 8080

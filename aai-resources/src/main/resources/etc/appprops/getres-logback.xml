@@ -88,7 +88,7 @@
 		<appender-ref ref="getTooldebug"/>
 		<appender-ref ref="getToolmetric"/>
 	</logger>
-	<logger name="com.thinkaurelius" level="WARN" additivity="false">
+	<logger name="org.janusgraph" level="WARN" additivity="false">
 		<appender-ref ref="getTool"/>
 		<appender-ref ref="getTooldebug"/>
 		<appender-ref ref="getToolmetric"/>

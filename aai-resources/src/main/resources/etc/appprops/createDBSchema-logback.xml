@@ -91,7 +91,7 @@
 		<appender-ref ref="createDBSchemametric"/>
 		<appender-ref ref="STDOUT"/>
 	</logger>
-	<logger name="com.thinkaurelius" level="WARN" additivity="false">
+	<logger name="org.janusgraph" level="WARN" additivity="false">
 		<appender-ref ref="createDBSchema"/>
 		<appender-ref ref="createDBSchemadebug"/>
 		<appender-ref ref="createDBSchemametric"/>

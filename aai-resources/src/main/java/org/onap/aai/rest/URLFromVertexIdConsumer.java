@@ -115,7 +115,7 @@ public class URLFromVertexIdConsumer extends RESTAPI {
 		} catch (Exception e) {
 			AAIException ex = new AAIException("AAI_4000", e);
 			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, ex);
-		} finally { //to close the titan transaction (I think)
+		} finally { //to close the janusgraph transaction (I think)
 			if (dbEngine != null) {
 				dbEngine.rollback();
 			}

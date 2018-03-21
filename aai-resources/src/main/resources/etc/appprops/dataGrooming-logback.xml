@@ -88,7 +88,7 @@
 		<appender-ref ref="dataGroomingdebug"/>
 		<appender-ref ref="dataGroomingmetric"/>
 	</logger>
-	<logger name="com.thinkaurelius" level="WARN" additivity="false">
+	<logger name="org.janusgraph" level="WARN" additivity="false">
 		<appender-ref ref="dataGrooming"/>
 		<appender-ref ref="dataGroomingdebug"/>
 		<appender-ref ref="dataGroomingmetric"/>

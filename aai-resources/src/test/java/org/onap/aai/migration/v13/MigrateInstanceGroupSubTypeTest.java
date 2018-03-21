@@ -17,52 +17,53 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
-package org.onap.aai.migration.v12;
+package org.onap.aai.migration.v13;
 
-import org.janusgraph.core.JanusGraphFactory;
-import org.janusgraph.core.JanusGraph;
-import org.janusgraph.core.schema.JanusGraphManagement;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.LoaderFactory;
 import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.Version;
-import org.onap.aai.serialization.db.AAIDirection;
-import org.onap.aai.serialization.db.EdgeProperty;
 import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.JanusGraphDBEngine;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.JanusGraphTransaction;
 
-public class ContainmentDeleteOtherVPropertyMigrationTest extends AAISetup {
 
-	private final static Version version = Version.v12;
+public class MigrateInstanceGroupSubTypeTest extends AAISetup{
+
+	private static final String SUB_TYPE_VALUE = "SubTypeValue";
+	private final static Version version = Version.v13;
 	private final static ModelType introspectorFactoryType = ModelType.MOXY;
 	private final static QueryStyle queryStyle = QueryStyle.TRAVERSAL;
 	private final static DBConnectionType type = DBConnectionType.REALTIME;
 	private Loader loader;
 	private TransactionalGraphEngine dbEngine;
 	private JanusGraph graph;
-	private ContainmentDeleteOtherVPropertyMigration migration;
+	private MigrateInstanceGroupSubType migration;
 	private GraphTraversalSource g;
-	private Graph tx;
+	private JanusGraphTransaction tx;
+	Vertex instanceGroup;
+	Vertex instanceGroupWithoutTSubType;
+
 
 	@Before
 	public void setUp() throws Exception {
-		graph = JanusGraphFactory.build().set("storage.backend","inmemory").open();
-		JanusGraphManagement janusgraphManagement = graph.openManagement();
+		graph = JanusGraphFactory.build().set("storage.backend", "inmemory").open();
 		tx = graph.newTransaction();
 		g = tx.traversal();
 		loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
@@ -70,43 +71,42 @@ public class ContainmentDeleteOtherVPropertyMigrationTest extends AAISetup {
 				queryStyle,
 				type,
 				loader);
-		Vertex v = g.addV().property("aai-node-type", "generic-vnf")
-							.property("vnf-id", "delcontains-test-vnf")
-							.next();
-		Vertex v2 = g.addV().property("aai-node-type", "l-interface")
-							.property("interface-name", "delcontains-test-lint")
-							.next();
-		Edge e = v.addEdge("hasLInterface", v2, EdgeProperty.CONTAINS.toString(), AAIDirection.OUT.toString(), 
-													EdgeProperty.DELETE_OTHER_V.toString(), AAIDirection.NONE.toString());
-		
-		Vertex v3 = g.addV().property("aai-node-type", "allotted-resource").next();
-		
-		Edge e2 = v2.addEdge("uses", v3, EdgeProperty.CONTAINS.toString(), AAIDirection.NONE.toString(),
-											EdgeProperty.DELETE_OTHER_V.toString(), AAIDirection.NONE.toString());
+		instanceGroup = g.addV().property("aai-node-type", MigrateInstanceGroupSubType.INSTANCE_GROUP_NODE_TYPE)
+				.property( MigrateInstanceGroupSubType.SUB_TYPE_PROPERTY, SUB_TYPE_VALUE)
+				.next();
+
+		instanceGroupWithoutTSubType = g.addV().property("aai-node-type", MigrateInstanceGroupSubType.INSTANCE_GROUP_NODE_TYPE)
+				.next();
+
 		TransactionalGraphEngine spy = spy(dbEngine);
 		TransactionalGraphEngine.Admin adminSpy = spy(dbEngine.asAdmin());
 		GraphTraversalSource traversal = g;
 		when(spy.asAdmin()).thenReturn(adminSpy);
 		when(adminSpy.getTraversalSource()).thenReturn(traversal);
-		Mockito.doReturn(janusgraphManagement).when(adminSpy).getManagementSystem();
-		migration = new ContainmentDeleteOtherVPropertyMigration(spy, "/edgeMigrationTestRules.json");
-		migration.run();
-	}
-	
-	@After
-	public void cleanUp() {
-		tx.tx().rollback();
-		graph.close();
-	}
-	
-	@Test
-	public void run() {
-		assertEquals("del other now OUT", true, 
-				g.E().hasLabel("hasLInterface").has(EdgeProperty.DELETE_OTHER_V.toString(), AAIDirection.OUT.toString()).hasNext());
-		assertEquals("contains val still same", true, 
-				g.E().hasLabel("hasLInterface").has(EdgeProperty.CONTAINS.toString(), AAIDirection.OUT.toString()).hasNext());
-		assertEquals("non-containment unchanged", true,
-				g.E().hasLabel("uses").has(EdgeProperty.DELETE_OTHER_V.toString(), AAIDirection.NONE.toString()).hasNext());
+		migration = new MigrateInstanceGroupSubType(spy);
 	}
 
+	@After
+	public void cleanUp() {
+		tx.rollback();
+		graph.close();
+	}
+
+
+	/***
+	 * checks if the type/subtype property were renamed
+	 */
+
+	@Test
+	public void confirmTypeAndSubTypeWereRenamed() {
+		migration.run();
+
+		//instance group with sub-type
+		assertEquals(SUB_TYPE_VALUE, instanceGroup.property(MigrateInstanceGroupSubType.INSTANCE_GROUP_ROLE_PROPERTY).value());
+		assertFalse(instanceGroup.property(MigrateInstanceGroupSubType.SUB_TYPE_PROPERTY).isPresent());
+
+		//instance group without subtype
+		assertFalse(instanceGroupWithoutTSubType.property(MigrateInstanceGroupSubType.INSTANCE_GROUP_ROLE_PROPERTY).isPresent());
+		assertFalse(instanceGroupWithoutTSubType.property(MigrateInstanceGroupSubType.SUB_TYPE_PROPERTY).isPresent());
+	}
 }
