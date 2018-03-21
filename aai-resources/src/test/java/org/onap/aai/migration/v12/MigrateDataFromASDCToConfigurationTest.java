@@ -19,9 +19,9 @@
  */
 package org.onap.aai.migration.v12;
 
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.TitanTransaction;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.JanusGraphTransaction;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.junit.After;
@@ -35,7 +35,7 @@ import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.Version;
 import org.onap.aai.serialization.db.EdgeRules;
 import org.onap.aai.serialization.engines.QueryStyle;
-import org.onap.aai.serialization.engines.TitanDBEngine;
+import org.onap.aai.serialization.engines.JanusGraphDBEngine;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 
 import static org.junit.Assert.assertEquals;
@@ -51,11 +51,11 @@ public class MigrateDataFromASDCToConfigurationTest extends AAISetup {
     private final static DBConnectionType type = DBConnectionType.REALTIME;
     private Loader loader;
     private TransactionalGraphEngine dbEngine;
-    private TitanGraph graph;
+    private JanusGraph graph;
     private MigrateDataFromASDCToConfiguration migration;
     private EdgeRules rules;
     private GraphTraversalSource g;
-    private TitanTransaction tx;
+    private JanusGraphTransaction tx;
     Vertex configuration;
     Vertex configuration2;
     Vertex configuration3;
@@ -68,11 +68,11 @@ public class MigrateDataFromASDCToConfigurationTest extends AAISetup {
 
     @Before
     public void setUp() throws Exception {
-        graph = TitanFactory.build().set("storage.backend","inmemory").open();
+        graph = JanusGraphFactory.build().set("storage.backend","inmemory").open();
         tx = graph.newTransaction();
         g = tx.traversal();
         loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
-        dbEngine = new TitanDBEngine(
+        dbEngine = new JanusGraphDBEngine(
                 queryStyle,
                 type,
                 loader);

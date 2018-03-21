@@ -19,9 +19,9 @@
  */
 package org.onap.aai.migration.v12;
 
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.schema.TitanManagement;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.schema.JanusGraphManagement;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -39,7 +39,7 @@ import org.onap.aai.introspection.Version;
 import org.onap.aai.serialization.db.AAIDirection;
 import org.onap.aai.serialization.db.EdgeProperty;
 import org.onap.aai.serialization.engines.QueryStyle;
-import org.onap.aai.serialization.engines.TitanDBEngine;
+import org.onap.aai.serialization.engines.JanusGraphDBEngine;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 
 import static org.junit.Assert.assertEquals;
@@ -55,19 +55,19 @@ public class ToscaMigrationTest extends AAISetup {
 	private final static DBConnectionType type = DBConnectionType.REALTIME;
 	private Loader loader;
 	private TransactionalGraphEngine dbEngine;
-	private TitanGraph graph;
+	private JanusGraph graph;
 	private ToscaMigration migration;
 	private GraphTraversalSource g;
 	private Graph tx;
 
 	@Before
 	public void setUp() throws Exception {
-		graph = TitanFactory.build().set("storage.backend","inmemory").open();
-		TitanManagement titanManagement = graph.openManagement();
+		graph = JanusGraphFactory.build().set("storage.backend","inmemory").open();
+		JanusGraphManagement janusgraphManagement = graph.openManagement();
 		tx = graph.newTransaction();
 		g = tx.traversal();
 		loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
-		dbEngine = new TitanDBEngine(
+		dbEngine = new JanusGraphDBEngine(
 				queryStyle,
 				type,
 				loader);
@@ -104,7 +104,7 @@ public class ToscaMigrationTest extends AAISetup {
 		GraphTraversalSource traversal = g;
 		when(spy.asAdmin()).thenReturn(adminSpy);
 		when(adminSpy.getTraversalSource()).thenReturn(traversal);
-		Mockito.doReturn(titanManagement).when(adminSpy).getManagementSystem();
+		Mockito.doReturn(janusgraphManagement).when(adminSpy).getManagementSystem();
 		migration = new ToscaMigration(spy);
 		migration.run();
 

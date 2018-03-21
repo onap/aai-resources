@@ -88,7 +88,7 @@
 		<appender-ref ref="pullInvDatadebug"/>
 		<appender-ref ref="pullInvDatametric"/>
 	</logger>
-	<logger name="com.thinkaurelius" level="WARN" additivity="false">
+	<logger name="org.janusgraph" level="WARN" additivity="false">
 		<appender-ref ref="pullInvData"/>
 		<appender-ref ref="pullInvDatadebug"/>
 		<appender-ref ref="pullInvDatametric"/>

@@ -49,7 +49,7 @@ import org.onap.aai.introspection.Version;
 import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.logging.LoggingContext.StatusCode;
 import org.onap.aai.serialization.engines.QueryStyle;
-import org.onap.aai.serialization.engines.TitanDBEngine;
+import org.onap.aai.serialization.engines.JanusGraphDBEngine;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.util.AAIConstants;
 import org.onap.aai.util.FormatDate;
@@ -113,7 +113,7 @@ public class MigrationControllerInternal {
 			} catch (ConfigurationException e) {
 				LoggingContext.statusCode(StatusCode.ERROR);
 				LoggingContext.responseCode(LoggingContext.DATA_ERROR);
-				logAndPrint("ERROR: Could not load titan configuration.\n" + ExceptionUtils.getFullStackTrace(e));
+				logAndPrint("ERROR: Could not load janusgraph configuration.\n" + ExceptionUtils.getFullStackTrace(e));
 				return;
 			}
 		}
@@ -126,7 +126,7 @@ public class MigrationControllerInternal {
 		QueryStyle queryStyle = QueryStyle.TRAVERSAL;
 		ModelType introspectorFactoryType = ModelType.MOXY;
 		Loader loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
-		TransactionalGraphEngine engine = new TitanDBEngine(queryStyle, DBConnectionType.REALTIME, loader);
+		TransactionalGraphEngine engine = new JanusGraphDBEngine(queryStyle, DBConnectionType.REALTIME, loader);
 
 		if (cArgs.help) {
 			jCommander.usage();
