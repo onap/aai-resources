@@ -47,8 +47,8 @@ import org.slf4j.MDC;
 import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
 
 
 
@@ -235,7 +235,7 @@ public class ForceDeleteTool {
 	  	}
 	  	
 	  	String msg = "";
-	  	TitanGraph graph = null;
+	  	JanusGraph graph = null;
 		try {   
     		AAIConfig.init();
     		System.out.println("    ---- NOTE --- about to open graph (takes a little while)--------\n");
@@ -321,7 +321,7 @@ public class ForceDeleteTool {
 	        	}
 	        }
 	        else {
-	           	msg =  "Bad TitanGraphQuery object.  ";
+	           	msg =  "Bad JanusGraphQuery object.  ";
 		 		System.out.println(msg);
 		 		LoggingContext.statusCode(StatusCode.ERROR);
 		 		LoggingContext.responseCode(LoggingContext.DATA_ERROR);
@@ -411,9 +411,9 @@ public class ForceDeleteTool {
 	
 	public static class ForceDelete {
 		
-		private static final int MAXDESCENDENTDEPTH = 15;
-		private final TitanGraph graph;
-		public ForceDelete(TitanGraph graph) {
+		private final int MAXDESCENDENTDEPTH = 15;
+		private final JanusGraph graph;
+		public ForceDelete(JanusGraph graph) {
 			this.graph = graph;
 		}
 		public void showNodeInfo(EELFLogger logger, Vertex tVert, Boolean displayAllVidsFlag ){ 
@@ -814,9 +814,9 @@ public class ForceDeleteTool {
 		} // End of getNodeDelConfirmation()
 	}
 
-	public static TitanGraph setupGraph(EELFLogger logger){
+	public static JanusGraph setupGraph(EELFLogger logger){
 
-		TitanGraph titanGraph = null;
+		JanusGraph janusGraph = null;
 
 		try (InputStream inputStream = new FileInputStream(AAIConstants.REALTIME_DB_CONFIG);){
 
@@ -824,10 +824,10 @@ public class ForceDeleteTool {
 			properties.load(inputStream);
 
 			if(INMEMORY.equals(properties.get("storage.backend"))){
-				titanGraph = AAIGraph.getInstance().getGraph();
+				janusGraph = AAIGraph.getInstance().getGraph();
 				graphType = INMEMORY;
 			} else {
-				titanGraph = TitanFactory.open(
+				janusGraph = JanusGraphFactory.open(
 						new AAIGraphConfig.Builder(AAIConstants.REALTIME_DB_CONFIG)
 						.forService(ForceDeleteTool.class.getSimpleName())
 						.withGraphType("realtime1")
@@ -838,10 +838,10 @@ public class ForceDeleteTool {
 			logger.error("Unable to open the graph", LogFormatTools.getStackTop(e));
 		}
 
-		return titanGraph;
+		return janusGraph;
 	}
 
-	public static void closeGraph(TitanGraph graph, EELFLogger logger){
+	public static void closeGraph(JanusGraph graph, EELFLogger logger){
 
 		try {
 			if(INMEMORY.equals(graphType)) {
@@ -852,7 +852,7 @@ public class ForceDeleteTool {
 				graph.close();
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
+			// Don't throw anything because JanusGraph sometimes is just saying that the graph is already closed{
 			logger.warn("WARNING from final graph.shutdown()", ex);
 		}
 	}

@@ -30,7 +30,7 @@
 #       Ie. createDbSchema.sh GEN_DB_WITH_NO_SCHEMA
 #
 
-COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )	
 . ${COMMON_ENV_PATH}/common_functions.sh
 start_date;
 check_user;
