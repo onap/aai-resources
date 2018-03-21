@@ -34,6 +34,15 @@ services:
       - LOCAL_GROUP_ID=__LOCAL_GROUP_ID__
     volumes:
       - /opt/aai/logroot/AAI-RES:/opt/aai/logroot/AAI-RES
+      - /opt/app/aai-resources/appconfig/aai-client-cert.p12:/opt/app/aai-resources/resources/etc/auth/aai-client-cert.p12
+      - /opt/app/aai-resources/appconfig/aai_keystore:/opt/app/aai-resources/resources/etc/auth/aai_keystore
+      - /opt/app/aai-resources/appconfig/aaiconfig.properties:/opt/app/aai-resources/resources/etc/appprops/aaiconfig.properties
+      - /opt/app/aai-resources/appconfig/application.properties:/opt/app/aai-resources/resources/application.properties
+      - /opt/app/aai-resources/appconfig/dme2.properties:/opt/app/aai-resources/resources/dme2.properties
+      - /opt/app/aai-resources/appconfig/localhost-access-logback.xml:/opt/app/aai-resources/resources/localhost-access-logback.xml
+      - /opt/app/aai-resources/appconfig/logback.xml:/opt/app/aai-resources/resources/logback.xml
+      - /opt/app/aai-resources/appconfig/janusgraph-cached.properties:/opt/app/aai-resources/resources/etc/appprops/janusgraph-cached.properties
+      - /opt/app/aai-resources/appconfig/janusgraph-realtime.properties:/opt/app/aai-resources/resources/etc/appprops/janusgraph-realtime.properties
     logging:
       driver: "json-file"
       options:

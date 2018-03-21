@@ -19,18 +19,18 @@
  */
 package org.onap.aai.schema.db;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.schema.TitanManagement;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.schema.JanusGraphManagement;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.onap.aai.AAISetup;
 import org.onap.aai.db.schema.DBIndex;
-import org.onap.aai.db.schema.ManageTitanSchema;
+import org.onap.aai.db.schema.ManageJanusGraphSchema;
 
 import java.io.IOException;
 import java.util.Set;
@@ -38,24 +38,23 @@ import java.util.Set;
 @Ignore("not ready yet")
 public class ManageSchemaTest extends AAISetup {
 
-	private TitanGraph graph = null;
+	private JanusGraph graph = null;
 
 	@Before
 	public void beforeTest() {
-		//graph = TitanFactory.open("src/test/resources/inmemory_titan.properties");
-		graph = TitanFactory.open("bundleconfig-local/etc/appprops/aaiconfig.properties");
+		graph = JanusGraphFactory.open("bundleconfig-local/etc/appprops/aaiconfig.properties");
 	}
 	
 	/*
 	@Test
 	public void populateEmptyGraph() {
-		ManageTitanSchema schema = new ManageTitanSchema(graph);
+		ManageJanusGraphSchema schema = new ManageJanusGraphSchema(graph);
 		schema.buildSchema();
 	}
 	
 	@Test
 	public void modifyIndex() {
-		ManageTitanSchema schema = new ManageTitanSchema(graph);
+		ManageJanusGraphSchema schema = new ManageJanusGraphSchema(graph);
 		schema.buildSchema();
 		Vertex v = graph.addVertex();
 		v.setProperty("aai-node-type", "pserver");
@@ -72,7 +71,7 @@ public class ManageSchemaTest extends AAISetup {
 	@Test
 	public void closeRunningInstances() {
 		
-		TitanManagement mgmt = graph.openManagement();
+		JanusGraphManagement mgmt = graph.openManagement();
  		Set<String> instances = mgmt.getOpenInstances();
 		
 		for (String instance : instances) {
@@ -99,8 +98,8 @@ public class ManageSchemaTest extends AAISetup {
 				"    } ]\r\n" + 
 				"  }";
 		DBIndex index = mapper.readValue(content, DBIndex.class);
-		ManageTitanSchema schema = new ManageTitanSchema(graph);
-		TitanManagement mgmt = graph.openManagement();
+		ManageJanusGraphSchema schema = new ManageJanusGraphSchema(graph);
+		JanusGraphManagement mgmt = graph.openManagement();
 		Set<String> instances = mgmt.getOpenInstances();
 		System.out.println(instances);
 		schema.updateIndex(index);

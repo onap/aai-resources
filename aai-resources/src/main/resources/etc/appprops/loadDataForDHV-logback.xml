@@ -82,7 +82,7 @@
 		<appender-ref ref="loadDataForDHVdebug"/>
 		<appender-ref ref="loadDataForDHVmetric"/>
 	</logger>
-	<logger name="com.thinkaurelius" level="WARN" additivity="false">
+	<logger name="org.janusgraph" level="WARN" additivity="false">
 		<appender-ref ref="loadDataForDHV"/>
 		<appender-ref ref="loadDataForDHVdebug"/>
 		<appender-ref ref="loadDataForDHVmetric"/>
