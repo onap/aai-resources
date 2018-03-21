@@ -62,7 +62,7 @@
 	<logger name="org.apache.hadoop" level="ERROR" additivity="false">
 		<appender-ref ref="migrationlog" />
 	</logger>
-	<logger name="com.thinkaurelius" level="ERROR" additivity="false">
+	<logger name="org.janusgraph" level="ERROR" additivity="false">
 		<appender-ref ref="migrationlog" />
 	</logger>
 	<logger name="ch.qos.logback.classic" level="ERROR" additivity="false">

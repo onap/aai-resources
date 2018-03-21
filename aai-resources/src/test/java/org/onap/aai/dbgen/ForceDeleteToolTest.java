@@ -21,7 +21,7 @@ package org.onap.aai.dbgen;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import com.thinkaurelius.titan.core.TitanTransaction;
+import org.janusgraph.core.JanusGraphTransaction;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -52,7 +52,7 @@ public class ForceDeleteToolTest extends AAISetup {
     public void setup(){
         deleteTool = new ForceDeleteTool();
         deleteTool.SHOULD_EXIT_VM = false;
-        TitanTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
+        JanusGraphTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
 
         EdgeRules edgeRules = EdgeRules.getInstance();
 
@@ -137,7 +137,7 @@ public class ForceDeleteToolTest extends AAISetup {
     @Test
     public void testCollectDataForEdge(){
 
-        TitanTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
+        JanusGraphTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
         GraphTraversalSource g = transaction.traversal();
         List<Edge> edges = g.E().toList();
         String cloudRegionToPserverId = edges.get(0).id().toString();
@@ -161,7 +161,7 @@ public class ForceDeleteToolTest extends AAISetup {
         InputStream systemInputStream = System.in;
         ByteArrayInputStream in = new ByteArrayInputStream("y".getBytes());
         System.setIn(in);
-        TitanTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
+        JanusGraphTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
         GraphTraversalSource g = transaction.traversal();
         List<Edge> edges = g.E().toList();
         String cloudRegionToPserverId = edges.get(0).id().toString();
@@ -182,7 +182,7 @@ public class ForceDeleteToolTest extends AAISetup {
     @After
     public void tearDown(){
 
-        TitanTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
+        JanusGraphTransaction transaction = AAIGraph.getInstance().getGraph().newTransaction();
         boolean success = true;
 
         try {

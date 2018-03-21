@@ -56,8 +56,8 @@ import org.slf4j.MDC;
 import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
 
 
 
@@ -132,8 +132,8 @@ public class DupeTool {
 		logger.error("ERROR - Could not do the moxyMod.init() " + LogFormatTools.getStackTop(ex));
 		exit(1);
 	}
-	TitanGraph graph1 = null;
-	TitanGraph graph2 = null;
+	JanusGraph graph1 = null;
+	JanusGraph graph2 = null;
 	Graph gt1 = null;
 	Graph gt2 = null;
 	
@@ -482,7 +482,7 @@ public class DupeTool {
 				gt1.tx().rollback();
 			}
 			catch (Exception ex) {
-				// Don't throw anything because Titan sometimes is just saying that the graph is already closed
+				// Don't throw anything because JanusGraph sometimes is just saying that the graph is already closed
 				logger.warn("WARNING from final gt1.rollback() " + LogFormatTools.getStackTop(ex));
 			}
 		}
@@ -493,7 +493,7 @@ public class DupeTool {
 			try {
 				gt2.tx().rollback();
 			} catch (Exception ex) {
-				// Don't throw anything because Titan sometimes is just saying that the graph is already closed
+				// Don't throw anything because JanusGraph sometimes is just saying that the graph is already closed
 				logger.warn("WARNING from final gt2.rollback() " + LogFormatTools.getStackTop(ex));
 			}
 		}
@@ -503,7 +503,7 @@ public class DupeTool {
 			    closeGraph(graph1, logger);
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
+			// Don't throw anything because JanusGraph sometimes is just saying that the graph is already closed{
 			logger.warn("WARNING from final graph1.shutdown() " + LogFormatTools.getStackTop(ex));
 		}
 			
@@ -512,7 +512,7 @@ public class DupeTool {
 				closeGraph(graph2, logger);
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
+			// Don't throw anything because JanusGraph sometimes is just saying that the graph is already closed{
 			logger.warn("WARNING from final graph2.shutdown() " + LogFormatTools.getStackTop(ex));
 		}
 	}
@@ -756,7 +756,7 @@ public class DupeTool {
 	}// End of getDupeSets4DependentNodes()	
 	
 	
-	private static Graph getGraphTransaction(TitanGraph graph, EELFLogger logger){
+	private static Graph getGraphTransaction(JanusGraph graph, EELFLogger logger){
 		
 		Graph gt = null;
 		try {   
@@ -829,7 +829,7 @@ public class DupeTool {
 		}
 		
 	}// End of showNodeInfo()
-	
+
 	public static ArrayList <String> collectEdgeInfoForNode( EELFLogger logger, Vertex tVert, boolean displayAllVidsFlag ){ 
 		ArrayList <String> retArr = new ArrayList <String> ();
 		Direction dir = Direction.OUT;
@@ -1035,7 +1035,7 @@ public class DupeTool {
   		}
   		
   		if(tgQ == null){
-  			msg =  "Bad TitanGraphQuery object.  ";
+  			msg =  "Bad JanusGraphQuery object.  ";
 	 		System.out.println(msg);
 	 		LoggingContext.statusCode(StatusCode.ERROR);
 	 		LoggingContext.responseCode(LoggingContext.AVAILABILITY_TIMEOUT_ERROR);
@@ -1391,7 +1391,7 @@ public class DupeTool {
 			String nType, ArrayList<Vertex> passedVertList, Loader loader)
 			throws AAIException {
 		
-		// Given a list of Titan Vertices, group them together by dependent
+		// Given a list of JanusGraph Vertices, group them together by dependent
 		// nodes. Ie. if given a list of ip address nodes (assumed to all 
 		// have the same key info) they might sit under several different 
 		// parent vertices.
@@ -1755,7 +1755,7 @@ public class DupeTool {
 					// This is not the last entry, it is one of the dupes
 					delIdArr.add(dupeArr[i]);
 					continue;
-				} 
+				}
 
 				// This is the last entry which should tell us if we
 				// have a preferred keeper and how many dupes we had
@@ -1846,9 +1846,9 @@ public class DupeTool {
 
     private static int graphIndex = 1;
 
-	public static TitanGraph setupGraph(EELFLogger logger){
+	public static JanusGraph setupGraph(EELFLogger logger){
 
-	    TitanGraph titanGraph = null;
+	    JanusGraph janusGraph = null;
 
 
 		try (InputStream inputStream = new FileInputStream(AAIConstants.REALTIME_DB_CONFIG);){
@@ -1857,20 +1857,20 @@ public class DupeTool {
             properties.load(inputStream);
 
             if(INMEMORY.equals(properties.get("storage.backend"))){
-                titanGraph = AAIGraph.getInstance().getGraph();
+                janusGraph = AAIGraph.getInstance().getGraph();
                 graphType = INMEMORY;
             } else {
-	            titanGraph = TitanFactory.open(new AAIGraphConfig.Builder(AAIConstants.REALTIME_DB_CONFIG).forService(DupeTool.class.getSimpleName()).withGraphType("realtime" + graphIndex).buildConfiguration());
+	            janusGraph = JanusGraphFactory.open(new AAIGraphConfig.Builder(AAIConstants.REALTIME_DB_CONFIG).forService(DupeTool.class.getSimpleName()).withGraphType("realtime" + graphIndex).buildConfiguration());
                 graphIndex++;
             }
 		} catch (Exception e) {
 		    logger.error("Unable to open the graph", LogFormatTools.getStackTop(e));
 		}
 
-		return titanGraph;
+		return janusGraph;
 	}
 
-	public static void closeGraph(TitanGraph graph, EELFLogger logger){
+	public static void closeGraph(JanusGraph graph, EELFLogger logger){
 
 		try {
 			if(INMEMORY.equals(graphType)) {
@@ -1881,7 +1881,7 @@ public class DupeTool {
 				graph.close();
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
+			// Don't throw anything because JanusGraph sometimes is just saying that the graph is already closed{
 			logger.warn("WARNING from final graph.shutdown()", ex);
 		}
 	}
