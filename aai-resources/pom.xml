@@ -80,8 +80,10 @@
         <hamcrest.junit.version>2.0.0.0</hamcrest.junit.version>
         <janino.version>2.7.8</janino.version>
         <google.guava.version>16.0</google.guava.version>
-        <titan.version>1.0.0</titan.version>
-        <gremlin.driver.version>3.0.1-incubating</gremlin.driver.version>
+        <janusgraph.version>0.2.0</janusgraph.version>
+        <gremlin.driver.version>3.2.2</gremlin.driver.version>
+        <gremlin.core.version>3.2.2</gremlin.core.version>
+		<gremlin.version>3.2.2</gremlin.version>
         <hbase.version>1.0.2</hbase.version>
         <smack.version>3.0.4</smack.version>
         <json.simple.version>1.1.1</json.simple.version>
@@ -148,6 +150,9 @@
 
         <!-- This will be used for the docker images as the default format of maven build has issues -->
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
+
+        <license.goal.type>check</license.goal.type>
+        <jacoco.line.coverage.limit>0.70</jacoco.line.coverage.limit>
     </properties>
     <profiles>
         <!-- Docker profile to be used for building docker image and pushing to nexus -->
@@ -383,9 +388,21 @@
             <version>${google.guava.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.thinkaurelius.titan</groupId>
-            <artifactId>titan-core</artifactId>
-            <version>${titan.version}</version>
+            <groupId>org.janusgraph</groupId>
+            <artifactId>janusgraph-core</artifactId>
+            <version>${janusgraph.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+       <dependency>
+            <groupId>org.janusgraph</groupId>
+            <artifactId>janusgraph-hbase-parent</artifactId>
+            <version>${janusgraph.version}</version>
+            <type>pom</type>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -394,9 +411,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.thinkaurelius.titan</groupId>
-            <artifactId>titan-cassandra</artifactId>
-            <version>${titan.version}</version>
+            <groupId>org.janusgraph</groupId>
+            <artifactId>janusgraph-hbase</artifactId>
+            <version>${janusgraph.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -405,9 +422,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.thinkaurelius.titan</groupId>
-            <artifactId>titan-hbase</artifactId>
-            <version>${titan.version}</version>
+            <groupId>org.janusgraph</groupId>
+            <artifactId>janusgraph-cassandra</artifactId>
+            <version>${janusgraph.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -415,11 +432,20 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>tinkergraph-gremlin</artifactId>
+            <version>${gremlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>gremlin-core</artifactId>
+            <version>${gremlin.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>gremlin-driver</artifactId>
-            <version>${gremlin.driver.version}</version>
+            <version>${gremlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>
@@ -745,6 +771,11 @@
             <artifactId>spring-boot-test</artifactId>
             <scope>test</scope>
         </dependency>
+         <dependency>
+         	<groupId>org.apache.tinkerpop</groupId>
+         	<artifactId>gremlin-groovy</artifactId>
+         	<version>${gremlin.version}</version>
+         </dependency>
     </dependencies>
     <build>
         <resources>
@@ -775,8 +806,8 @@
             <resource>
                 <directory>${project.basedir}/src/main/resources/etc/appprops/</directory>
                 <includes>
-                    <include>titan-realtime.properties</include>
-                    <include>titan-cached.properties</include>
+                    <include>janusgraph-realtime.properties</include>
+                    <include>janusgraph-cached.properties</include>
                     <include>aaiconfig.properties</include>
                 </includes>
                 <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig
@@ -788,6 +819,7 @@
                 <includes>
                     <include>aai-client-cert.p12</include>
                     <include>tomcat_keystore</include>
+                    <include>aai_policy.json</include>
                 </includes>
                 <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/aai-resources/appconfig
                 </targetPath>
@@ -971,6 +1003,27 @@
                             <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>default-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
+                            <rules>
+                                <rule implementation="org.jacoco.maven.RuleConfiguration">
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit implementation="org.jacoco.report.check.Limit">
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.line.coverage.limit}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -1027,9 +1080,9 @@
                     <execution>
                         <goals>
                             <!-- Set goal to "format" to auto update license headers -->
-                            <goal>check</goal>
+                            <goal>${license.goal.type}</goal>
                         </goals>
-                        <phase>process-sources</phase>
+                        <phase>initialize</phase>
                     </execution>
                 </executions>
             </plugin>

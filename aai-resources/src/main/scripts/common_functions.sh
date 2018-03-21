@@ -54,3 +54,18 @@ end_date(){
     echo
     echo `date` "   Done $0"
 }
+
+# Inserts GEN_DB_WITH_NO_SCHEMA as a paranmter if it isn't there already
+force_GEN_DB_WITH_NO_SCHEMA () {
+  for p in "$@"
+    do
+    if [ "$p" == "GEN_DB_WITH_NO_SCHEMA" ]
+    then
+      echo "$@"
+      return
+    fi
+    done
+    echo "GEN_DB_WITH_NO_SCHEMA $@"
+    return
+}
+

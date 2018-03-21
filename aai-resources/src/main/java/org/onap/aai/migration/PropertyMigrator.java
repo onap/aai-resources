@@ -27,9 +27,9 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.onap.aai.db.props.AAIProperties;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 
-import com.thinkaurelius.titan.core.Cardinality;
-import com.thinkaurelius.titan.core.PropertyKey;
-import com.thinkaurelius.titan.core.schema.TitanManagement;
+import org.janusgraph.core.Cardinality;
+import org.janusgraph.core.PropertyKey;
+import org.janusgraph.core.schema.JanusGraphManagement;
 
 /**
  * A migration template for migrating a property from one name to another
@@ -42,7 +42,7 @@ public abstract class PropertyMigrator extends Migrator {
 	protected final String NEW_FIELD;
 	protected final Class<?> fieldType;
 	protected final Cardinality cardinality;
-	protected final TitanManagement graphMgmt;
+	protected final JanusGraphManagement graphMgmt;
 
 	public PropertyMigrator(TransactionalGraphEngine engine, String oldName, String newName, Class<?> type, Cardinality cardinality) {
 		super(engine);

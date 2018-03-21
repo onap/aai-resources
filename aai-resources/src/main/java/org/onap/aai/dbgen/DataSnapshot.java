@@ -39,8 +39,8 @@ import org.onap.aai.util.FormatDate;
 import com.att.eelf.configuration.Configuration;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.util.TitanCleanup;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.util.JanusGraphCleanup;
 
 public class DataSnapshot {
 
@@ -63,7 +63,7 @@ public class DataSnapshot {
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
 
 		Boolean dbClearFlag = false;
-		TitanGraph graph = null;
+		JanusGraph graph = null;
 		String command = "JUST_TAKE_SNAPSHOT"; // This is the default
 		String oldSnapshotFileName = "";
 		if (args.length == 1) {
@@ -160,7 +160,7 @@ public class DataSnapshot {
 
 				System.out.println(" Begin clearing out old data. ");
 				graph.close();
-				TitanCleanup.clear(graph);
+				JanusGraphCleanup.clear(graph);
 				System.out.println(" Done clearing data. ");
 				System.out.println(">>> IMPORTANT - NOTE >>> you need to run the SchemaGenerator (use GenTester) before ");
 				System.out.println("     reloading data or the data will be put in without indexes. ");
@@ -192,7 +192,7 @@ public class DataSnapshot {
 				}
 
 				System.out.println("We will load data IN from the file = " + oldSnapshotFullFname);
-				System.out.println(" Begin reloading Titan 0.5 data. ");
+				System.out.println(" Begin reloading JanusGraph 0.5 data. ");
 				
 				LegacyGraphSONReader lgr = LegacyGraphSONReader.build().create();
 				InputStream is = new FileInputStream(oldSnapshotFullFname);
@@ -200,7 +200,7 @@ public class DataSnapshot {
 				
 				System.out.println("Completed the inputGraph command, now try to commit()... ");
 				graph.tx().commit();
-				System.out.println("Completed reloading Titan 0.5 data.");
+				System.out.println("Completed reloading JanusGraph 0.5 data.");
 
 				long vCount = graph.traversal().V().count().next();
 				System.out.println("A little after repopulating from an old snapshot, we see: " + vCount + " vertices in the db.");

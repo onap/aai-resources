@@ -19,10 +19,10 @@
  */
 package org.onap.aai.migration;
 
-import com.thinkaurelius.titan.core.Cardinality;
-import com.thinkaurelius.titan.core.TitanFactory;
-import com.thinkaurelius.titan.core.TitanGraph;
-import com.thinkaurelius.titan.core.schema.TitanManagement;
+import org.janusgraph.core.Cardinality;
+import org.janusgraph.core.JanusGraphFactory;
+import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.schema.JanusGraphManagement;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -37,7 +37,7 @@ import org.onap.aai.introspection.Version;
 import org.onap.aai.serialization.db.DBSerializer;
 import org.onap.aai.serialization.db.EdgeRules;
 import org.onap.aai.serialization.engines.QueryStyle;
-import org.onap.aai.serialization.engines.TitanDBEngine;
+import org.onap.aai.serialization.engines.JanusGraphDBEngine;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 
 import java.io.UnsupportedEncodingException;
@@ -59,24 +59,24 @@ public class VertexMergeTest extends AAISetup {
 	private final static DBConnectionType type = DBConnectionType.REALTIME;
 	private Loader loader;
 	private TransactionalGraphEngine dbEngine;
-	private TitanGraph graph;
+	private JanusGraph graph;
 	private EdgeRules rules;
 	private GraphTraversalSource g;
 	private Graph tx;
 
 	@Before
 	public void setUp() throws Exception {
-		graph = TitanFactory.build().set("storage.backend","inmemory").open();
+		graph = JanusGraphFactory.build().set("storage.backend","inmemory").open();
 		tx = graph.newTransaction();
 		g = tx.traversal();
 		loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
-		dbEngine = new TitanDBEngine(
+		dbEngine = new JanusGraphDBEngine(
 				queryStyle,
 				type,
 				loader);
 		rules = EdgeRules.getInstance();
 		
-		TitanManagement mgmt = graph.openManagement();
+		JanusGraphManagement mgmt = graph.openManagement();
 		mgmt.makePropertyKey("test-list").dataType(String.class).cardinality(Cardinality.SET).make();
 		mgmt.commit();
 		Vertex pserverSkeleton = g.addV().property("aai-node-type", "pserver").property("hostname", "TEST1")
