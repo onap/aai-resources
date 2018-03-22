@@ -44,7 +44,11 @@ import com.thinkaurelius.titan.core.util.TitanCleanup;
 
 public class DataSnapshot {
 
-	private static EELFLogger LOGGER;
+	private static final String OLD_SNAPSHOT_FILE_ = "oldSnapshotFile ";
+	private static final String _COULD_NOT_BE_FOUND = " could not be found.";
+	private static final String _COULD_NOT_BE_READ = " could not be read.";
+	private static final String _HAD_NO_DATA = " had no data.";
+
 	/**
 	 * The main method.
 	 *
@@ -57,7 +61,7 @@ public class DataSnapshot {
 		Properties props = System.getProperties();
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_DATA_SNAPSHOT_LOGBACK_PROPS);
 		props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_ETC_APP_PROPERTIES);
-		LOGGER = EELFManager.getInstance().getLogger(DataSnapshot.class);
+
 		Boolean dbClearFlag = false;
 		TitanGraph graph = null;
 		String command = "JUST_TAKE_SNAPSHOT"; // This is the default
@@ -93,7 +97,7 @@ public class DataSnapshot {
 				AAISystemExitUtil.systemExitCloseAAIGraph(1);
 			}
 
-			if (command.equals("JUST_TAKE_SNAPSHOT")) {
+			if ("JUST_TAKE_SNAPSHOT".equals(command)) {
 				// ------------------------------------------
 				// They just want to take a snapshot.
 				// ------------------------------------------
@@ -112,7 +116,7 @@ public class DataSnapshot {
 				 * "A little after taking the snapshot, we see: " + vCount +
 				 * " vertices in the db.");
 				 ************/
-			} else if (command.equals("CLEAR_ENTIRE_DATABASE")) {
+			} else if ("CLEAR_ENTIRE_DATABASE".equals(command)) {
 				// ------------------------------------------------------------------
 				// They are calling this to clear the db before re-loading it
 				// later
@@ -120,7 +124,7 @@ public class DataSnapshot {
 
 				// First - make sure the backup file they will be using can be
 				// found and has data
-				if (oldSnapshotFileName.equals("")) {
+				if (oldSnapshotFileName.isEmpty()) {
 					String emsg = "No oldSnapshotFileName passed to DataSnapshot.";
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
@@ -128,15 +132,15 @@ public class DataSnapshot {
 				String oldSnapshotFullFname = targetDir + AAIConstants.AAI_FILESEP + oldSnapshotFileName;
 				File f = new File(oldSnapshotFullFname);
 				if (!f.exists()) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be found.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _COULD_NOT_BE_FOUND;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (!f.canRead()) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be read.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _COULD_NOT_BE_READ;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (f.length() == 0) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " had no data.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _HAD_NO_DATA;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
@@ -162,11 +166,11 @@ public class DataSnapshot {
 				System.out.println("     reloading data or the data will be put in without indexes. ");
 				dbClearFlag = true;
 				
-			} else if (command.equals("RELOAD_LEGACY_DATA")) {
+			} else if ("RELOAD_LEGACY_DATA".equals(command)) {
 				// -------------------------------------------------------------------
 				// They want to restore the database from an old snapshot file
 				// -------------------------------------------------------------------
-				if (oldSnapshotFileName.equals("")) {
+				if (oldSnapshotFileName.isEmpty()) {
 					String emsg = "No oldSnapshotFileName passed to DataSnapshot when RELOAD_LEGACY_DATA used.";
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
@@ -174,15 +178,15 @@ public class DataSnapshot {
 				String oldSnapshotFullFname = targetDir + AAIConstants.AAI_FILESEP + oldSnapshotFileName;
 				File f = new File(oldSnapshotFullFname);
 				if (!f.exists()) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be found.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _COULD_NOT_BE_FOUND;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (!f.canRead()) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be read.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _COULD_NOT_BE_READ;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (f.length() == 0) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " had no data.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _HAD_NO_DATA;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
@@ -212,15 +216,15 @@ public class DataSnapshot {
 				String oldSnapshotFullFname = targetDir + AAIConstants.AAI_FILESEP + oldSnapshotFileName;
 				File f = new File(oldSnapshotFullFname);
 				if (!f.exists()) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be found.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _COULD_NOT_BE_FOUND;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (!f.canRead()) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " could not be read.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _COULD_NOT_BE_READ;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				} else if (f.length() == 0) {
-					String emsg = "oldSnapshotFile " + oldSnapshotFullFname + " had no data.";
+					String emsg = OLD_SNAPSHOT_FILE_ + oldSnapshotFullFname + _HAD_NO_DATA;
 					System.out.println(emsg);
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
@@ -246,13 +250,11 @@ public class DataSnapshot {
 		} catch (Exception ex) {
 			ErrorLogHelper.logError("AAI_6128", ex.getMessage());
 		} finally {
-			if (!dbClearFlag && graph != null) {
+			if (!dbClearFlag && graph != null && graph.isOpen()) {
 				// Any changes that worked correctly should have already done
 				// thier commits.
-				if (graph.isOpen()) {
-					graph.tx().rollback();
-					graph.close();
-				}
+				graph.tx().rollback();
+				graph.close();
 			}
 			try {
 				baos.close();
