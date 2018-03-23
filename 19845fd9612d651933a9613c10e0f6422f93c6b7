@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_d0566e06",
+        "filename": "aai-resources/src/main/java/org/onap/aai/dbgen/DupeTool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 1619
+      },
+      "writtenOn": "2018-03-23T18:45:32Z",
+      "side": 1,
+      "message": "not sure why this value was changed from (60 * 1000) to (601 * 10001)?  It\u0027s supposed to be converting a value that is in minutes to milliseconds.",
+      "range": {
+        "startLine": 887,
+        "startChar": 7,
+        "endLine": 887,
+        "endChar": 56
+      },
+      "revId": "19845fd9612d651933a9613c10e0f6422f93c6b7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
