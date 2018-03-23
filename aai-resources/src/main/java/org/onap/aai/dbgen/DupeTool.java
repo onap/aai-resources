@@ -19,11 +19,17 @@
  */
 package org.onap.aai.dbgen;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import java.util.Properties;
+import java.util.UUID;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -59,6 +65,10 @@ public class DupeTool {
 
 	private static final String FROMAPPID = "AAI-DB";
 	private static final String TRANSID = UUID.randomUUID().toString();
+	private static final String COULD_NOT_FIND_EDGE_ID_ = " >>> COULD NOT FIND VERTEX on the other side of this edge edgeId = ";
+	private static final String AAI_NODE_TYPE = "aai-node-type";
+	private static final String KEEP_VID = "KeepVid";
+	private static final String INMEMORY = "inmemory";
 
 	private static String graphType = "realdb";
 
@@ -139,11 +149,11 @@ public class DupeTool {
 		
 		try {
 			String maxFixStr = AAIConfig.get("aai.dupeTool.default.max.fix");
-			if( maxFixStr != null &&  !maxFixStr.equals("") ){
+			if( maxFixStr != null &&  !maxFixStr.isEmpty() ){
 				maxRecordsToFix = Integer.parseInt(maxFixStr);
 			}
 			String sleepStr = AAIConfig.get("aai.dupeTool.default.sleep.minutes");
-			if( sleepStr != null &&  !sleepStr.equals("") ){
+			if( sleepStr != null &&  !sleepStr.isEmpty() ){
 				sleepMinutes = Integer.parseInt(sleepStr);
 			}
 		}
@@ -166,7 +176,7 @@ public class DupeTool {
 				String thisArg = args[i];
 				argStr4Msg = argStr4Msg + " " + thisArg;
 				
-				if (thisArg.equals("-nodeType")) {
+				if ("-nodeType".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -177,7 +187,7 @@ public class DupeTool {
 					nodeTypeVal = args[i];
 					argStr4Msg = argStr4Msg + " " + nodeTypeVal;
 				}
-				else if (thisArg.equals("-sleepMinutes")) {
+				else if ("-sleepMinutes".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -197,7 +207,7 @@ public class DupeTool {
 					}
 					argStr4Msg = argStr4Msg + " " + sleepMinutes;
 				}
-				else if (thisArg.equals("-maxFix")) {
+				else if ("-maxFix".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -217,7 +227,7 @@ public class DupeTool {
 					}
 					argStr4Msg = argStr4Msg + " " + maxRecordsToFix;
 				}
-				else if (thisArg.equals("-timeWindowMinutes")) {
+				else if ("-timeWindowMinutes".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -237,16 +247,16 @@ public class DupeTool {
 					}
 					argStr4Msg = argStr4Msg + " " + timeWindowMinutes;
 				}
-				else if (thisArg.equals("-skipHostCheck")) {
+				else if ("-skipHostCheck".equals(thisArg)) {
 					skipHostCheck = true;
 				}
-				else if (thisArg.equals("-specialTenantRule")) {
+				else if ("-specialTenantRule".equals(thisArg)) {
 					specialTenantRule = true;
 				}
-				else if (thisArg.equals("-autoFix")) {
+				else if ("-autoFix".equals(thisArg)) {
 					autoFix = true;
 				}
-				else if (thisArg.equals("-userId")) {
+				else if ("-userId".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -257,7 +267,7 @@ public class DupeTool {
 					userIdVal = args[i];
 					argStr4Msg = argStr4Msg + " " + userIdVal;
 				}
-				else if (thisArg.equals("-params4Collect")) {
+				else if ("-params4Collect".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -280,7 +290,7 @@ public class DupeTool {
 		}
 	  	
 	  	userIdVal = userIdVal.trim();
-	  	if( (userIdVal.length() < 6) || userIdVal.toUpperCase().equals("AAIADMIN") ){
+	  	if( (userIdVal.length() < 6) || "AAIADMIN".equalsIgnoreCase(userIdVal) ){
 	  		String emsg = "userId parameter is required.  [" + userIdVal + "] passed to DupeTool(). userId must be not empty and not aaiadmin \n";
 			System.out.println(emsg);
 			LoggingContext.statusCode(StatusCode.ERROR);
@@ -290,7 +300,7 @@ public class DupeTool {
 	  	}
 	  		  	
 	  	nodeTypeVal = nodeTypeVal.trim();
-	  	if(  nodeTypeVal.equals("") ){
+	  	if(  nodeTypeVal.isEmpty() ){
 	  		String emsg = " nodeType is a required parameter for DupeTool().\n";
 			System.out.println(emsg);
 			LoggingContext.statusCode(StatusCode.ERROR);
@@ -332,20 +342,11 @@ public class DupeTool {
 		graph1 = setupGraph(logger);
 		gt1 = getGraphTransaction( graph1, logger );
 		ArrayList<Vertex> verts2Check = new ArrayList<Vertex>();
-		try {
-			verts2Check = figureOutNodes2Check( TRANSID, FROMAPPID, gt1, 
-				nodeTypeVal, windowStartTime, filterParams, logger ); 
-		}
-		catch ( AAIException ae ){
-			String emsg = "Error trying to get initial set of nodes to check. \n";
-			System.out.println(emsg);
-			LoggingContext.statusCode(StatusCode.ERROR);
-			LoggingContext.responseCode(LoggingContext.DATA_ERROR);
-			logger.error(emsg);
-	 		exit(0);
-	  	}
+
+		verts2Check = figureOutNodes2Check( TRANSID, FROMAPPID, gt1,
+			nodeTypeVal, windowStartTime, filterParams, logger );
 		
-		if( verts2Check == null || verts2Check.size() == 0 ){
+		if( verts2Check == null || verts2Check.isEmpty() ){
 			msg = " No vertices found to check.  Used nodeType = [" + nodeTypeVal 
 					+ "], windowMinutes = " + timeWindowMinutes 
 					+ ", filterData = [" + filterParams + "].";
@@ -360,7 +361,7 @@ public class DupeTool {
 			System.out.println( msg ); 
 		}
 		
-		ArrayList <String> firstPassDupeSets = new ArrayList <String>();
+		ArrayList<String> firstPassDupeSets = new ArrayList <String>();
 		ArrayList <String> secondPassDupeSets = new ArrayList <String>();
 		Boolean isDependentOnParent = false;
 		if( !obj.getDependentOn().isEmpty() ){
@@ -381,7 +382,7 @@ public class DupeTool {
 		msg = " Found " + firstPassDupeSets.size() + " sets of duplicates for this request. ";
 		logger.info( msg );
 		System.out.println( msg ); 
-		if( firstPassDupeSets.size() > 0 ){
+		if( !firstPassDupeSets.isEmpty() ){
 			msg = " Here is what they look like: ";
 			logger.info( msg );
 			System.out.println( msg );
@@ -395,7 +396,7 @@ public class DupeTool {
 		
 		boolean didSomeDeletesFlag = false;
 		ArrayList <String> dupeSetsToFix = new ArrayList <String> ();
-		if( autoFix && firstPassDupeSets.size() == 0 ){
+		if( autoFix && firstPassDupeSets.isEmpty() ){
 			msg = "AutoFix option is on, but no dupes were found on the first pass.  Nothing to fix.";
 			logger.info( msg );
 			System.out.println( msg );
@@ -435,7 +436,7 @@ public class DupeTool {
 				+ " sets of duplicates that we think can be deleted. ";
 			logger.info( msg );
 			System.out.println( msg ); 
-			if( dupeSetsToFix.size() > 0 ){
+			if( !dupeSetsToFix.isEmpty()){
 				msg = " Here is what the sets look like: ";
 				logger.info( msg );
 				System.out.println( msg );
@@ -447,7 +448,7 @@ public class DupeTool {
 				}
 			}
 			
-			if( dupeSetsToFix.size() > 0 ){
+			if( !dupeSetsToFix.isEmpty() ){
 				if( dupeSetsToFix.size() > maxRecordsToFix ){
 					String infMsg = " >> WARNING >>  Dupe list size ("
 							+ dupeSetsToFix.size()
@@ -502,7 +503,7 @@ public class DupeTool {
 			    closeGraph(graph1, logger);
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed{
+			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
 			logger.warn("WARNING from final graph1.shutdown() " + LogFormatTools.getStackTop(ex));
 		}
 			
@@ -511,7 +512,7 @@ public class DupeTool {
 				closeGraph(graph2, logger);
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed{
+			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
 			logger.warn("WARNING from final graph2.shutdown() " + LogFormatTools.getStackTop(ex));
 		}
 	}
@@ -530,7 +531,6 @@ public class DupeTool {
 	 * @param version the version
 	 * @param nType the n type
 	 * @param passedVertList the passed vert list
-	 * @param dbMaps the db maps
 	 * @return the array list
 	 */
 	private static ArrayList<String> getDupeSets4NonDepNodes( String transId,
@@ -568,7 +568,7 @@ public class DupeTool {
 				String hKey = getNodeKeyValString( tvx, keyPropNamesArr, logger );
 				if( keyVals2VidHash.containsKey(hKey) ){
 					// We've already seen this key 
-					ArrayList <String> tmpVL = (ArrayList <String>)keyVals2VidHash.get(hKey);
+					ArrayList <String> tmpVL = keyVals2VidHash.get(hKey);
 					tmpVL.add(thisVid);
 					keyVals2VidHash.put(hKey, tmpVL);
 				}
@@ -630,10 +630,9 @@ public class DupeTool {
 	 * @param version the version
 	 * @param nType the n type
 	 * @param passedVertList the passed vert list
-	 * @param dbMaps the db maps
 	 * @param keyPropNamesArr Array (ordered) of keyProperty names
 	 * @param specialTenantRule flag
-	 * @param EELFLogger the logger
+	 * @param logger the logger
 	 * @return the array list
 	 */
 	private static ArrayList<String> getDupeSets4DependentNodes( String transId,
@@ -661,7 +660,7 @@ public class DupeTool {
 		// couldn't figure out which one to keep)
 		// or, "100017|200027|30037|keepVid=30037" (if there were 3 dupes and we
 		// thought the third one was the one that should survive)
-		HashMap <String, Object> checkVertHash = new HashMap <String,Object> ();
+		HashMap<String, Object> checkVertHash = new HashMap <String,Object> ();
 		try {
 			Iterator<Vertex> pItr = passedVertList.iterator();
 			while (pItr.hasNext()) {
@@ -726,9 +725,7 @@ public class DupeTool {
 						// hanging off the same parent/dependent node
 						String dupesStr = "";
 						for (int i = 0; i < thisParentsVertList.size(); i++) {
-							dupesStr = dupesStr
-									+ ( (thisParentsVertList
-											.get(i))).id() + "|";
+							dupesStr = dupesStr + thisParentsVertList.get(i).id() + "|";
 						}
 						if (dupesStr != "") {
 							Vertex prefV = getPreferredDupe(transId,
@@ -833,7 +830,6 @@ public class DupeTool {
 		
 	}// End of showNodeInfo()
 	
-	
 	public static ArrayList <String> collectEdgeInfoForNode( EELFLogger logger, Vertex tVert, boolean displayAllVidsFlag ){ 
 		ArrayList <String> retArr = new ArrayList <String> ();
 		Direction dir = Direction.OUT;
@@ -859,19 +855,19 @@ public class DupeTool {
 					vtx = ed.outVertex();
 				}
 				if( vtx == null ){
-					retArr.add(" >>> COULD NOT FIND VERTEX on the other side of this edge edgeId = " + ed.id() + " <<< ");
+					retArr.add(COULD_NOT_FIND_EDGE_ID_ + ed.id() + " <<< ");
+					continue;
+				}
+
+				String nType = vtx.<String>property(AAI_NODE_TYPE).orElse(null);
+				if( displayAllVidsFlag ){
+					// This should rarely be needed
+					String vid = vtx.id().toString();
+					retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node with VtxId = " + vid );
 				}
 				else {
-					String nType = vtx.<String>property("aai-node-type").orElse(null);
-					if( displayAllVidsFlag ){
-						// This should rarely be needed
-						String vid = vtx.id().toString();
-						retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node with VtxId = " + vid );
-					}
-					else {
-						// This is the normal case
-						retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node. ");
-					}
+					// This is the normal case
+					retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node. ");
 				}
 			}
 		}
@@ -888,11 +884,9 @@ public class DupeTool {
 			return 0;
 		}
 		long unixTimeNow = System.currentTimeMillis();
-		long windowInMillis = timeWindowMinutes * 60 * 1000;
+		long windowInMillis = timeWindowMinutes * 60l * 1000l;
 		
-		long startTimeStamp = unixTimeNow - windowInMillis;
-		
-		return startTimeStamp;
+		return unixTimeNow - windowInMillis;
 	} // End of figureWindowStartTime()
 
 	
@@ -937,25 +931,25 @@ public class DupeTool {
 		try { 
 			if( topPropIndex == 0 ){
 				propsAndValuesForMsg = " (" + kName.get(0) + " = " + kVal.get(0) + ") ";
-				verts= g.V().has(kName.get(0),kVal.get(0)).has("aai-node-type",nodeType);	
+				verts= g.V().has(kName.get(0),kVal.get(0)).has(AAI_NODE_TYPE,nodeType);
 			}	
 			else if( topPropIndex == 1 ){
 				propsAndValuesForMsg = " (" + kName.get(0) + " = " + kVal.get(0) + ", " 
 						+ kName.get(1) + " = " + kVal.get(1) + ") ";
-				verts =  g.V().has(kName.get(0),kVal.get(0)).has(kName.get(1),kVal.get(1)).has("aai-node-type",nodeType);	
+				verts =  g.V().has(kName.get(0),kVal.get(0)).has(kName.get(1),kVal.get(1)).has(AAI_NODE_TYPE,nodeType);
 			}	 		
 			else if( topPropIndex == 2 ){
 				propsAndValuesForMsg = " (" + kName.get(0) + " = " + kVal.get(0) + ", " 
 						+ kName.get(1) + " = " + kVal.get(1) + ", " 
 						+ kName.get(2) + " = " + kVal.get(2) +  ") ";
-				verts= g.V().has(kName.get(0),kVal.get(0)).has(kName.get(1),kVal.get(1)).has(kName.get(2),kVal.get(2)).has("aai-node-type",nodeType);			
+				verts= g.V().has(kName.get(0),kVal.get(0)).has(kName.get(1),kVal.get(1)).has(kName.get(2),kVal.get(2)).has(AAI_NODE_TYPE,nodeType);
 			}	
 			else if( topPropIndex == 3 ){
 				propsAndValuesForMsg = " (" + kName.get(0) + " = " + kVal.get(0) + ", " 
 						+ kName.get(1) + " = " + kVal.get(1) + ", " 
 						+ kName.get(2) + " = " + kVal.get(2) + ", " 
 						+ kName.get(3) + " = " + kVal.get(3) +  ") ";
-				verts= g.V().has(kName.get(0),kVal.get(0)).has(kName.get(1),kVal.get(1)).has(kName.get(2),kVal.get(2)).has(kName.get(3),kVal.get(3)).has("aai-node-type",nodeType);			
+				verts= g.V().has(kName.get(0),kVal.get(0)).has(kName.get(1),kVal.get(1)).has(kName.get(2),kVal.get(2)).has(kName.get(3),kVal.get(3)).has(AAI_NODE_TYPE,nodeType);
 			}	 		
 			else {
 				throw new AAIException("AAI_6114", " We only support 4 keys per nodeType for now \n"); 
@@ -976,7 +970,7 @@ public class DupeTool {
 			}
 		}
 		
-		if( retVertList.size() == 0 ){
+		if( retVertList.isEmpty() ){
 			logger.debug("DEBUG No node found for nodeType = [" + nodeType +
 					"], propsAndVal = " + propsAndValuesForMsg );
 		}
@@ -995,21 +989,19 @@ public class DupeTool {
 	 * @param graph the graph
 	 * @param nodeType the node type
 	 * @param windowStartTime the window start time
-	 * @param propsHash the props hash
-	 * @param apiVersion the api version
 	 * @return the nodes 
 	 * @throws AAIException the AAI exception
 	 */
 	public static ArrayList <Vertex> figureOutNodes2Check( String transId, String fromAppId, 
 			Graph graph, String nodeType, long windowStartTime, 
-			String propsString, EELFLogger logger ) 	 throws AAIException{
+			String propsString, EELFLogger logger ) 	{
 		
 		ArrayList <Vertex> retVertList = new ArrayList <Vertex> ();
 		String msg = "";
-		GraphTraversal<Vertex,Vertex> tgQ = graph.traversal().V().has("aai-node-type",nodeType);
+		GraphTraversal<Vertex,Vertex> tgQ = graph.traversal().V().has(AAI_NODE_TYPE,nodeType);
   		String qStringForMsg = "graph.traversal().V().has(\"aai-node-type\"," + nodeType + ")";
   			
-  		if( propsString != null && !propsString.trim().equals("") ){
+  		if( propsString != null && !propsString.trim().isEmpty() ){
   			propsString = propsString.trim();
   			int firstPipeLoc = propsString.indexOf("|");
 	  		if( firstPipeLoc <= 0 ){
@@ -1050,32 +1042,32 @@ public class DupeTool {
 	 		logger.error(msg);
 	 		exit(0);
   		}
-  		else {
-  			Iterator<Vertex> vertItor = tgQ;
-           	while( vertItor.hasNext() ){
-        		Vertex tiV = vertItor.next();
-        		if( windowStartTime <= 0 ){
+
+			Iterator<Vertex> vertItor = tgQ;
+			while( vertItor.hasNext() ){
+				Vertex tiV = vertItor.next();
+				if( windowStartTime <= 0 ){
 					// We're not applying a time-window
 					retVertList.add(tiV);
+					continue;
 				}
-				else {
-					 Object objTimeStamp = tiV.property("aai-created-ts").orElse(null);
-					 if( objTimeStamp == null ){
-						 // No timestamp - so just take it
-						 retVertList.add(tiV);
-					 }
-					 else {
-						 long thisNodeCreateTime = (long)objTimeStamp;
-						 if( thisNodeCreateTime > windowStartTime ){
-							 // It is in our window, so we can take it
-							 retVertList.add(tiV);
-						 }
-					 }
-				}
+
+			 Object objTimeStamp = tiV.property("aai-created-ts").orElse(null);
+			 if( objTimeStamp == null ){
+				 // No timestamp - so just take it
+				 retVertList.add(tiV);
+				 continue;
+			 }
+
+			 long thisNodeCreateTime = (long)objTimeStamp;
+			 if( thisNodeCreateTime > windowStartTime ){
+				 // It is in our window, so we can take it
+				 retVertList.add(tiV);
+			 }
 			}
-		}
+
 		
-		if( retVertList.size() == 0 ){
+		if( retVertList.isEmpty() ){
 			logger.debug("DEBUG No node found for: [" + qStringForMsg + ", with aai-created-ts > " + windowStartTime );
 		}
 		
@@ -1092,7 +1084,7 @@ public class DupeTool {
 	 * @param g the g
 	 * @param dupeVertexList the dupe vertex list
 	 * @param ver the ver
-	 * @param EELFLogger the logger
+	 * @param logger the logger
 	 * @return Vertex
 	 * @throws AAIException the AAI exception
 	 */
@@ -1146,8 +1138,8 @@ public class DupeTool {
 	 * @param vtxA the vtx A
 	 * @param vtxB the vtx B
 	 * @param ver the ver
-	 * @param boolean specialTenantRuleFlag flag
-	 * @param EELFLogger the logger
+	 * @param specialTenantRule flag
+	 * @param logger the logger
 	 * @return Vertex
 	 * @throws AAIException the AAI exception
 	 */
@@ -1163,16 +1155,16 @@ public class DupeTool {
 
 		String vtxANodeType = "";
 		String vtxBNodeType = "";
-		Object obj = vtxA.<Object>property("aai-node-type").orElse(null);
+		Object obj = vtxA.<Object>property(AAI_NODE_TYPE).orElse(null);
 		if (obj != null) {
 			vtxANodeType = obj.toString();
 		}
-		obj = vtxB.<Object>property("aai-node-type").orElse(null);
+		obj = vtxB.<Object>property(AAI_NODE_TYPE).orElse(null);
 		if (obj != null) {
 			vtxBNodeType = obj.toString();
 		}
 
-		if (vtxANodeType.equals("") || (!vtxANodeType.equals(vtxBNodeType))) {
+		if (vtxANodeType.isEmpty() || (!vtxANodeType.equals(vtxBNodeType))) {
 			// Either they're not really dupes or there's some bad data - so
 			// don't pick one
 			return nullVtx;
@@ -1222,12 +1214,12 @@ public class DupeTool {
 				tmpVtx = ed.inVertex();
 			}
 			if( tmpVtx == null ){
-				retArr.add(" >>> COULD NOT FIND VERTEX on the other side of this edge edgeId = " + ed.id() + " <<< ");
+				retArr.add(COULD_NOT_FIND_EDGE_ID_ + ed.id() + " <<< ");
 			}
 			else {
 				String conVid = tmpVtx.id().toString();
 				String nt = "";
-				obj = tmpVtx.<Object>property("aai-node-type").orElse(null);
+				obj = tmpVtx.<Object>property(AAI_NODE_TYPE).orElse(null);
 				if (obj != null) {
 					nt = obj.toString();
 				}
@@ -1247,12 +1239,12 @@ public class DupeTool {
 				tmpVtx = ed.inVertex();
 			}
 			if( tmpVtx == null ){
-				retArr.add(" >>> COULD NOT FIND VERTEX on the other side of this edge edgeId = " + ed.id() + " <<< ");
+				retArr.add(COULD_NOT_FIND_EDGE_ID_ + ed.id() + " <<< ");
 			}
 			else {
 				String conVid = tmpVtx.id().toString();
 				String nt = "";
-				obj = tmpVtx.<Object>property("aai-node-type").orElse(null);
+				obj = tmpVtx.<Object>property(AAI_NODE_TYPE).orElse(null);
 				if (obj != null) {
 					nt = obj.toString();
 				}
@@ -1286,7 +1278,7 @@ public class DupeTool {
 					depNodeVtxId4B = nodeTypesConn2B.get(depNodeType);
 				}
 			}
-			if (depNodeVtxId4A.equals("")
+			if (depNodeVtxId4A.isEmpty()
 					|| (!depNodeVtxId4A.equals(depNodeVtxId4B))) {
 				// Either they're not really dupes or there's some bad data - so
 				// don't pick either one
@@ -1319,29 +1311,27 @@ public class DupeTool {
 					preferredVtx = vtxB;
 				}
 			}
-			else if ( specialTenantRule ){
+			else if ( specialTenantRule && vtxIdsConn2A.size() == 2 && "tenant".equals(vtxANodeType)){
 				// They asked us to apply a special rule if it applies
-				if(vtxIdsConn2A.size() == 2 && vtxANodeType.equals("tenant") ){
-					// We're dealing with two tenant nodes which each just have
-					// two connections.  One must be the parent (cloud-region) 
-					// which we check in step 1 above.   If one connects to 
-					// a vserver and the other connects to a service-subscription,
-					// our special rule is to keep the one connected
-					// to the 
-					if( nodeTypesConn2A.containsKey("vserver") && nodeTypesConn2B.containsKey("service-subscription") ){
-						String infMsg = " WARNING >>> we are using the special tenant rule to choose to " +
-									" delete tenant vtxId = " + vidA + ", and keep tenant vtxId = " + vidB ;
-						System.out.println(infMsg);	
-						logger.info( infMsg );
-						preferredVtx = vtxB;
-					}
-					else if( nodeTypesConn2B.containsKey("vserver") && nodeTypesConn2A.containsKey("service-subscription") ){
-						String infMsg = " WARNING >>> we are using the special tenant rule to choose to " +
-								" delete tenant vtxId = " + vidB + ", and keep tenant vtxId = " + vidA ;
-						System.out.println(infMsg);	
-						logger.info( infMsg );
-						preferredVtx = vtxA;
-					}
+				// We're dealing with two tenant nodes which each just have
+				// two connections.  One must be the parent (cloud-region)
+				// which we check in step 1 above.   If one connects to
+				// a vserver and the other connects to a service-subscription,
+				// our special rule is to keep the one connected
+				// to the
+				if( nodeTypesConn2A.containsKey("vserver") && nodeTypesConn2B.containsKey("service-subscription") ){
+					String infMsg = " WARNING >>> we are using the special tenant rule to choose to " +
+								" delete tenant vtxId = " + vidA + ", and keep tenant vtxId = " + vidB ;
+					System.out.println(infMsg);
+					logger.info( infMsg );
+					preferredVtx = vtxB;
+				}
+				else if( nodeTypesConn2B.containsKey("vserver") && nodeTypesConn2A.containsKey("service-subscription") ){
+					String infMsg = " WARNING >>> we are using the special tenant rule to choose to " +
+							" delete tenant vtxId = " + vidB + ", and keep tenant vtxId = " + vidA ;
+					System.out.println(infMsg);
+					logger.info( infMsg );
+					preferredVtx = vtxA;
 				}
 			}
 		} else if (vtxIdsConn2A.size() > vtxIdsConn2B.size()) {
@@ -1392,7 +1382,7 @@ public class DupeTool {
 	 * @param version the version
 	 * @param nType the n type
 	 * @param passedVertList the passed vert list
-	 * @param dbMaps the db maps
+	 * @param loader loader
 	 * @return the hash map
 	 * @throws AAIException the AAI exception
 	 */
@@ -1430,23 +1420,23 @@ public class DupeTool {
 					 GraphTraversal<Vertex, Vertex> modPipe = null;
 					 // NOTE -- if we change the direction of parent/child edges, we will need
 					 //    the "in" below to become "out"
-					 modPipe = g.traversal().V(thisVert).in().has("aai-node-type", depNtItr.next() );
+					 modPipe = g.traversal().V(thisVert).in().has(AAI_NODE_TYPE, depNtItr.next() );
 					 if( modPipe == null || !modPipe.hasNext() ){
 						 //System.out.println("DEBUG - didn't find any [" + targetStep + "] connected to this guy (which is ok)");
+						 continue;
 					 }
-					 else {
-						 while( modPipe.hasNext() ){
-							 Vertex depVert =  modPipe.next();
-							 String parentVid = depVert.id().toString();
-							 if (retHash.containsKey(parentVid)) {
-								 // add this vert to the list for this parent key
-								 retHash.get(parentVid).add(thisVert);
-							 } else {
-								 // This is the first one we found on this parent
-								 ArrayList<Vertex> vList = new ArrayList<Vertex>();
-								 vList.add(thisVert);
-								 retHash.put(parentVid, vList);
-							 }
+
+					 while( modPipe.hasNext() ){
+						 Vertex depVert =  modPipe.next();
+						 String parentVid = depVert.id().toString();
+						 if (retHash.containsKey(parentVid)) {
+							 // add this vert to the list for this parent key
+							 retHash.get(parentVid).add(thisVert);
+						 } else {
+							 // This is the first one we found on this parent
+							 ArrayList<Vertex> vList = new ArrayList<Vertex>();
+							 vList.add(thisVert);
+							 retHash.put(parentVid, vList);
 						 }
 					 }
 				}
@@ -1477,7 +1467,7 @@ public class DupeTool {
 		for( int n = 0; n < dupeInfoList.size(); n++ ){
 			String dupeInfoString = dupeInfoList.get(n);
 			boolean tmpFlag = deleteNonKeeperForOneSet( g, dupeInfoString, logger );
-			didADelFlag = tmpFlag | didADelFlag;
+			didADelFlag = tmpFlag || didADelFlag;
 		}
 			
 		return didADelFlag;
@@ -1489,7 +1479,7 @@ public class DupeTool {
 	 * Delete non keepers if appropriate.
 	 *
 	 * @param g the g
-	 * @param dupeSetStr the dupe string
+	 * @param dupeInfoString the dupe string
 	 * @param logger the EELFLogger
 	 * @return the boolean
 	 */
@@ -1510,75 +1500,76 @@ public class DupeTool {
 				// This is not the last entry, it is one of the dupes,
 				String vidString = dupeArr[i];
 				idArr.add(vidString);
-			} else {
-				// This is the last entry which should tell us if we have a
-				// preferred keeper
-				String prefString = dupeArr[i];
-				if (prefString.equals("KeepVid=UNDETERMINED")) {
-					// They sent us a bad string -- nothing should be deleted if
-					// no dupe could be tagged as preferred.
-					return false;
-				} else {
-					// If we know which to keep, then the prefString should look
-					// like, "KeepVid=12345"
-					String[] prefArr = prefString.split("=");
-					if (prefArr.length != 2 || (!prefArr[0].equals("KeepVid"))) {
-						String emsg = "Bad format. Expecting KeepVid=999999";
+				continue;
+			}
+
+			// This is the last entry which should tell us if we have a
+			// preferred keeper
+			String prefString = dupeArr[i];
+			if ("KeepVid=UNDETERMINED".equals(prefString)) {
+				// They sent us a bad string -- nothing should be deleted if
+				// no dupe could be tagged as preferred.
+				return false;
+			}
+			// If we know which to keep, then the prefString should look
+			// like, "KeepVid=12345"
+			String[] prefArr = prefString.split("=");
+			if (prefArr.length != 2 || !KEEP_VID.equals(prefArr[0])) {
+				String emsg = "Bad format. Expecting KeepVid=999999";
+				System.out.println(emsg);
+				LoggingContext.statusCode(StatusCode.ERROR);
+				LoggingContext.responseCode(LoggingContext.DATA_ERROR);
+				logger.error(emsg);
+				LoggingContext.statusCode(StatusCode.COMPLETE);
+				LoggingContext.responseCode(LoggingContext.SUCCESS);
+				return false;
+			}
+
+			String keepVidStr = prefArr[1];
+			if (idArr.contains(keepVidStr)) {
+				idArr.remove(keepVidStr);
+				// So now, the idArr should just contain the vid's
+				// that we want to remove.
+				for (int x = 0; x < idArr.size(); x++) {
+					boolean okFlag = true;
+					String thisVid = idArr.get(x);
+					try {
+						long longVertId = Long.parseLong(thisVid);
+						Vertex vtx = g.traversal().V(longVertId).next();
+						String msg = "--->>>   We will delete node with VID = " + thisVid + " <<<---";
+						System.out.println(msg);
+						logger.info(msg);
+						vtx.remove();
+					}
+					catch (Exception e) {
+						okFlag = false;
+						String emsg = "ERROR trying to delete VID = " + thisVid + ", [" + e + "]";
 						System.out.println(emsg);
 						LoggingContext.statusCode(StatusCode.ERROR);
-				 		LoggingContext.responseCode(LoggingContext.DATA_ERROR);
+						LoggingContext.responseCode(LoggingContext.DATA_ERROR);
 						logger.error(emsg);
 						LoggingContext.statusCode(StatusCode.COMPLETE);
-				 		LoggingContext.responseCode(LoggingContext.SUCCESS);
-						return false;
-					} else {
-						String keepVidStr = prefArr[1];
-						if (idArr.contains(keepVidStr)) {
-							idArr.remove(keepVidStr);
-							// So now, the idArr should just contain the vid's
-							// that we want to remove.
-							for (int x = 0; x < idArr.size(); x++) {
-								boolean okFlag = true;
-								String thisVid = idArr.get(x);
-								try {
-									long longVertId = Long.parseLong(thisVid);
-									Vertex vtx = g.traversal().V(longVertId).next();
-									String msg = "--->>>   We will delete node with VID = " + thisVid + " <<<---";
-									System.out.println(msg);
-									logger.info(msg);
-									vtx.remove();
-								} 
-								catch (Exception e) {
-									okFlag = false;
-									String emsg = "ERROR trying to delete VID = " + thisVid + ", [" + e + "]";
-									System.out.println(emsg);
-									LoggingContext.statusCode(StatusCode.ERROR);
-									LoggingContext.responseCode(LoggingContext.DATA_ERROR);
-									logger.error(emsg);
-									LoggingContext.statusCode(StatusCode.COMPLETE);
-							 		LoggingContext.responseCode(LoggingContext.SUCCESS);
-								}
-								if (okFlag) {
-									String infMsg = " DELETED VID = " + thisVid;
-									logger.info(infMsg);
-									System.out.println(infMsg);
-									deletedSomething = true;
-								}
-							}
-						} else {
-							String emsg = "ERROR - Vertex Id to keep not found in list of dupes.  dupeInfoString = ["
-									+ dupeInfoString + "]";
-							LoggingContext.statusCode(StatusCode.ERROR);
-							LoggingContext.responseCode(LoggingContext.DATA_ERROR);
-							logger.error(emsg);
-							LoggingContext.statusCode(StatusCode.COMPLETE);
-					 		LoggingContext.responseCode(LoggingContext.SUCCESS);
-							System.out.println(emsg);
-							return false;
-						}
+						LoggingContext.responseCode(LoggingContext.SUCCESS);
 					}
-				}// else we know which one to keep
-			}// else last entry
+					if (okFlag) {
+						String infMsg = " DELETED VID = " + thisVid;
+						logger.info(infMsg);
+						System.out.println(infMsg);
+						deletedSomething = true;
+					}
+				}
+			} else {
+				String emsg = "ERROR - Vertex Id to keep not found in list of dupes.  dupeInfoString = ["
+						+ dupeInfoString + "]";
+				LoggingContext.statusCode(StatusCode.ERROR);
+				LoggingContext.responseCode(LoggingContext.DATA_ERROR);
+				logger.error(emsg);
+				LoggingContext.statusCode(StatusCode.COMPLETE);
+				LoggingContext.responseCode(LoggingContext.SUCCESS);
+				System.out.println(emsg);
+				return false;
+			}
+
 		}// for each vertex in a group
 		
 		return deletedSomething;
@@ -1590,7 +1581,7 @@ public class DupeTool {
 	 * Get values of the key properties for a node.
 	 *
 	 * @param tvx the vertex to pull the properties from
-	 * @param keyPropertyNames ArrayList (ordered) of key prop names
+	 * @param keyPropNamesArr ArrayList (ordered) of key prop names
 	 * @param logger the EELFLogger
 	 * @return a hashMap of the propertyNames/values
 	 */
@@ -1615,7 +1606,7 @@ public class DupeTool {
 	 * Get values of the key properties for a node as a single string
 	 *
 	 * @param tvx the vertex to pull the properties from
-	 * @param keyPropertyNames collection of key prop names
+	 * @param keyPropNamesArr collection of key prop names
 	 * @param logger the EELFLogger
 	 * @return a String of concatenated values
 	 */
@@ -1644,7 +1635,7 @@ public class DupeTool {
 	 *
 	 * @param firstPassDupeSets from the first pass
 	 * @param secondPassDupeSets from the second pass
-	 * @param EELFLogger logger
+	 * @param logger logger
 	 * @return commonDupeSets that are common to both passes and have a determined keeper
 	 */
 	private static ArrayList <String> figureWhichDupesStillNeedFixing( ArrayList <String>firstPassDupeSets, 
@@ -1696,7 +1687,7 @@ public class DupeTool {
 			//	where the key is the vid to KEEP and the value is an 
 			// 	array of (String) vids that would get deleted.
 			HashMap <String,ArrayList<String>> firstPassHash = makeKeeperHashOfDupeStrings( firstPassDupeSets, common2BothSet, logger );
-			
+
 			HashMap <String,ArrayList<String>> secPassHash = makeKeeperHashOfDupeStrings( secondPassDupeSets, common2BothSet, logger );
 					
 			// Loop through the secondPass data and keep the ones 
@@ -1719,24 +1710,25 @@ public class DupeTool {
 						}
 					}
 				}
-				if( !skipThisOne ){
-					// Put the string back together and pass it back
-					// Not beautiful, but no time to make it nice right now...
-					// Put it back in the format: "3456|9880|keepVid=3456"
-					String thisDelSetStr = "";
-					for( int z = 0; z < secList.size(); z++ ){
-						if( z == 0 ){
-							thisDelSetStr = secList.get(z);
-						}
-						else {
-							thisDelSetStr = thisDelSetStr + "|" + secList.get(z);
-						}
-					}
-					thisDelSetStr = thisDelSetStr + "|keepVid=" + secKey;	
-					common2BothSet.add(thisDelSetStr);
+				if( skipThisOne ) {
+					continue;
 				}
+
+				// Put the string back together and pass it back
+				// Not beautiful, but no time to make it nice right now...
+				// Put it back in the format: "3456|9880|keepVid=3456"
+				String thisDelSetStr = "";
+				for( int z = 0; z < secList.size(); z++ ){
+					if( z == 0 ){
+						thisDelSetStr = secList.get(z);
+					}
+					else {
+						thisDelSetStr = thisDelSetStr + "|" + secList.get(z);
+					}
+				}
+				thisDelSetStr = thisDelSetStr + "|keepVid=" + secKey;
+				common2BothSet.add(thisDelSetStr);
 			}
-			
 		}
 		return common2BothSet;
 		
@@ -1762,35 +1754,35 @@ public class DupeTool {
 				if (i < lastIndex) {
 					// This is not the last entry, it is one of the dupes
 					delIdArr.add(dupeArr[i]);
+					continue;
 				} 
+
+				// This is the last entry which should tell us if we
+				// have a preferred keeper and how many dupes we had
+				String prefString = dupeArr[i];
+				if( i == 1 ){
+					// There was only one dupe, so if we were gonna find
+					// it, we would have found it above with no parsing.
+				}
+				else if ("KeepVid=UNDETERMINED".equals(prefString)) {
+					// This one had no determined keeper, so we don't
+					// want it.
+				}
 				else {
-					// This is the last entry which should tell us if we
-					// have a preferred keeper and how many dupes we had
-					String prefString = dupeArr[i];
-					if( i == 1 ){
-						// There was only one dupe, so if we were gonna find
-						// it, we would have found it above with no parsing.
+					// If we know which to keep, then the prefString
+					// should look like, "KeepVid=12345"
+					String[] prefArr = prefString.split("=");
+					if( prefArr.length != 2 || !KEEP_VID.equals(prefArr[0]) ) {
+						String infMsg = "Bad format in figureWhichDupesStillNeedFixing(). Expecting " +
+							" KeepVid=999999 but string looks like: [" + tmpSetStr + "]";
+						System.out.println(infMsg);
+						logger.info(infMsg);
 					}
-					else if (prefString.equals("KeepVid=UNDETERMINED")) {
-						// This one had no determined keeper, so we don't
-						// want it.
-					} 
 					else {
-						// If we know which to keep, then the prefString
-						// should look like, "KeepVid=12345"
-						String[] prefArr = prefString.split("=");
-						if( prefArr.length != 2
-								|| (!prefArr[0].equals("KeepVid")) ) {
-							String infMsg = "Bad format in figureWhichDupesStillNeedFixing(). Expecting " +
-								" KeepVid=999999 but string looks like: [" + tmpSetStr + "]";
-							System.out.println(infMsg);
-							logger.info(infMsg);
-						} 
-						else {
-							keeperHash.put(prefArr[0], delIdArr);
-						}
+						keeperHash.put(prefArr[0], delIdArr);
 					}
 				}
+
 			}
 		}
 		
@@ -1832,7 +1824,7 @@ public class DupeTool {
 					// If we know which to keep, then the prefString should look
 					// like, "KeepVid=12345"
 					String[] prefArr = prefString.split("=");
-					if (prefArr.length != 2 || (!prefArr[0].equals("KeepVid"))) {
+					if (prefArr.length != 2 || (!prefArr[0].equals(KEEP_VID))) {
 						String emsg = "Bad format. Expecting KeepVid=999999";
 						System.out.println(emsg);
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -1864,9 +1856,9 @@ public class DupeTool {
             Properties properties = new Properties();
             properties.load(inputStream);
 
-            if("inmemory".equals(properties.get("storage.backend"))){
+            if(INMEMORY.equals(properties.get("storage.backend"))){
                 titanGraph = AAIGraph.getInstance().getGraph();
-                graphType = "inmemory";
+                graphType = INMEMORY;
             } else {
 	            titanGraph = TitanFactory.open(new AAIGraphConfig.Builder(AAIConstants.REALTIME_DB_CONFIG).forService(DupeTool.class.getSimpleName()).withGraphType("realtime" + graphIndex).buildConfiguration());
                 graphIndex++;
@@ -1881,7 +1873,7 @@ public class DupeTool {
 	public static void closeGraph(TitanGraph graph, EELFLogger logger){
 
 		try {
-			if("inmemory".equals(graphType)) {
+			if(INMEMORY.equals(graphType)) {
 				return;
             }
 			if( graph != null && graph.isOpen() ){
@@ -1889,7 +1881,7 @@ public class DupeTool {
 				graph.close();
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed{
+			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
 			logger.warn("WARNING from final graph.shutdown()", ex);
 		}
 	}
