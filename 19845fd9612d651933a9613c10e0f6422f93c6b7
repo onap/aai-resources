@@ -22,6 +22,30 @@
       "revId": "19845fd9612d651933a9613c10e0f6422f93c6b7",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_597da2b0",
+        "filename": "aai-resources/src/main/java/org/onap/aai/dbgen/DupeTool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 1619
+      },
+      "writtenOn": "2018-03-26T13:25:18Z",
+      "side": 1,
+      "message": "ok -- Olaf corrected my vision -- He just added an \"l\" (L - for long), not the digit \"1\".  My eyes have trouble seeing the difference, but of course it makes sense so this change is fine.",
+      "parentUuid": "5a93c517_d0566e06",
+      "range": {
+        "startLine": 887,
+        "startChar": 7,
+        "endLine": 887,
+        "endChar": 56
+      },
+      "revId": "19845fd9612d651933a9613c10e0f6422f93c6b7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
