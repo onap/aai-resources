@@ -19,7 +19,6 @@
  */
 package org.onap.aai.dbgen;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,7 +26,6 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.UUID;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -55,10 +53,14 @@ import com.thinkaurelius.titan.core.TitanGraph;
 
 
 public class ForceDeleteTool {
-	private static 	final  String    FROMAPPID = "AAI-DB";
-	private static 	final  String    TRANSID   = UUID.randomUUID().toString();
-
+	private static final String FROMAPPID = "AAI-DB";
+	private static final String TRANSID   = UUID.randomUUID().toString();
+	private static final String DELETE_NODE = "DELETE_NODE";
+	private static final String DELETE_EDGE = "DELETE_EDGE";
 	private static String graphType = "realdb";
+	private static String FOUND_VERTEX_ID_ = ">>> Found Vertex with VertexId = ";
+	private static String PROPERTIES_ = ", properties:    ";
+	private static String INMEMORY = "inmemory";
 
 	public static boolean SHOULD_EXIT_VM = true;
 
@@ -124,7 +126,7 @@ public class ForceDeleteTool {
 					actionVal = args[i];
 					argStr4Msg = argStr4Msg + " " + actionVal;
 				}
-				else if (thisArg.equals("-userId")) {
+				else if ("-userId".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -135,13 +137,13 @@ public class ForceDeleteTool {
 					userIdVal = args[i];
 					argStr4Msg = argStr4Msg + " " + userIdVal;
 				}
-				else if (thisArg.equals("-overRideProtection")) {
+				else if ("-overRideProtection".equals(thisArg)) {
 					overRideProtection = true;
 				}
-				else if (thisArg.equals("-DISPLAY_ALL_VIDS")) {
+				else if ("-DISPLAY_ALL_VIDS".equals(thisArg)) {
 					displayAllVidsFlag = true;
 				}
-				else if (thisArg.equals("-vertexId")) {
+				else if ("-vertexId".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -161,7 +163,7 @@ public class ForceDeleteTool {
 						exit(0);
 					}
 				}
-				else if (thisArg.equals("-params4Collect")) {
+				else if ("-params4Collect".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -172,7 +174,7 @@ public class ForceDeleteTool {
 					dataString = args[i];
 					argStr4Msg = argStr4Msg + " " + dataString;
 				}
-				else if (thisArg.equals("-edgeId")) {
+				else if ("-edgeId".equals(thisArg)) {
 					i++;
 					if (i >= args.length) {
 						LoggingContext.statusCode(StatusCode.ERROR);
@@ -195,7 +197,7 @@ public class ForceDeleteTool {
 			}
 		}
 		
-	  	if( !actionVal.equals("COLLECT_DATA") && !actionVal.equals("DELETE_NODE") && !actionVal.equals("DELETE_EDGE")){
+	  	if( !"COLLECT_DATA".equals(actionVal) && !DELETE_NODE.equals(actionVal) && !DELETE_EDGE.equals(actionVal)){
 	 		String emsg = "Bad action parameter [" + actionVal + "] passed to ForceDeleteTool().  Valid values = COLLECT_DATA or DELETE_NODE or DELETE_EDGE\n";
 			System.out.println(emsg);
 			LoggingContext.statusCode(StatusCode.ERROR);
@@ -204,7 +206,7 @@ public class ForceDeleteTool {
 	 		exit(0);
 	  	}
 	  	
-	  	if( actionVal.equals("DELETE_NODE") && vertexIdLong == 0 ){
+	  	if( DELETE_NODE.equals(actionVal) && vertexIdLong == 0 ){
 	 		String emsg = "ERROR: No vertex ID passed on DELETE_NODE request. \n";
 			System.out.println(emsg);
 			LoggingContext.statusCode(StatusCode.ERROR);
@@ -212,7 +214,7 @@ public class ForceDeleteTool {
 			logger.error(emsg);
 	 		exit(0);
 	  	}
-	  	else if( actionVal.equals("DELETE_EDGE") && edgeIdStr.equals("")){
+	  	else if( DELETE_EDGE.equals(actionVal) && edgeIdStr.isEmpty()){
 	 		String emsg = "ERROR: No edge ID passed on DELETE_EDGE request. \n";
 			System.out.println(emsg);
 			LoggingContext.statusCode(StatusCode.ERROR);
@@ -223,7 +225,7 @@ public class ForceDeleteTool {
 	  	
 	  	
 	  	userIdVal = userIdVal.trim();
-	  	if( (userIdVal.length() < 6) || userIdVal.toUpperCase().equals("AAIADMIN") ){
+	  	if( (userIdVal.length() < 6) || "AAIADMIN".equalsIgnoreCase(userIdVal) ){
 	  		String emsg = "Bad userId parameter [" + userIdVal + "] passed to ForceDeleteTool(). must be not empty and not aaiadmin \n";
 			System.out.println(emsg);
 			LoggingContext.statusCode(StatusCode.ERROR);
@@ -269,7 +271,7 @@ public class ForceDeleteTool {
 		logger.info(msg);
   	
 		ForceDelete fd = new ForceDelete(graph);
-    	if( actionVal.equals("COLLECT_DATA") ){
+    	if( "COLLECT_DATA".equals(actionVal) ){
 	  		// When doing COLLECT_DATA, we expect the dataString string to be comma separated
     		// name value pairs like this:
 	  		//    "propName1|propVal1,propName2|propVal2" etc.  We will look for a node or nodes
@@ -331,7 +333,7 @@ public class ForceDeleteTool {
 	  		System.out.println( infMsg );
 	  		logger.info( infMsg );
 	  	} 
-	  	else if( actionVal.equals("DELETE_NODE") ){
+	  	else if( DELETE_NODE.equals(actionVal) ){
 	  		Iterator <Vertex> vtxItr = graph.vertices( vertexIdLong );
 	  		if( vtxItr != null && vtxItr.hasNext() ) {
 	  			Vertex vtx = vtxItr.next();
@@ -367,7 +369,7 @@ public class ForceDeleteTool {
 	  			logger.info( infMsg );
 	  		}
 	  	}
-	  	else if( actionVal.equals("DELETE_EDGE") ){
+	  	else if( DELETE_EDGE.equals(actionVal) ){
 	  		Edge thisEdge = null;
 	  		Iterator <Edge> edItr = graph.edges( edgeIdStr );
 	  		if( edItr != null && edItr.hasNext() ) {
@@ -409,7 +411,7 @@ public class ForceDeleteTool {
 	
 	public static class ForceDelete {
 		
-		private final int MAXDESCENDENTDEPTH = 15;
+		private static final int MAXDESCENDENTDEPTH = 15;
 		private final TitanGraph graph;
 		public ForceDelete(TitanGraph graph) {
 			this.graph = graph;
@@ -418,7 +420,7 @@ public class ForceDeleteTool {
 			
 			try {
 				Iterator<VertexProperty<Object>> pI = tVert.properties();
-				String infStr = ">>> Found Vertex with VertexId = " + tVert.id() + ", properties:    ";
+				String infStr = FOUND_VERTEX_ID_ + tVert.id() + PROPERTIES_;
 				System.out.println( infStr );
 				logger.info(infStr);
 				while( pI.hasNext() ){
@@ -487,8 +489,8 @@ public class ForceDeleteTool {
 				logger.info(infMsg);
 				Vertex inVtx = tEd.inVertex();
 				Iterator<VertexProperty<Object>> pI = inVtx.properties();
-				String infStr = ">>> Found Vertex with VertexId = " + inVtx.id() 
-					+ ", properties:    ";
+				String infStr = FOUND_VERTEX_ID_ + inVtx.id()
+					+ PROPERTIES_;
 				System.out.println( infStr );
 				logger.info(infStr);
 				while( pI.hasNext() ){
@@ -512,8 +514,8 @@ public class ForceDeleteTool {
 				logger.info(infMsg);
 				Vertex outVtx = tEd.outVertex();
 				Iterator<VertexProperty<Object>> pI = outVtx.properties();
-				String infStr = ">>> Found Vertex with VertexId = " + outVtx.id() 
-					+ ", properties:    ";
+				String infStr = FOUND_VERTEX_ID_ + outVtx.id()
+					+ PROPERTIES_;
 				System.out.println( infStr );
 				logger.info(infStr);
 				while( pI.hasNext() ){
@@ -560,18 +562,18 @@ public class ForceDeleteTool {
 					}
 					if( vtx == null ){
 						retArr.add(" >>> COULD NOT FIND VERTEX on the other side of this edge edgeId = " + ed.id() + " <<< ");
+						continue;
+					}
+
+					String nType = vtx.<String>property("aai-node-type").orElse(null);
+					if( displayAllVidsFlag ){
+						// This should rarely be needed
+						String vid = vtx.id().toString();
+						retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node with VtxId = " + vid );
 					}
 					else {
-						String nType = vtx.<String>property("aai-node-type").orElse(null);
-						if( displayAllVidsFlag ){
-							// This should rarely be needed
-							String vid = vtx.id().toString();
-							retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node with VtxId = " + vid );
-						}
-						else {
-							// This is the normal case
-							retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node. ");
-						}
+						// This is the normal case
+						retArr.add("Found an " + dir + " edge (" + lab + ") between this vertex and a [" + nType + "] node. ");
 					}
 				}
 			}
@@ -647,7 +649,7 @@ public class ForceDeleteTool {
 			String confirm = s.next();
 			s.close();
 			
-			if (!confirm.equalsIgnoreCase("y")) {
+			if (!"y".equalsIgnoreCase(confirm)) {
 				String infMsg = " User [" + uid + "] has chosen to abandon this delete request. ";
 				System.out.println("\n" + infMsg);
 				logger.info(infMsg);
@@ -703,7 +705,7 @@ public class ForceDeleteTool {
 				LoggingContext.successStatusFields();
 			}
 			
-			if( maxDescString != null && !maxDescString.equals("") ){
+			if( maxDescString != null && !maxDescString.isEmpty() ){
 				try {
 					maxDescCount = Integer.parseInt(maxDescString);
 				}
@@ -712,7 +714,7 @@ public class ForceDeleteTool {
 				}
 			}
 			
-			if( maxEdgeString != null &&  !maxEdgeString.equals("") ){
+			if( maxEdgeString != null &&  !maxEdgeString.isEmpty() ){
 				try {
 					maxEdgeCount = Integer.parseInt(maxEdgeString);
 				}
@@ -721,7 +723,7 @@ public class ForceDeleteTool {
 				}
 			}
 			
-			if( ntListString != null && !ntListString.trim().equals("") ){
+			if( ntListString != null && !ntListString.trim().isEmpty() ){
 				String [] nodeTypes = ntListString.split("\\|");
 				for( int i = 0; i < nodeTypes.length; i++ ){
 					protectedNTypes.add(nodeTypes[i]);
@@ -796,7 +798,7 @@ public class ForceDeleteTool {
 			String confirm = s.next();
 			s.close();
 			
-			if (!confirm.equalsIgnoreCase("y")) {
+			if (!"y".equalsIgnoreCase(confirm)) {
 				String infMsg = " User [" + uid + "] has chosen to abandon this delete request. ";
 				System.out.println("\n" + infMsg);
 				logger.info(infMsg);
@@ -821,9 +823,9 @@ public class ForceDeleteTool {
 			Properties properties = new Properties();
 			properties.load(inputStream);
 
-			if("inmemory".equals(properties.get("storage.backend"))){
+			if(INMEMORY.equals(properties.get("storage.backend"))){
 				titanGraph = AAIGraph.getInstance().getGraph();
-				graphType = "inmemory";
+				graphType = INMEMORY;
 			} else {
 				titanGraph = TitanFactory.open(
 						new AAIGraphConfig.Builder(AAIConstants.REALTIME_DB_CONFIG)
@@ -842,7 +844,7 @@ public class ForceDeleteTool {
 	public static void closeGraph(TitanGraph graph, EELFLogger logger){
 
 		try {
-			if("inmemory".equals(graphType)) {
+			if(INMEMORY.equals(graphType)) {
 				return;
 			}
 			if( graph != null && graph.isOpen() ){
@@ -850,7 +852,7 @@ public class ForceDeleteTool {
 				graph.close();
 			}
 		} catch (Exception ex) {
-			// Don't throw anything because Titan sometimes is just saying that the graph is already closed{
+			// Don't throw anything because Titan sometimes is just saying that the graph is already closed
 			logger.warn("WARNING from final graph.shutdown()", ex);
 		}
 	}
