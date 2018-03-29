@@ -54,7 +54,33 @@ if [ -f ${APP_HOME}/aai.sh ]; then
     mv ${APP_HOME}/aai.sh /etc/profile.d/aai.sh
     chmod 755 /etc/profile.d/aai.sh
 
-    gosu aaiadmin /opt/app/aai-resources/scripts/createDBSchema.sh || exit 1
+    scriptName=$1;
+
+    if [ ! -z $scriptName ]; then
+
+        if [ -f ${APP_HOME}/bin/${scriptName} ]; then
+            shift 1;
+            gosu aaiadmin ${APP_HOME}/bin/${scriptName} "$@" || {
+                echo "Failed to run the ${scriptName}";
+                exit 1;
+            }
+        else
+            echo "Unable to find the script ${scriptName} in ${APP_HOME}/bin";
+            exit 1;
+        fi;
+
+        exit 0;
+    fi;
+
+
+    # If in the environment file skip create db schema there is a value set
+    # Then it will skip the create db schema at startup
+    # This is a workaround that will be there temporarily
+    # Ideally createDBSchema should be run from chef
+    # Or run without having to startup the application
+    if [ -z ${SKIP_CREATE_DB_SCHEMA_AT_STARTUP} ]; then
+      gosu aaiadmin /opt/app/aai-resources/scripts/createDBSchema.sh || exit 1
+    fi;
 fi;
 
 JAVA_CMD="exec gosu aaiadmin java";
