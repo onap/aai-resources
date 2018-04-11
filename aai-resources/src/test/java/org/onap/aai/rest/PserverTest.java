@@ -36,6 +36,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -70,7 +72,7 @@ public class PserverTest {
     private String baseUrl;
 
     @Before
-    public void setup(){
+    public void setup() throws UnsupportedEncodingException {
 
         HttpHeaders headers = new HttpHeaders();
 
@@ -79,6 +81,9 @@ public class PserverTest {
         headers.add("Real-Time", "true");
         headers.add("X-FromAppId", "JUNIT");
         headers.add("X-TransactionId", "JUNIT");
+
+        String authorization = Base64.getEncoder().encodeToString("AAI:AAI".getBytes("UTF-8"));
+        headers.add("Authorization", "Basic " + authorization);
 
         httpEntity = new HttpEntity(headers);
         baseUrl = "https://localhost:" + randomPort;
