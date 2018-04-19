@@ -29,7 +29,9 @@ public final class AAIRequestFilterPriority {
 
 	public static final int SET_LOGGING_CONTEXT = 3000;
 
-	public static final int AUTHORIZATION = 4000;
+	public static final int HTTP_HEADER = 4000;
+
+	public static final int AUTHORIZATION = 4500;
 
 	public static final int HEADER_MANIPULATION = 5000;
 
