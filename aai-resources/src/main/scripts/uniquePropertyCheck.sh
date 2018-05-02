@@ -3,7 +3,7 @@
 # ============LICENSE_START=======================================================
 # org.onap.aai
 # ================================================================================
-# Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+# Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 #
-# ECOMP is a trademark and service mark of AT&T Intellectual Property.
-#
 
 #
 # The script invokes UniqueProperty java class to see if the passed property is unique in the db and if
@@ -28,34 +26,19 @@
 # For example:    uniquePropertyCheck.sh subscriber-name
 #
 
-echo
-echo `date` "   Starting $0"
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )	
+. ${COMMON_ENV_PATH}/common_functions.sh
+start_date;
+check_user;
+source_profile;
 
-userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
-if [ "${userid}" != "aaiadmin" ]; then
-    echo "You must be aaiadmin to run $0. The id used $userid."
-    exit 1
-fi 
-
-. /etc/profile.d/aai.sh
-PROJECT_HOME=/opt/app/aai-resources
-
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
-
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME org.onap.aai.util.UniquePropertyCheck "$@"
+#execute_spring_jar org.onap.aai.util.UniquePropertyCheck ${PROJECT_HOME}/resources/etc/appprops/uniquePropertyCheck-logback.xml "$@"
+execute_spring_jar org.onap.aai.util.UniquePropertyCheck ${PROJECT_HOME}/resources/uniquePropertyCheck-logback.xml "$@"
 ret_code=$?
 if [ $ret_code != 0 ]; then
-  echo `date` "   Done $0"
+  end_date;
   exit $ret_code
 fi
 
-echo `date` "   Done $0"
+end_date;
 exit 0

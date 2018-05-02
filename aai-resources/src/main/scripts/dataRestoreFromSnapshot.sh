@@ -3,7 +3,7 @@
 # ============LICENSE_START=======================================================
 # org.onap.aai
 # ================================================================================
-# Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+# Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 #
-# ECOMP is a trademark and service mark of AT&T Intellectual Property.
-#
 
 #
 # This script uses the dataSnapshot and SchemaGenerator (via GenTester) java classes to restore 
@@ -30,60 +28,43 @@
 #      contain an xml view of the db data).
 #
 
-echo
-echo `date` "   Starting $0"
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+. ${COMMON_ENV_PATH}/common_functions.sh
 
+start_date;
+check_user;
 
-userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
-if [ "${userid}" != "aaiadmin" ]; then
-    echo "You must be aaiadmin to run $0. The id used $userid."
-    exit 1
-fi 
-
-
-if [ "$#" -ne 1 ]; then
+if [ "$#" -lt 1 ]; then
     echo "Illegal number of parameters"
     echo "usage: $0 previous_snapshot_filename"
     exit 1
 fi
 
-. /etc/profile.d/aai.sh
-
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
+source_profile;
+export PRE_JAVA_OPTS=${PRE_JAVA_OPTS:--Xms6g -Xmx8g};
 
 #### Step 1) clear out the database
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.onap.aai.dbgen.DataSnapshot CLEAR_ENTIRE_DATABASE $1
+execute_spring_jar org.onap.aai.dbgen.DataSnapshot ${PROJECT_HOME}/resources/etc/appprops/dataSnapshot-logback.xml "CLEAR_ENTIRE_DATABASE" "$1" "$2"
 if [ "$?" -ne "0" ]; then
     echo "Problem clearing out database."
     exit 1
 fi
  
 #### Step 2) rebuild the db-schema
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.onap.aai.dbgen.GenTester GEN_DB_WITH_NO_DEFAULT_CR
+execute_spring_jar org.onap.aai.dbgen.GenTester ${PROJECT_HOME}/resources/etc/appprops/createDBSchema-logback.xml "GEN_DB_WITH_NO_DEFAULT_CR"
 if [ "$?" -ne "0" ]; then
     echo "Problem rebuilding the schema (SchemaGenerator)."
     exit 1
 fi
 
 #### Step 3) reload the data from a snapshot file
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.onap.aai.dbgen.DataSnapshot RELOAD_DATA $1
+
+execute_spring_jar org.onap.aai.dbgen.DataSnapshot ${PROJECT_HOME}/resources/etc/appprops/dataSnapshot-logback.xml "RELOAD_DATA" "$1"
 if [ "$?" -ne "0" ]; then
     echo "Problem reloading data into the database."
+    end_date;
     exit 1
 fi
  
- 
- 
-echo `date` "   Done $0"
+end_date;
 exit 0

@@ -3,7 +3,7 @@
 # ============LICENSE_START=======================================================
 # org.onap.aai
 # ================================================================================
-# Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+# Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 # limitations under the License.
 # ============LICENSE_END=========================================================
 #
-# ECOMP is a trademark and service mark of AT&T Intellectual Property.
-#
 
 #
 # The script invokes the dataGrooming java class to run some tests and generate a report and
@@ -31,6 +29,8 @@
 #  -autoFix 
 #  -sleepMinutes nn
 #  -edgesOnly
+#  -skipEdges
+#  -timeWindowMinutes nn
 #  -dontFixOrphans
 #  -maxFix
 #  -skipHostCheck
@@ -65,8 +65,12 @@
 #           we want to give it time to resolve itself if possible.
 #
 # -edgesOnly    Can be used any time you want to limit this tool so it only looks at edges.
-#           It runs much more quickly when it's just doing edges and sometimes all our
-#           problems are with bad edges so it can be nice to focus on edges only sometimes.
+#            Note - as of 1710, we have not been seeing many purely bad edges, 
+#            (ie. not associated with a phantom node) so this option is not used often.
+#           
+# -skipEdgeChecks  Use it to bypass checks for bad Edges (which are pretty rare).
+#
+# -timeWindowMinutes   Use it to limit the nodes looked at to ones whose update-timestamp tells us that it was last updated less than this many minutes ago.  Note this is usually used along with the skipEdgeChecks option.
 #
 # -dontFixOrphans   Since there can sometimes be a lot of orphan nodes, and they don't 
 #           harm processing as much as phantom-nodes or bad-edges, it is useful to be
@@ -99,37 +103,29 @@
 #           This parameter lets us turn that fixing ON if we want to try to fix them. 
 #
 
-echo
-echo `date` "   Starting $0"
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
+. ${COMMON_ENV_PATH}/common_functions.sh
 
+start_date;
+check_user;
 
-userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
-if [ "${userid}" != "aaiadmin" ]; then
-    echo "You must be aaiadmin to run $0. The id used $userid."
-    exit 1
-fi 
+# Make sure that it's not already running
+processStat=`ps -ef|grep aaiadmin|grep -E "org.onap.aai.dbgen.DataGrooming"|grep -v grep`
+if [ "$processStat" != "" ]
+	then
+	echo "Found dataGrooming is already running: " $processStat
+	exit 1	
+fi
 
+# Make sure that it's not already running
+processStat=`ps -ef|grep aaiadmin|grep -E "org.onap.aai.dbgen.DataGrooming"|grep -v grep`
+if [ "$processStat" != "" ]
+	then
+	echo "Found dataGrooming is already running: " $processStat
+	exit 1	
+fi
 
-. /etc/profile.d/aai.sh
-
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/jetty/webapps/*/webapp/WEB-INF/lib/*.jar`
-do
-	CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
-
-
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.onap.aai.dbgen.DataGrooming "$@"
- 
-echo `date` "   Done $0"
+source_profile;
+execute_spring_jar org.onap.aai.dbgen.DataGrooming ${PROJECT_HOME}/resources/etc/appprops/dataGrooming-logback.xml "$@"
+end_date;
 exit 0

@@ -3,7 +3,7 @@
 # ============LICENSE_START=======================================================
 # org.onap.aai
 # ================================================================================
-# Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+# Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============LICENSE_END=========================================================
-#
-# ECOMP is a trademark and service mark of AT&T Intellectual Property.
 #
 
 #
@@ -49,16 +47,10 @@
 # Ie.    schemaMod flavor-id String index true
 #
 
-echo
-echo `date` "   Starting $0"
-
-
-userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
-if [ "${userid}" != "aaiadmin" ]; then
-    echo "You must be aaiadmin to run $0. The id used $userid."
-    exit 1
-fi 
-
+COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )	
+. ${COMMON_ENV_PATH}/common_functions.sh
+start_date;
+check_user;
 
 if [ "$#" -ne 4 ]; then
     echo "Illegal number of parameters"
@@ -66,26 +58,13 @@ if [ "$#" -ne 4 ]; then
     exit 1
 fi
 
-. /etc/profile.d/aai.sh
-PROJECT_HOME=/opt/app/aai-resources
-
-for JAR in `ls $PROJECT_HOME/extJars/*.jar`
-do
-      CLASSPATH=$CLASSPATH:$JAR
-done
-
-for JAR in `ls $PROJECT_HOME/lib/*.jar`
-do
-     CLASSPATH=$CLASSPATH:$JAR
-done
-
-$JAVA_HOME/bin/java -classpath $CLASSPATH -Dhttps.protocols=TLSv1.1,TLSv1.2 -DAJSC_HOME=$PROJECT_HOME  -Daai.home=$PROJECT_HOME \
- org.onap.aai.dbgen.SchemaMod $1 $2 $3 $4
+source_profile;
+execute_spring_jar org.onap.aai.dbgen.SchemaMod ${PROJECT_HOME}/resources/etc/appprops/schemaMod-logback.xml "$1 $2 $3 $4"
 if [ "$?" -ne "0" ]; then
     echo "Problem executing schemaMod "
+    end_date;
     exit 1
 fi
-
  
-echo `date` "   Done $0"
+end_date;
 exit 0
