@@ -219,7 +219,7 @@ public class ModelVersionTransformer extends RESTAPI {
 					.status(Status.INTERNAL_SERVER_ERROR)
 					.entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
 					.build();
-			e.printStackTrace();
+			LOGGER.error("Internal server error", e);
 			success = false;
 		} finally {
 			if (dbEngine != null) {
