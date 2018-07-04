@@ -144,28 +144,29 @@ public class SchemaMod {
 			Thread.sleep(5000);
 		} catch (java.lang.InterruptedException ie) {
 			logAndPrint(logger, " DB Schema Update has been aborted. ");
+			Thread.currentThread().interrupt();
 			System.exit(1);
 		}
 
-			logAndPrint(logger, "    ---- NOTE --- about to open graph (takes a little while)\n");
+		logAndPrint(logger, "    ---- NOTE --- about to open graph (takes a little while)\n");
 
-			Version version = Version.getLatest();
-			QueryStyle queryStyle = QueryStyle.TRAVERSAL;
-			ModelType introspectorFactoryType = ModelType.MOXY;
-			Loader loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
-			TransactionalGraphEngine engine = null;
-			try {
-				engine = new JanusGraphDBEngine(queryStyle, DBConnectionType.REALTIME, loader);
-				SchemaModInternal internal = new SchemaModInternal(engine, logger, propName, targetDataType, targetIndexInfo, new Boolean(preserveDataFlag));
-				internal.execute();
-				engine.startTransaction();
-				engine.tx().close();
-			} catch (Exception e) {
-				String emsg = "Not able to get a graph object in SchemaMod.java\n";
-				logAndPrint(logger, e.getMessage());
-				logAndPrint(logger, emsg);
-				System.exit(1);
-			}
+		Version version = Version.getLatest();
+		QueryStyle queryStyle = QueryStyle.TRAVERSAL;
+		ModelType introspectorFactoryType = ModelType.MOXY;
+		Loader loader = LoaderFactory.createLoaderForVersion(introspectorFactoryType, version);
+		TransactionalGraphEngine engine = null;
+		try {
+			engine = new JanusGraphDBEngine(queryStyle, DBConnectionType.REALTIME, loader);
+			SchemaModInternal internal = new SchemaModInternal(engine, logger, propName, targetDataType, targetIndexInfo, new Boolean(preserveDataFlag));
+			internal.execute();
+			engine.startTransaction();
+			engine.tx().close();
+		} catch (Exception e) {
+			String emsg = "Not able to get a graph object in SchemaMod.java\n";
+			logAndPrint(logger, e.getMessage());
+			logAndPrint(logger, emsg);
+			System.exit(1);
+		}
 	}
 	/**
 	 * Log and print.

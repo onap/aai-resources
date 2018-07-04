@@ -276,7 +276,7 @@ public class ForceDeleteTool {
     		// name value pairs like this:
 	  		//    "propName1|propVal1,propName2|propVal2" etc.  We will look for a node or nodes
 	  		//    that have properties that ALL match what was passed in.
-	  		
+
 	  	   	int resCount = 0;
         	int firstPipeLoc = dataString.indexOf("|");
 	  		if( firstPipeLoc <= 0 ){
@@ -287,27 +287,30 @@ public class ForceDeleteTool {
 		 		logger.error(msg);
 		 		exit(0);
 	  		}
-	  		GraphTraversal<Vertex, Vertex> g  = graph.traversal().V();
-	  		String qStringForMsg = " graph.traversal().V()";
-	  	   	// Note - if they're only passing on parameter, there won't be any commas
-	  		String [] paramArr = dataString.split(",");
-	  		for( int i = 0; i < paramArr.length; i++ ){
-	  			int pipeLoc = paramArr[i].indexOf("|");
-	  			if( pipeLoc <= 0 ){
-		  			msg =  "Must use the -params4Collect option when collecting data with data string in a format like: 'propName1|propVal1,propName2|propVal2'";
-			 		System.out.println(msg);
-			 		LoggingContext.statusCode(StatusCode.ERROR);
-			 		LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
-			 		logger.error(msg);
-			 		exit(0);
-	  			}
-	  			else {
-	  				String propName = paramArr[i].substring(0,pipeLoc);
-		  			String propVal = paramArr[i].substring(pipeLoc + 1);
-		  			g = g.has(propName,propVal);
-		  			qStringForMsg = qStringForMsg + ".has(" + propName + "," + propVal + ")";
-		  		}
-	  		}
+			GraphTraversal<Vertex, Vertex> g  = null;
+			String qStringForMsg = null;
+	  		if (graph != null) {
+				g = graph.traversal().V();
+				qStringForMsg = " graph.traversal().V()";
+				// Note - if they're only passing on parameter, there won't be any commas
+				String[] paramArr = dataString.split(",");
+				for (int i = 0; i < paramArr.length; i++) {
+					int pipeLoc = paramArr[i].indexOf("|");
+					if (pipeLoc <= 0) {
+						msg = "Must use the -params4Collect option when collecting data with data string in a format like: 'propName1|propVal1,propName2|propVal2'";
+						System.out.println(msg);
+						LoggingContext.statusCode(StatusCode.ERROR);
+						LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
+						logger.error(msg);
+						exit(0);
+					} else {
+						String propName = paramArr[i].substring(0, pipeLoc);
+						String propVal = paramArr[i].substring(pipeLoc + 1);
+						g = g.has(propName, propVal);
+						qStringForMsg = qStringForMsg + ".has(" + propName + "," + propVal + ")";
+					}
+				}
+			}
 	  	   	if( (g != null)){
 	        	Iterator<Vertex> vertItor = g;
 	           	while( vertItor.hasNext() ){

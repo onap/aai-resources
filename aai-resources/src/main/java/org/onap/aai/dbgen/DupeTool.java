@@ -307,9 +307,8 @@ public class DupeTool {
 			LoggingContext.responseCode(LoggingContext.BUSINESS_PROCESS_ERROR);
 			logger.error(emsg);
 	 		exit(0);
-	  	} else {
-			obj = loader.introspectorFromName(nodeTypeVal);
 	  	}
+	  	obj = loader.introspectorFromName(nodeTypeVal);
 	  	
 		if (skipHostCheck) {
 			logger.info(" We will skip the HostCheck as requested. ");
@@ -413,6 +412,7 @@ public class DupeTool {
 				Thread.sleep(sleepMsec);
 			} catch (InterruptedException ie) {
 				msg = "\n >>> Sleep Thread has been Interrupted <<< ";
+				Thread.currentThread().interrupt();
 				logger.info( msg );
 				System.out.println( msg );
 				exit(0);
@@ -760,7 +760,9 @@ public class DupeTool {
 		
 		Graph gt = null;
 		try {   
-			if( graph == null ){
+			if( graph != null ){
+				gt = graph.newTransaction();
+			} else {
 				String emsg = "could not get graph object in DupeTool.  \n";
 				System.out.println(emsg);
 				LoggingContext.statusCode(StatusCode.ERROR);
@@ -768,23 +770,9 @@ public class DupeTool {
 				logger.error(emsg);
 		 		exit(0);
 			}
-			gt = graph.newTransaction();
-			if (gt == null) {
-				String emsg = "null graphTransaction object in DupeTool. \n";
-				throw new AAIException("AAI_6101", emsg);
-			}
-			
 		}
-	    catch (AAIException e1) {
-			String msg =  e1.getErrorObject().toString();
-			System.out.println(msg);
-			LoggingContext.statusCode(StatusCode.ERROR);
-			LoggingContext.responseCode(LoggingContext.DATA_ERROR);
-			logger.error(msg);
-			exit(0);
-	    }
-	    catch (Exception e2) {
-	 		String msg =  e2.toString();
+	    catch (Exception e) {
+	 		String msg =  e.toString();
 	 		System.out.println(msg);
 	 		LoggingContext.statusCode(StatusCode.ERROR);
 	 		LoggingContext.responseCode(LoggingContext.UNKNOWN_ERROR);
@@ -1033,39 +1021,38 @@ public class DupeTool {
 		  		}
 	  		}
   		}
-  		
-  		if(tgQ == null){
-  			msg =  "Bad JanusGraphQuery object.  ";
-	 		System.out.println(msg);
-	 		LoggingContext.statusCode(StatusCode.ERROR);
-	 		LoggingContext.responseCode(LoggingContext.AVAILABILITY_TIMEOUT_ERROR);
-	 		logger.error(msg);
-	 		exit(0);
-  		}
 
+		if(tgQ != null) {
 			Iterator<Vertex> vertItor = tgQ;
-			while( vertItor.hasNext() ){
+			while (vertItor.hasNext()) {
 				Vertex tiV = vertItor.next();
-				if( windowStartTime <= 0 ){
+				if (windowStartTime <= 0) {
 					// We're not applying a time-window
 					retVertList.add(tiV);
 					continue;
 				}
 
-			 Object objTimeStamp = tiV.property("aai-created-ts").orElse(null);
-			 if( objTimeStamp == null ){
-				 // No timestamp - so just take it
-				 retVertList.add(tiV);
-				 continue;
-			 }
+				Object objTimeStamp = tiV.property("aai-created-ts").orElse(null);
+				if (objTimeStamp == null) {
+					// No timestamp - so just take it
+					retVertList.add(tiV);
+					continue;
+				}
 
-			 long thisNodeCreateTime = (long)objTimeStamp;
-			 if( thisNodeCreateTime > windowStartTime ){
-				 // It is in our window, so we can take it
-				 retVertList.add(tiV);
-			 }
+				long thisNodeCreateTime = (long) objTimeStamp;
+				if (thisNodeCreateTime > windowStartTime) {
+					// It is in our window, so we can take it
+					retVertList.add(tiV);
+				}
 			}
-
+		} else {
+			msg =  "Bad JanusGraphQuery object.  ";
+			System.out.println(msg);
+			LoggingContext.statusCode(StatusCode.ERROR);
+			LoggingContext.responseCode(LoggingContext.AVAILABILITY_TIMEOUT_ERROR);
+			logger.error(msg);
+			exit(0);
+		}
 		
 		if( retVertList.isEmpty() ){
 			logger.debug("DEBUG No node found for: [" + qStringForMsg + ", with aai-created-ts > " + windowStartTime );

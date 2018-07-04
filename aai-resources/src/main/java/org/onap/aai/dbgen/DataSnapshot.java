@@ -155,6 +155,7 @@ public class DataSnapshot {
 					Thread.sleep(5000);
 				} catch (java.lang.InterruptedException ie) {
 					System.out.println(" DB Clearing has been aborted. ");
+					Thread.currentThread().interrupt();
 					AAISystemExitUtil.systemExitCloseAAIGraph(1);
 				}
 

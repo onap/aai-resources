@@ -158,6 +158,14 @@ public class UpdateEdgeTagsCmd implements Command {
 			}
 			return;
 		}
+		finally {
+			try {
+				g.close();
+			}
+			catch (Exception e) {
+				logger.error("Error occured while closing Transaction with graph" + e.getMessage());
+			}
+		}
 	}
 
 
