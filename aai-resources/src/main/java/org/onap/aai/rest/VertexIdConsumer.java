@@ -62,7 +62,7 @@ import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 /**
  * The Class VertexIdConsumer.
  */
-@Path("{version: v[789]|v1[0123]}/resources")
+@Path("{version: v[789]|v1[01234]}/resources")
 public class VertexIdConsumer extends RESTAPI {
 	
 	private ModelType introspectorFactoryType = ModelType.MOXY;
