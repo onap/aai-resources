@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 
 ###
 # ============LICENSE_START=======================================================
@@ -119,6 +119,14 @@ else
         fi
 fi
 
+fname=$JSONFILE
+if [ -f /tmp/$(basename $JSONFILE) ]; then
+	fname=/tmp/$(basename $JSONFILE)
+elif [ ! -f $JSONFILE ]; then
+	echo "The file $JSONFILE does not exist"
+	exit -1
+fi
+
 if [ $MISSING_PROP = false ]; then
         if [ $USEBASICAUTH = false ]; then
                 AUTHSTRING="--cert $PROJECT_HOME/resources/etc/auth/aaiClientPublicCert.pem --key $PROJECT_HOME/resources/etc/auth/aaiClientPrivateKey.pem"
@@ -126,10 +134,10 @@ if [ $MISSING_PROP = false ]; then
                 AUTHSTRING="-u $CURLUSER:$CURLPASSWORD"
         fi
         if [ $RETURNRESPONSE = true ]; then
-			curl --request PUT -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -T /tmp/$(basename $JSONFILE) $RESTURL$RESOURCE | jq '.'
+			curl --request PUT -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -H "Content-Type: application/json" -T $fname $RESTURL$RESOURCE | jq '.'
 			RC=$?
 		else
-        	result=`curl --request PUT -sL -w "%{http_code}" -o /dev/null -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -T /tmp/$(basename $JSONFILE) $RESTURL$RESOURCE`
+        	result=`curl --request PUT -w "%{http_code}" -o /dev/null -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" -H "Content-Type: application/json" -T $fname $RESTURL$RESOURCE`
         	#echo "result is $result."
         	RC=0;
         	if [ $? -eq 0 ]; then

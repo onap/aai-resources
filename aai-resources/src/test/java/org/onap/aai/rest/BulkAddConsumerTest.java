@@ -28,11 +28,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.onap.aai.introspection.Version;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-
 public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
 
     private static final EELFLogger logger = EELFManager.getInstance().getLogger(BulkAddConsumerTest.class.getName());
@@ -137,6 +135,6 @@ public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
   
     @Override
     protected String getUri() {
-		return "/aai/" + Version.getLatest().toString() + "/bulkadd";
+		return "/aai/" + schemaVersions.getDefaultVersion().toString() + "/bulkadd";
 	}
 }

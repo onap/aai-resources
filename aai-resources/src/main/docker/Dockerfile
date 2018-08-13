@@ -1,4 +1,4 @@
-FROM aaionap/aai-common:1.2.0
+FROM aaionap/aai-common:1.3.0
 
 
 # Add the proper files into the docker image from your build
@@ -16,6 +16,8 @@ ENTRYPOINT ["/bin/bash", "/opt/app/aai-resources/docker-entrypoint.sh"]
 RUN  mkdir -p /opt/aaihome/aaiadmin /opt/aai/logroot/AAI-RES
 
 VOLUME /opt/aai/logroot/AAI-RES
+VOLUME /tmp
+VOLUME /opt/tools
 
 COPY /maven/aai-resources/ .
 

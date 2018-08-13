@@ -72,34 +72,44 @@ if [ -f ${APP_HOME}/aai.sh ]; then
         exit 0;
     fi;
 
-
-    # If in the environment file skip create db schema there is a value set
-    # Then it will skip the create db schema at startup
-    # This is a workaround that will be there temporarily
-    # Ideally createDBSchema should be run from chef
-    # Or run without having to startup the application
-    if [ -z ${SKIP_CREATE_DB_SCHEMA_AT_STARTUP} ]; then
-      gosu aaiadmin /opt/app/aai-resources/scripts/createDBSchema.sh || exit 1
+    if [ ! -f ${APP_HOME}/scripts/updatePem.sh ]; then
+        echo "Unable to find the updatePem script";
+        exit 1;
+    else
+        gosu aaiadmin ${APP_HOME}/scripts/updatePem.sh
     fi;
+
 fi;
+
+mkdir -p /opt/app/aai-resources/logs/gc
+chown -R aaiadmin:aaiadmin /opt/app/aai-resources/logs/gc
+
+if [ -f ${APP_HOME}/resources/aai-resources-swm-vars.sh ]; then
+    source ${APP_HOME}/resources/aai-resources-swm-vars.sh;
+fi;
+
+if [ ! -z "${HEAP_SIZE}" ]; then
+    MIN_HEAP_SIZE=${HEAP_SIZE};
+    MAX_HEAP_SIZE=${HEAP_SIZE};
+fi;
+
+MIN_HEAP_SIZE=${MIN_HEAP_SIZE:-512m};
+MAX_HEAP_SIZE=${MAX_HEAP_SIZE:-1024m};
+MAX_PERM_SIZE=${MAX_PERM_SIZE:-512m};
+PERM_SIZE=${PERM_SIZE:-512m};
 
 JAVA_CMD="exec gosu aaiadmin java";
 
-JVM_OPTS="${PRE_JVM_OPTS} -XX:+UnlockDiagnosticVMOptions";
-JVM_OPTS="${JVM_OPTS} -XX:+UnsyncloadClass";
-JVM_OPTS="${JVM_OPTS} -XX:+UseConcMarkSweepGC";
-JVM_OPTS="${JVM_OPTS} -XX:+CMSParallelRemarkEnabled";
-JVM_OPTS="${JVM_OPTS} -XX:+UseCMSInitiatingOccupancyOnly";
-JVM_OPTS="${JVM_OPTS} -XX:CMSInitiatingOccupancyFraction=70";
-JVM_OPTS="${JVM_OPTS} -XX:+ScavengeBeforeFullGC";
-JVM_OPTS="${JVM_OPTS} -XX:+CMSScavengeBeforeRemark";
-JVM_OPTS="${JVM_OPTS} -XX:-HeapDumpOnOutOfMemoryError";
-JVM_OPTS="${JVM_OPTS} -XX:+UseParNewGC";
-JVM_OPTS="${JVM_OPTS} -verbose:gc";
+JVM_OPTS="${PRE_JVM_ARGS} -Xloggc:/opt/app/aai-resources/logs/gc/aai_gc.log";
+JVM_OPTS="${JVM_OPTS} -XX:HeapDumpPath=/opt/app/aai-resources/logs/ajsc-jetty/heap-dump";
+JVM_OPTS="${JVM_OPTS} -Xms${MIN_HEAP_SIZE}";
+JVM_OPTS="${JVM_OPTS} -Xmx${MAX_HEAP_SIZE}";
+
 JVM_OPTS="${JVM_OPTS} -XX:+PrintGCDetails";
 JVM_OPTS="${JVM_OPTS} -XX:+PrintGCTimeStamps";
-JVM_OPTS="${JVM_OPTS} -XX:MaxPermSize=512M";
-JVM_OPTS="${JVM_OPTS} -XX:PermSize=512M";
+JVM_OPTS="${JVM_OPTS} -XX:MaxPermSize=${MAX_PERM_SIZE}";
+JVM_OPTS="${JVM_OPTS} -XX:PermSize=${PERM_SIZE}";
+
 JVM_OPTS="${JVM_OPTS} -server";
 JVM_OPTS="${JVM_OPTS} -XX:NewSize=512m";
 JVM_OPTS="${JVM_OPTS} -XX:MaxNewSize=512m";
@@ -115,19 +125,19 @@ JVM_OPTS="${JVM_OPTS} -XX:ParallelGCThreads=4";
 JVM_OPTS="${JVM_OPTS} -XX:LargePageSizeInBytes=128m";
 JVM_OPTS="${JVM_OPTS} -XX:+PrintGCDetails";
 JVM_OPTS="${JVM_OPTS} -XX:+PrintGCTimeStamps";
-JVM_OPTS="${JVM_OPTS} -Xloggc:/opt/app/aai-resources/logs/ajsc-jetty/gc/aai_gc.log";
 JVM_OPTS="${JVM_OPTS} -Dsun.net.inetaddr.ttl=180";
 JVM_OPTS="${JVM_OPTS} -XX:+HeapDumpOnOutOfMemoryError";
-JVM_OPTS="${JVM_OPTS} -XX:HeapDumpPath=/opt/app/aai-resources/logs/ajsc-jetty/heap-dump";
-JVM_OPTS="${JVM_OPTS} ${POST_JVM_OPTS}";
-
+JVM_OPTS="${JVM_OPTS} ${POST_JVM_ARGS}";
 JAVA_OPTS="${PRE_JAVA_OPTS} -DAJSC_HOME=$APP_HOME";
 JAVA_OPTS="${JAVA_OPTS} -Dserver.port=${SERVER_PORT}";
 JAVA_OPTS="${JAVA_OPTS} -DBUNDLECONFIG_DIR=./resources";
 JAVA_OPTS="${JAVA_OPTS} -Dserver.local.startpath=${RESOURCES_HOME}";
 JAVA_OPTS="${JAVA_OPTS} -DAAI_CHEF_ENV=${AAI_CHEF_ENV}";
 JAVA_OPTS="${JAVA_OPTS} -DSCLD_ENV=${SCLD_ENV}";
+JAVA_OPTS="${JAVA_OPTS} -DAFT_ENVIRONMENT=${AFT_ENVIRONMENT}";
+JAVA_OPTS="${JAVA_OPTS} -DAAI_BUILD_VERSION=${AAI_BUILD_VERSION}";
 JAVA_OPTS="${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom";
+JAVA_OPTS="${JAVA_OPTS} -Dlogback.configurationFile=./resources/logback.xml";
 JAVA_OPTS="${JAVA_OPTS} -Dloader.path=$APP_HOME/resources";
 JAVA_OPTS="${JAVA_OPTS} ${POST_JAVA_OPTS}";
 

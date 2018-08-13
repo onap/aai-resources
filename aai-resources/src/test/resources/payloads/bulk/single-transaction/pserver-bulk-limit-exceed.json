@@ -1,0 +1,308 @@
+{
+  "operations": [
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    }
+  ]
+}

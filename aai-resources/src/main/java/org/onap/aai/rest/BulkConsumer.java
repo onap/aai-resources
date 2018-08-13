@@ -43,12 +43,13 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.javatuples.Pair;
+import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.ModelType;
-import org.onap.aai.introspection.Version;
+import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.introspection.exceptions.AAIUnmarshallingException;
 import org.onap.aai.logging.ErrorObjectNotFoundException;
 import org.onap.aai.logging.LoggingContext;
@@ -99,8 +100,8 @@ public abstract class BulkConsumer extends RESTAPI {
 	private ModelType introspectorFactoryType = ModelType.MOXY;
 	
 	/** The query style. */
-	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
-	
+	private QueryStyle queryStyle = QueryStyle.TRAVERSAL_URI;
+
 	/**
 	 * Bulk add.
 	 *
@@ -121,7 +122,7 @@ public abstract class BulkConsumer extends RESTAPI {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
-		Version version = Version.valueOf(versionParam);
+		SchemaVersion version = new SchemaVersion(versionParam);
 		Response response = null;
 
 		try {
@@ -145,9 +146,10 @@ public abstract class BulkConsumer extends RESTAPI {
 			JsonArray transactions = getTransactions(content, headers);
 			
 			for (int i = 0; i < transactions.size(); i++){
-				HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-				Loader loader = httpEntry.getLoader();
-				TransactionalGraphEngine dbEngine = httpEntry.getDbEngine();
+				HttpEntry resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+				resourceHttpEntry.setHttpEntryProperties(version, type);
+				Loader loader = resourceHttpEntry.getLoader();
+				TransactionalGraphEngine dbEngine = resourceHttpEntry.getDbEngine();
 				URI thisUri = null;
 				List<BulkOperation> bulkOperations = new ArrayList<>();
 				HttpMethod method = null;
@@ -175,7 +177,7 @@ public abstract class BulkConsumer extends RESTAPI {
 						requests.add(request);
 					}
 					
-					Pair<Boolean, List<Pair<URI, Response>>> results = httpEntry.process(requests, sourceOfTruth, this.enableResourceVersion());
+					Pair<Boolean, List<Pair<URI, Response>>> results = resourceHttpEntry.process(requests, sourceOfTruth, this.enableResourceVersion());
 					List<BulkOperationResponse> responses = BulkOperationResponse.processPairList(method, results.getValue1());
 					allResponses.add(responses);
 					if (results.getValue0()) { //everything was processed without error
@@ -364,7 +366,7 @@ public abstract class BulkConsumer extends RESTAPI {
 					 * keep any errors with their corresponding uris for client feedback  
 					 */
 					bulkOperation.setUri(uri);
-					
+
 					bulkOperation.addUriInfoQueryParams(uriComponents.getQueryParams());
 					
 					if (!ValidateEncoding.getInstance().validate(uri)) {

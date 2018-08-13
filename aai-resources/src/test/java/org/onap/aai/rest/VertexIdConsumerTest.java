@@ -29,8 +29,6 @@ import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.introspection.ModelInjestor;
-import org.onap.aai.introspection.Version;
 
 import javax.ws.rs.core.*;
 import java.io.IOException;
@@ -40,7 +38,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 import org.springframework.mock.web.MockHttpServletRequest;
-
 public class VertexIdConsumerTest extends AAISetup {
 
     protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
@@ -68,15 +65,19 @@ public class VertexIdConsumerTest extends AAISetup {
     private List<MediaType> outputMediaTypes;
 
     private static final EELFLogger logger = EELFManager.getInstance().getLogger(LegacyMoxyConsumerTest.class.getName());
-
+    private boolean initialized = false;
+    
     @BeforeClass
     public static void setupRest(){
-        AAIGraph.getInstance();
-        ModelInjestor.getInstance();
+        //AAIGraph.getInstance();
     }
 
     @Before
     public void setup(){
+    	if(!initialized){
+    		initialized = true;
+    		AAIGraph.getInstance();
+    	}
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
         vertexIdConsumer    = new VertexIdConsumer();
@@ -129,7 +130,7 @@ public class VertexIdConsumerTest extends AAISetup {
                 "",
                 "-1",
                 "-1",
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 uri,
                 "all",
                 "false",
@@ -143,7 +144,7 @@ public class VertexIdConsumerTest extends AAISetup {
         
         response = legacyMoxyConsumer.update(
                 payload,
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
@@ -166,7 +167,7 @@ public class VertexIdConsumerTest extends AAISetup {
 
         response = vertexIdConsumer.getByVertexId(
                 "",
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 Long.valueOf(vertexId).longValue(),
                 "10000",
                 httpHeaders,

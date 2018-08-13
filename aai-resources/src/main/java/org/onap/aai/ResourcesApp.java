@@ -19,15 +19,21 @@
  */
 package org.onap.aai;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.onap.aai.config.PropertyPasswordConfiguration;
+import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.introspection.ModelInjestor;
+
 import org.onap.aai.logging.LoggingContext;
-import org.onap.aai.migration.MigrationControllerInternal;
+import org.onap.aai.logging.LoggingContext.StatusCode;
 import org.onap.aai.util.AAIConfig;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -37,10 +43,11 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
+import org.onap.aai.nodes.NodeIngestor;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.util.UUID;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 @SpringBootApplication
 // Component Scan provides a way to look for spring beans
@@ -50,6 +57,7 @@ import java.util.UUID;
 @ComponentScan(basePackages = {
 		"org.onap.aai.config",
 		"org.onap.aai.web",
+		"org.onap.aai.setup",
 		"org.onap.aai.tasks",
 		"org.onap.aai.service",
 		"org.onap.aai.rest"
@@ -64,10 +72,21 @@ public class ResourcesApp {
 	private static final EELFLogger logger = EELFManager.getInstance().getLogger(ResourcesApp.class.getName());
 
 	private static final String APP_NAME = "aai-resources";
+	private static Map<String,String> contextMap;
 
 	@Autowired
 	private Environment env;
 
+	@Autowired
+	private NodeIngestor nodeIngestor;
+	
+	@Autowired
+	private SpringContextAware context;
+	
+	@Autowired
+	private SpringContextAware loaderFactory;
+	
+	
 	@PostConstruct
 	private void init() throws AAIException {
 		System.setProperty("org.onap.aai.serverStarted", "false");
@@ -80,22 +99,22 @@ public class ResourcesApp {
 		LoggingContext.requestId(UUID.randomUUID().toString());
 		LoggingContext.serviceName(APP_NAME);
 		LoggingContext.targetServiceName("contextInitialized");
-
+		LoggingContext.statusCode(StatusCode.COMPLETE);
+		
+		contextMap = MDC.getCopyOfContextMap();
 		logger.info("AAI Server initialization started...");
 
 		// Setting this property to allow for encoded slash (/) in the path parameter
 		// This is only needed for tomcat keeping this as temporary
 		System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
 
-	    logger.info("Starting AAIGraph connections and the ModelInjestor");
+	    logger.info("Starting AAIGraph connections and the NodeInjestor");
 
 	    if(env.acceptsProfiles(Profiles.TWO_WAY_SSL) && env.acceptsProfiles(Profiles.ONE_WAY_SSL)){
 	        logger.warn("You have seriously misconfigured your application");
 	    }
 
-		AAIConfig.init();
-		ModelInjestor.getInstance();
-		AAIGraph.getInstance();
+		LoggingContext.restoreIfPossible();
 	}
 
 	@PreDestroy
@@ -104,29 +123,46 @@ public class ResourcesApp {
 		AAIGraph.getInstance().graphShutdown();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws AAIException {
 
 	    setDefaultProps();
+	    
+	    LoggingContext.save();
+		LoggingContext.component("init");
+		LoggingContext.partnerName("NA");
+		LoggingContext.targetEntity(APP_NAME);
+		LoggingContext.requestId(UUID.randomUUID().toString());
+		LoggingContext.serviceName(APP_NAME);
+		LoggingContext.targetServiceName("contextInitialized");
+		LoggingContext.statusCode(StatusCode.COMPLETE);
+		
+	    
 		SpringApplication app = new SpringApplication(ResourcesApp.class);
+		app.setLogStartupInfo(false);
 		app.setRegisterShutdownHook(true);
 		app.addInitializers(new PropertyPasswordConfiguration());
 		Environment env = app.run(args).getEnvironment();
-
+		MDC.setContextMap (contextMap);
 		logger.info(
 				"Application '{}' is running on {}!" ,
 				env.getProperty("spring.application.name"),
 				env.getProperty("server.port")
 		);
 
-		if ("true".equals(AAIConfig.get("aai.run.migrations", "false"))) {
-			MigrationControllerInternal migrations = new MigrationControllerInternal();
-			migrations.run(new String[]{"--commit"});
-		}
+		// The main reason this was moved from the constructor is due
+		// to the SchemaGenerator needs the bean and during the constructor
+		// the Spring Context is not yet initialized
+
+		AAIConfig.init();
+		AAIGraph.getInstance();
 
 		logger.info("Resources MicroService Started");
 		logger.error("Resources MicroService Started");
 		logger.debug("Resources MicroService Started");
+
 		System.out.println("Resources Microservice Started");
+		
+		LoggingContext.restoreIfPossible();
 	}
 
 	public static void setDefaultProps(){
@@ -150,6 +186,5 @@ public class ResourcesApp {
 				System.setProperty("BUNDLECONFIG_DIR", "aai-resources/src/main/resources");
 			}
 		}
-
 	}
 }

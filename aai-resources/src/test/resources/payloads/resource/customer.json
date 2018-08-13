@@ -1,0 +1,15 @@
+{
+  "global-customer-id": "customer-987654321-91",
+  "subscriber-name": "subscriber-name-987654321-91",
+  "subscriber-type": "subscriber-type-987654321-91",
+  "service-subscriptions": {
+    "service-subscription": {
+      "service-type": "service-type-987654321-91",
+      "service-instances": {
+        "service-instance": {
+          "service-instance-id": "service-instance-id-987654321-91"
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 
 ###
 # ============LICENSE_START=======================================================
@@ -95,7 +95,7 @@ if [ $MISSING_PROP = false ]; then
         else
                 AUTHSTRING="-u $CURLUSER:$CURLPASSWORD"
         fi
-        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | jq '.'
+        curl --request GET -sL -k $AUTHSTRING -H "X-FromAppId: $XFROMAPPID" -H "X-TransactionId: $XTRANSID" -H "Accept: application/json" $RESTURL$RESOURCE | jq -M '.' | sed 's/\r//g'
         RC=$?;
 else
         echo "usage: $0 resource"

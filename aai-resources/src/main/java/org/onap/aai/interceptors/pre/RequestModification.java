@@ -36,7 +36,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.onap.aai.interceptors.AAIContainerFilter;
 
 @PreMatching
-@Priority(AAIRequestFilterPriority.HEADER_VALIDATION)
+@Priority(AAIRequestFilterPriority.REQUEST_MODIFICATION)
 public class RequestModification extends AAIContainerFilter implements ContainerRequestFilter {
 
 	@Override

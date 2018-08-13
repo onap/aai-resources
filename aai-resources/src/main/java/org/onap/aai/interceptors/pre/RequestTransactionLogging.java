@@ -25,12 +25,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 import java.util.UUID;
+import java.security.SecureRandom;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.message.internal.ReaderWriter;
 import org.glassfish.jersey.server.ContainerException;
@@ -43,6 +45,7 @@ import org.onap.aai.util.HbaseSaltPrefixer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.JsonObject;
+import org.springframework.util.StringUtils;
 
 @PreMatching
 @Priority(AAIRequestFilterPriority.REQUEST_TRANS_LOGGING)
@@ -50,6 +53,13 @@ public class RequestTransactionLogging extends AAIContainerFilter implements Con
 
 	@Autowired
 	private HttpServletRequest httpServletRequest;
+
+	private static final String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON;
+	private static final String DEFAULT_RESPONSE_TYPE = MediaType.APPLICATION_XML;
+
+	private static final String CONTENT_TYPE = "Content-Type";
+	private static final String ACCEPT = "Accept";
+	private static final String TEXT_PLAIN = "text/plain";
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -59,17 +69,34 @@ public class RequestTransactionLogging extends AAIContainerFilter implements Con
 		this.addToRequestContext(requestContext, AAIHeaderProperties.AAI_TX_ID, fullId);
 		this.addToRequestContext(requestContext, AAIHeaderProperties.AAI_REQUEST, this.getRequest(requestContext, fullId));
 		this.addToRequestContext(requestContext, AAIHeaderProperties.AAI_REQUEST_TS, currentTimeStamp);
+		this.addDefaultContentType(requestContext);
 	}
 
 	private void addToRequestContext(ContainerRequestContext requestContext, String name, String aaiTxIdToHeader) {
 		requestContext.setProperty(name, aaiTxIdToHeader);
 	}
 
+	private void addDefaultContentType(ContainerRequestContext requestContext) {
+
+		String contentType = requestContext.getHeaderString(CONTENT_TYPE);
+		String acceptType  = requestContext.getHeaderString(ACCEPT);
+
+		if(contentType == null || contentType.contains(TEXT_PLAIN)){
+			requestContext.getHeaders().putSingle(CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+		}
+
+		if(StringUtils.isEmpty(acceptType) || acceptType.contains(TEXT_PLAIN)){
+			requestContext.getHeaders().putSingle(ACCEPT, DEFAULT_RESPONSE_TYPE);
+		}
+	}
+
 	private String getAAITxIdToHeader(String currentTimeStamp) {
 		String txId = UUID.randomUUID().toString();
 		try {
+			Random rand = new SecureRandom();
+			int number = rand.nextInt(99999);
 			txId = HbaseSaltPrefixer.getInstance().prependSalt(AAIConfig.get(AAIConstants.AAI_NODENAME) + "-"
-					+ currentTimeStamp + "-" + new Random(System.currentTimeMillis()).nextInt(99999));
+					+ currentTimeStamp + "-" + number ); //new Random(System.currentTimeMillis()).nextInt(99999)
 		} catch (AAIException e) {
 		}
 
@@ -81,7 +108,7 @@ public class RequestTransactionLogging extends AAIContainerFilter implements Con
 		JsonObject request = new JsonObject();
 		request.addProperty("ID", fullId);
 		request.addProperty("Http-Method", requestContext.getMethod());
-		request.addProperty("Content-Type", httpServletRequest.getContentType());
+		request.addProperty(CONTENT_TYPE, httpServletRequest.getContentType());
 		request.addProperty("Headers", requestContext.getHeaders().toString());
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

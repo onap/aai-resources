@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 #
 # ============LICENSE_START=======================================================
 # org.onap.aai
@@ -47,15 +47,18 @@ contains() {
 
 display_usage() {
 cat <<EOF
+Use the execTool starting 1806 for running the updateTool.sh in the format shown below:
+/opt/app/aai-resources/execTool.sh --debug ./updateTool.sh <node type> <update nodeURI> /tmp/updatepayload.json
+
 Usage 1: updateTool.sh <node type> <update node URI> <property name>:<property value>
 [,<property name>:<property value]* | where update node uri is the URI path for that node
 for ex1: ./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX prov-status:NEWSTATUS
 ex2:./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX 'prov-status:NEWSTATUS with space'
 ex3:./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX 'prov-status:NEWSTATUS,attribute2:value'
 
-Usage 2. using .json file for update: ./updateTool.sh <node type> <update node URI> /tmp/updatepayload.json
+Usage 2. using .json file for update: ./updateTool.sh <node type> <update nodeURI> /tmp/updatepayload.json
 Ex: ./updateTool.sh pserver cloud-infrastructure/pservers/pserver/XXX /tmp/testpayload.json
-
+testpayload.json should be only under /tmp
 EOF
 }
 
@@ -93,7 +96,7 @@ fi
 
 . /etc/profile.d/aai.sh
 PROJECT_HOME=/opt/app/aai-resources
-prop_file=$PROJECT_HOME/bundleconfig/etc/appprops/aaiconfig.properties
+prop_file=$PROJECT_HOME/resources/etc/appprops/aaiconfig.properties
 log_dir=$PROJECT_HOME/logs/misc
 today=$(date +\%Y-\%m-\%d)
 
@@ -168,7 +171,7 @@ EOF
 
 if [ $MISSING_PROP = false ]; then
         if [ $USEBASICAUTH = false ]; then
-                AUTHSTRING="--cert $PROJECT_HOME/bundleconfig/etc/auth/aaiClientPublicCert.pem --key $PROJECT_HOME/bundleconfig/etc/auth/aaiClientPrivateKey.pem"
+                AUTHSTRING="--cert $PROJECT_HOME/resources/etc/auth/aaiClientPublicCert.pem --key $PROJECT_HOME/resources/etc/auth/aaiClientPrivateKey.pem"
         else
                 AUTHSTRING="-u $CURLUSER:$CURLPASSWORD"
         fi

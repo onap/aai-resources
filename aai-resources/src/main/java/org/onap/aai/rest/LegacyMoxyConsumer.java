@@ -25,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -52,13 +50,13 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.jaxrs.PATCH;
 import org.javatuples.Pair;
+import org.onap.aai.concurrent.AaiCallable;
+import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
-import org.onap.aai.introspection.ModelType;
-import org.onap.aai.introspection.Version;
-import org.onap.aai.logging.LoggingContext;
+import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
@@ -66,50 +64,40 @@ import org.onap.aai.rest.exceptions.AAIInvalidXMLNamespace;
 import org.onap.aai.rest.util.ValidateEncoding;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
-import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.util.AAIConstants;
-import org.onap.aai.workarounds.RemoveDME2QueryParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import com.google.common.base.Joiner;
 
-
 /**
  * The Class LegacyMoxyConsumer.
  */
-@Path("{version: v[789]|v1[01234]}")
+@Controller
+@Path("{version: v[1-9][0-9]*|latest}")
 public class LegacyMoxyConsumer extends RESTAPI {
-	
-	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(LegacyMoxyConsumer.class.getName());
-	protected static String authPolicyFunctionName = "REST";
-	private ModelType introspectorFactoryType = ModelType.MOXY;
-	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
-	private final static String TARGET_ENTITY = "aai-resources";
-	/**
-	 * Update.
-	 *
-	 * @param content the content
-	 * @param versionParam the version param
-	 * @param uri the uri
-	 * @param headers the headers
-	 * @param info the info
-	 * @param req the req
-	 * @return the response
-	 */
+
+	private static final EELFLogger logger = EELFManager.getInstance().getLogger(LegacyMoxyConsumer.class.getName());
+
+//	private HttpEntry traversalUriHttpEntry;
+
+//	@Autowired
+//	public LegacyMoxyConsumer(HttpEntry traversalUriHttpEntry){
+//		this.traversalUriHttpEntry = traversalUriHttpEntry;
+//	}
+
+	public LegacyMoxyConsumer(){
+
+	}
+
 	@PUT
 	@Path("/{uri: .+}")
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response update (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-		String serviceName =  "PUT " + uri.toString();
-		String queryStr = req.getQueryString();
-		if ( queryStr != null ) {
-			serviceName = serviceName + "?" + queryStr;
-		}
-		LoggingContext.serviceName(serviceName);
-		LoggingContext.targetServiceName(serviceName);
 		MediaType mediaType = headers.getMediaType();
 		return this.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info);
 	}
@@ -140,25 +128,14 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		TransactionalGraphEngine dbEngine = null;
 		boolean success = true;
 
-		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
-		String queryStr = req.getQueryString();
-		if ( queryStr != null ) {
-			serviceName = serviceName + "?" + queryStr;
-		}
-		LoggingContext.requestId(transId);
-		LoggingContext.partnerName(sourceOfTruth);
-		LoggingContext.serviceName(serviceName);
-		LoggingContext.targetEntity(TARGET_ENTITY);
-		LoggingContext.targetServiceName(serviceName);
-
    	 	try {
 			validateRequest(info);
-   			Version version = Version.valueOf(versionParam);
-   			version = Version.valueOf(versionParam);
+   			SchemaVersion version = new SchemaVersion(versionParam);
    			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-			loader = httpEntry.getLoader();
-			dbEngine = httpEntry.getDbEngine();
+   			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+   			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			loader = traversalUriHttpEntry.getLoader();
+			dbEngine = traversalUriHttpEntry.getDbEngine();
 
 			URI uriObject = UriBuilder.fromPath(uri).build();
 			this.validateURI(uriObject);
@@ -170,7 +147,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			DBRequest request = new DBRequest.Builder(HttpMethod.PUT_EDGE, uriObject, uriQuery, wrappedEntity, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests, sourceOfTruth);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
@@ -214,13 +191,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	public Response patch (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
 
 		MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
-		String serviceName =  "PATCH " + uri.toString();
-		String queryStr = req.getQueryString();
-		if ( queryStr != null ) {
-			serviceName = serviceName + "?" + queryStr;
-		}
-		LoggingContext.serviceName(serviceName);
-		LoggingContext.targetServiceName(serviceName);
 		return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info);
 
 	}
@@ -249,9 +219,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				headers,
 				info,
 				HttpMethod.GET,
-				new Callable<Response>() {
+				new AaiCallable<Response>() {
 					@Override
-					public Response call() {
+					public Response process() {
 						return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>(), resultIndex, resultSize);
 					}
 				}
@@ -279,25 +249,15 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
 		Loader loader = null;
-		
-		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
-		String queryStr = req.getQueryString();
-		if ( queryStr != null ) {
-			serviceName = serviceName + "?" + queryStr;
-		}
-		LoggingContext.requestId(transId);
-		LoggingContext.partnerName(sourceOfTruth);
-		LoggingContext.serviceName(serviceName);
-		LoggingContext.targetEntity(TARGET_ENTITY);
-		LoggingContext.targetServiceName(serviceName);
 
 		try {
 			validateRequest(info);
-			Version version = Version.valueOf(versionParam);
+			SchemaVersion version = new SchemaVersion(versionParam);
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-			final HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-			dbEngine = httpEntry.getDbEngine();
-			loader = httpEntry.getLoader();
+			final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			dbEngine = traversalUriHttpEntry.getDbEngine();
+			loader = traversalUriHttpEntry.getLoader();
 			MultivaluedMap<String, String> params = info.getQueryParameters();
 
 			params = removeNonFilterableParams(params);
@@ -319,7 +279,11 @@ public class LegacyMoxyConsumer extends RESTAPI {
 					new DBRequest.Builder(HttpMethod.GET, uriObject, uriQuery, obj, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = httpEntry.process(requests, sourceOfTruth);
+			if (resultIndex != null && resultIndex != "-1" && resultSize != null && resultSize != "-1") {
+				traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
+				traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
+			}
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
 			
@@ -377,16 +341,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
-		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
-		String queryStr = req.getQueryString();
-		if ( queryStr != null ) {
-			serviceName = serviceName + "?" + queryStr;
-		}
-		LoggingContext.requestId(transId);
-		LoggingContext.partnerName(sourceOfTruth);
-		LoggingContext.serviceName(serviceName);
-		LoggingContext.targetEntity(TARGET_ENTITY);
-		LoggingContext.targetServiceName(serviceName);
 
 		TransactionalGraphEngine dbEngine = null;
 		Response response = Response.status(404)
@@ -397,12 +351,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		try {
 
 			validateRequest(info);
-			Version version = Version.valueOf(versionParam);
+			SchemaVersion version = new SchemaVersion(versionParam);
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-
-			dbEngine = httpEntry.getDbEngine();
-			Loader loader = httpEntry.getLoader();
+			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			dbEngine = traversalUriHttpEntry.getDbEngine();
+			Loader loader = traversalUriHttpEntry.getLoader();
 
 			URI uriObject = UriBuilder.fromPath(uri).build();
 
@@ -413,7 +367,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			DBRequest request = new DBRequest.Builder(HttpMethod.DELETE, uriObject, uriQuery, obj, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests, sourceOfTruth);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
@@ -462,17 +416,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 
-		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
-		String queryStr = req.getQueryString();
-		if ( queryStr != null ) {
-			serviceName = serviceName + "?" + queryStr;
-		}
-		LoggingContext.requestId(transId);
-		LoggingContext.partnerName(sourceOfTruth);
-		LoggingContext.serviceName(serviceName);
-		LoggingContext.targetEntity(TARGET_ENTITY);
-		LoggingContext.targetServiceName(serviceName);
-
 		Loader loader = null;
 		TransactionalGraphEngine dbEngine = null;
 		Response response = Response.status(404)
@@ -482,11 +425,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 		try {
 			this.validateRequest(info);
-			Version version = Version.valueOf(versionParam);
+			SchemaVersion version = new SchemaVersion(versionParam);
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-			loader = httpEntry.getLoader();
-			dbEngine = httpEntry.getDbEngine();
+			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			loader = traversalUriHttpEntry.getLoader();
+			dbEngine = traversalUriHttpEntry.getDbEngine();
 
 			if (content.equals("")) {
 				throw new AAIException("AAI_3102", "You must supply a relationship");
@@ -501,7 +445,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
     		DBRequest request = new DBRequest.Builder(HttpMethod.DELETE_EDGE, uriObject, uriQuery, wrappedEntity, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests, sourceOfTruth);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
@@ -581,25 +525,21 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
 		Loader loader = null;
-		Version version = null;
+		SchemaVersion version = null;
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		Boolean success = true;
-		
-		//LoggingContext service name and target service name set in calling method
-		LoggingContext.requestId(transId);
-		LoggingContext.partnerName(sourceOfTruth);
-		LoggingContext.targetEntity(TARGET_ENTITY);
 
 		try {
 			validateRequest(info);
 
-			version = Version.valueOf(versionParam);
+			version = new SchemaVersion(versionParam);
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-			loader = httpEntry.getLoader();
-			dbEngine = httpEntry.getDbEngine();
+			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			loader = traversalUriHttpEntry.getLoader();
+			dbEngine = traversalUriHttpEntry.getDbEngine();
 			URI uriObject = UriBuilder.fromPath(uri).build();
 			this.validateURI(uriObject);
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
@@ -627,7 +567,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 					.rawRequestContent(content).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests,  sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests,  sourceOfTruth);
 	        
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();

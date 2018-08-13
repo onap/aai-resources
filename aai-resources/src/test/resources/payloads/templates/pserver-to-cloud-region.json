@@ -1,0 +1,12 @@
+{
+  "cloud-region-id": "${cloud-region-id}",
+  "cloud-owner": "${cloud-owner}",
+  "relationship-list": {
+    "relationship": [
+      {
+        "related-to": "pserver",
+        "related-link": "/cloud-infrastructure/pservers/pserver/${hostname}"
+      }
+    ]
+  }
+}

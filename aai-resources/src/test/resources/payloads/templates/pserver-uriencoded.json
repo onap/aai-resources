@@ -1,0 +1,4 @@
+{
+  "hostname":"${hostname}",
+  "ptnii-equip-name": "some equip name"
+}

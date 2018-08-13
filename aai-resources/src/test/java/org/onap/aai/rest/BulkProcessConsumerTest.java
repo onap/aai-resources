@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.junit.Test;
-import org.onap.aai.introspection.Version;
+import org.onap.aai.dbmap.AAIGraph;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import com.att.eelf.configuration.EELFLogger;
@@ -68,6 +68,19 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         assertEquals("Contains 1 {\"201\":null}", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
         assertEquals("Contains 1 {\"404\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"404\":\"{"));
         assertEquals("Contains 1 ERR.5.4.6114", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6114"));
+    }
+
+    @Test
+    public void bulkProcessPayloadWithPatchTest() throws IOException {
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        String payload = getBulkPayload("pserver-bulk-process-transactions-with-patch");
+        Response response = executeRequest(payload);
+        System.out.println(response.getEntity());
+        System.out.println(AAIGraph.getInstance().getGraph().newTransaction().traversal().V().has("fqdn", "NEW").count().next());
+        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 	
 	@Test
@@ -109,7 +122,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
 
         Response response = legacyMoxyConsumer.updateRelationship(
                 complexToPserverRelationshipData,
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 complexToPserverRelationshipUri,
                 httpHeaders,
                 uriInfo,
@@ -154,7 +167,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 "",
                 "-1",
                 "-1",
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 uri,
                 "all",
                 "false",
@@ -169,7 +182,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
 
         response = legacyMoxyConsumer.update(
                 payload,
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
@@ -189,7 +202,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 "",
                 "-1",
                 "-1",
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 uri,
                 "all",
                 "false",
@@ -280,6 +293,6 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
   
     @Override
     protected String getUri() {
-		return "/aai/" + Version.getLatest().toString() + "/bulkprocess";
+		return "/aai/" + schemaVersions.getDefaultVersion().toString() + "/bulkprocess";
 	}
 }

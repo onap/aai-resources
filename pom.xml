@@ -23,7 +23,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>org.onap.oparent</groupId>
+        <artifactId>oparent</artifactId>
+        <version>1.1.0</version>
+    </parent>
     <groupId>org.onap.aai.resources</groupId>
     <artifactId>resources</artifactId>
     <version>1.3.0-SNAPSHOT</version>
@@ -33,10 +37,16 @@
         <module>aai-resources</module>
     </modules>
     <properties>
+        <!--
+            Nexus Proxy Properties and Snapshot Locations
+            Ideally this can be overwritten at runtime per internal environment specific values at runtime
+        -->
         <nexusproxy>https://nexus.onap.org</nexusproxy>
         <site.path>/content/sites/site/org/onap/aai/resources/${project.artifactId}/${project.version}</site.path>
         <release.path>/content/repositories/releases/</release.path>
         <snapshot.path>/content/repositories/snapshots/</snapshot.path>
+        <!-- GMaven plugin uses this property to figure out the name of the docker tag -->
+        <aai.project.version>${project.version}</aai.project.version>
     </properties>
     <build>
         <pluginManagement>
@@ -44,7 +54,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.2</version>
+                    <version>3.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

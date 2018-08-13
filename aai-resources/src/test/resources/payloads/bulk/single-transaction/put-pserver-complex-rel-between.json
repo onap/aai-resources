@@ -1,0 +1,38 @@
+{
+  "operations": [
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "body": {
+        "hostname": "pserver-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/complexes/complex/complex-<methodName>",
+      "body": {
+        "physical-location-id": "complex-<methodName>",
+        "data-center-code": "code",
+        "identity-url": "N/A",
+        "physical-location-type": "type",
+        "street1": "street",
+        "city": "city",
+        "state": "state",
+        "postal-code": "12345",
+        "country": "NONE",
+        "region": "Earth"
+
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/complexes/complex/complex-<methodName>/relationship-list/relationship",
+      "body": {
+        "related-to": "pserver",
+        "related-link": "/aai/v13/cloud-infrastructure/pservers/pserver/pserver-<methodName>"
+
+      }
+    }
+  ]
+}
