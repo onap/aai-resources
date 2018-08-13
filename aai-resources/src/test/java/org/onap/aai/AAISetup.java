@@ -23,21 +23,81 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
-import org.onap.aai.serialization.queryformats.QueryFormatTestHelper;
-import org.onap.aai.util.AAIConstants;
+import org.onap.aai.config.SpringContextAware;
+import org.onap.aai.config.IntrospectionConfig;
+import org.onap.aai.introspection.LoaderFactory;
+import org.onap.aai.logging.LoggingContext;
+import org.onap.aai.nodes.NodeIngestor;
+import org.onap.aai.config.RestBeanConfig;
+import org.onap.aai.rest.db.HttpEntry;
+import org.onap.aai.setup.SchemaLocationsBean;
+import org.onap.aai.setup.SchemaVersion;
+import org.onap.aai.setup.SchemaVersions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.onap.aai.introspection.MoxyLoader;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.onap.aai.edges.EdgeIngestor;
+import org.onap.aai.setup.AAIConfigTranslator;
+import org.onap.aai.serialization.db.EdgeSerializer;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
+
+@ContextConfiguration(classes = {
+        SchemaLocationsBean.class,
+        SchemaVersions.class,
+        AAIConfigTranslator.class,
+        NodeIngestor.class,
+        EdgeIngestor.class,
+        EdgeSerializer.class,
+        SpringContextAware.class,
+        IntrospectionConfig.class,  
+        RestBeanConfig.class
+})
+@TestPropertySource(properties = {
+    "schema.uri.base.path = /aai" ,
+    "schema.ingest.file = src/test/resources/application-test.properties"
+})
 public abstract class AAISetup {
+
+	@Autowired
+	protected NodeIngestor nodeIngestor;
+
+	@Autowired
+	protected LoaderFactory loaderFactory;
+	
+	@Autowired
+	protected  Map<SchemaVersion, MoxyLoader>  moxyLoaderInstance;
+	
+	@Autowired
+	protected HttpEntry traversalHttpEntry;
+	
+	@Autowired
+	protected HttpEntry traversalUriHttpEntry;
+
+	@Autowired
+	protected SchemaVersions schemaVersions;
+
+    @ClassRule
+    public static final SpringClassRule springClassRule = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @BeforeClass
     public static void setupBundleconfig() throws Exception {
         System.setProperty("AJSC_HOME", "./");
         System.setProperty("BUNDLECONFIG_DIR", "src/main/resources/");
-//        QueryFormatTestHelper.setFinalStatic(AAIConstants.class.getField("AAI_HOME_ETC_OXM"), "bundleconfig-local/etc/oxm/");
+        LoggingContext.init();
     }
-
+   
     public String getPayload(String filename) throws IOException {
 
         InputStream inputStream = getClass()

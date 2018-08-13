@@ -27,8 +27,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
-import org.onap.aai.introspection.ModelInjestor;
-import org.onap.aai.introspection.Version;
 
 import javax.ws.rs.core.*;
 
@@ -69,7 +67,7 @@ public class ExampleConsumerTest extends AAISetup {
     @BeforeClass
     public static void setupRest(){
         AAIGraph.getInstance();
-        ModelInjestor.getInstance();
+      
     }
 
     @Before
@@ -114,7 +112,7 @@ public class ExampleConsumerTest extends AAISetup {
     public void testGetExampleRespondsWithOkStatusForValidObject(){
 
         Response response = exampleConsumer.getExample(
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 "pserver",
                 httpHeaders,
                 uriInfo,
@@ -134,7 +132,7 @@ public class ExampleConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn("examples/fakeObject");
 
         Response response = exampleConsumer.getExample(
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 "testRandomCrazyObject",
                 httpHeaders,
                 uriInfo,

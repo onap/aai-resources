@@ -41,8 +41,6 @@ import org.junit.BeforeClass;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
-import org.onap.aai.introspection.ModelInjestor;
-import org.onap.aai.introspection.Version;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -74,16 +72,21 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
     
     protected String uri;
 
+    private boolean initialized = false;
     private static final EELFLogger logger = EELFManager.getInstance().getLogger(BulkProcessorTestAbstraction.class.getName());
 
     @BeforeClass
     public static void setupRest(){
-        AAIGraph.getInstance();
-        ModelInjestor.getInstance();
+       // AAIGraph.getInstance();
+        
     }
 
     @Before
     public void setup(){
+    	if(!initialized){
+    		initialized = true;
+    		AAIGraph.getInstance();
+    	}
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
         bulkConsumer     = getConsumer();
@@ -126,7 +129,7 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
     	
 		return bulkConsumer.bulkProcessor(
 				payload.replaceAll("<UUID>", UUID.randomUUID().toString()),
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 httpHeaders,
                 uriInfo,
                 mockReq

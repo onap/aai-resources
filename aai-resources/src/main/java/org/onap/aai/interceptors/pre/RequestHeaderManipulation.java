@@ -39,15 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Priority(AAIRequestFilterPriority.HEADER_MANIPULATION)
 public class RequestHeaderManipulation extends AAIContainerFilter implements ContainerRequestFilter {
 
-	@Autowired
-	private HttpServletRequest httpServletRequest;
-
-	private static final Pattern versionedEndpoint = Pattern.compile("^/aai/(v\\d+)");
-	
 	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
+	public void filter(ContainerRequestContext requestContext) {
 
-		String uri = httpServletRequest.getRequestURI();
+		String uri = requestContext.getUriInfo().getPath();
 		this.addRequestContext(uri, requestContext.getHeaders());
 
 	}
@@ -56,7 +51,7 @@ public class RequestHeaderManipulation extends AAIContainerFilter implements Con
 
 		String rc = "";
 
-        Matcher match = versionedEndpoint.matcher(uri);
+        Matcher match = VersionInterceptor.EXTRACT_VERSION_PATTERN.matcher(uri);
         if (match.find()) {
             rc = match.group(1);
         }

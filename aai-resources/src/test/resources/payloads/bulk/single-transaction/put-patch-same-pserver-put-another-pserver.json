@@ -1,0 +1,27 @@
+{
+  "operations": [
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-1-<methodName>",
+      "body": {
+        "hostname": "pserver-1-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    },
+    {
+      "action": "patch",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-1-<methodName>",
+      "body": {
+        "fqdn": "patched-fqdn"
+      }
+    },
+    {
+      "action": "put",
+      "uri": "/cloud-infrastructure/pservers/pserver/pserver-2-<methodName>",
+      "body": {
+        "hostname": "pserver-2-<methodName>",
+        "fqdn": "pserver-<methodName>-fqdn"
+      }
+    }
+  ]
+}

@@ -1,8 +1,0 @@
-apiVersion: v1
-data:
-  dynamic.properties: |
-    my.property.name=prod
-kind: ConfigMap
-metadata:
-  name: ajsc6configdemo-dynamic-properties
-  namespace: org-onap-aai

@@ -21,11 +21,8 @@ package org.onap.aai.web;
 
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletProperties;
 import org.onap.aai.rest.*;
-import org.onap.aai.rest.retired.V7V8Models;
-import org.onap.aai.rest.retired.V7V8NamedQueries;
-import org.onap.aai.rest.tools.ModelVersionTransformer;
+import org.onap.aai.rest.bulk.BulkSingleTransactionConsumer;
 import org.onap.aai.rest.util.EchoResponse;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +31,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Priority;
-import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import java.util.List;
@@ -43,7 +39,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Component
-@ApplicationPath("/aai")
 public class JerseyConfiguration extends ResourceConfig {
 
     private static final Logger log = Logger.getLogger(JerseyConfiguration.class.getName());
@@ -60,18 +55,14 @@ public class JerseyConfiguration extends ResourceConfig {
         register(ExampleConsumer.class);
         register(BulkAddConsumer.class);
         register(BulkProcessConsumer.class);
+        register(BulkSingleTransactionConsumer.class);
         register(LegacyMoxyConsumer.class);
         register(URLFromVertexIdConsumer.class);
-        register(V7V8Models.class);
-        register(V7V8NamedQueries.class);
-        register(ModelVersionTransformer.class);
 
         //Request Filters
         registerFiltersForRequests();
         // Response Filters
         registerFiltersForResponses();
-
-        property(ServletProperties.FILTER_FORWARD_ON_404, true);
 
         // Following registers the request headers and response headers
         // If the LoggingFilter second argument is set to true, it will print response value as well

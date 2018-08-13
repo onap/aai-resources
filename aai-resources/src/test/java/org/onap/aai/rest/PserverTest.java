@@ -20,25 +20,11 @@
 package org.onap.aai.rest;
 
 import com.jayway.jsonpath.JsonPath;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.onap.aai.ResourcesApp;
-import org.onap.aai.ResourcesTestConfiguration;
-import org.onap.aai.config.PropertyPasswordConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.*;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Base64;
-import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -54,40 +40,7 @@ import static org.junit.Assert.assertEquals;
  * This can be used to potentially replace a lot of the fitnesse tests since
  * they will be testing against the same thing except fitnesse uses hbase
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = ResourcesApp.class)
-@TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(initializers = PropertyPasswordConfiguration.class)
-@Import(ResourcesTestConfiguration.class)
-public class PserverTest {
-
-    @Autowired
-    RestTemplate restTemplate;
-
-    @LocalServerPort
-    int randomPort;
-
-    private HttpEntity httpEntity;
-
-    private String baseUrl;
-
-    @Before
-    public void setup() throws UnsupportedEncodingException {
-
-        HttpHeaders headers = new HttpHeaders();
-
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Real-Time", "true");
-        headers.add("X-FromAppId", "JUNIT");
-        headers.add("X-TransactionId", "JUNIT");
-
-        String authorization = Base64.getEncoder().encodeToString("AAI:AAI".getBytes("UTF-8"));
-        headers.add("Authorization", "Basic " + authorization);
-
-        httpEntity = new HttpEntity(headers);
-        baseUrl = "https://localhost:" + randomPort;
-    }
+public class PserverTest extends AbstractSpringRestTest {
 
     @Test
     public void testPutPserverExtractVertexAndThenDoGetByVertexIdAndThenDeleteIt() {

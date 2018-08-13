@@ -26,12 +26,14 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.UriInfo;
 
 import org.onap.aai.introspection.Introspector;
+import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.restcore.HttpMethod;
 import org.springframework.util.MultiValueMap;
 
 public class BulkOperation {
 
 	private URI uri = null;
+	private QueryParser uriQuery = null;
 	private Introspector introspector = null;
 	private HttpMethod httpMethod = null;
 	private String rawReq = "";
@@ -55,6 +57,14 @@ public class BulkOperation {
 
 	public void setUri(URI uri) {
 		this.uri = uri;
+	}
+
+	public QueryParser getUriQuery() {
+		return uriQuery;
+	}
+
+	public void setUriQuery(QueryParser uriQuery) {
+		this.uriQuery = uriQuery;
 	}
 
 	public Introspector getIntrospector() {
@@ -82,6 +92,10 @@ public class BulkOperation {
 		}
 		
 		this.uriInfo = bui;
+	}
+
+	public void addUriInfo(UriInfo uriInfo){
+		this.uriInfo = uriInfo;
 	}
 
 }

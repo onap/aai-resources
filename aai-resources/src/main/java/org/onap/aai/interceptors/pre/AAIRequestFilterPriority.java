@@ -31,9 +31,16 @@ public final class AAIRequestFilterPriority {
 
 	public static final int HTTP_HEADER = 4000;
 
+	public static final int LATEST = 4250;
+
 	public static final int AUTHORIZATION = 4500;
 
-	public static final int HEADER_MANIPULATION = 5000;
+	public static final int RETIRED_SERVICE = 5000;
 
-	public static final int REQUEST_MODIFICATION = 6000;
+	public static final int VERSION = 5500;
+
+	public static final int HEADER_MANIPULATION = 6000;
+
+	public static final int REQUEST_MODIFICATION = 7000;
+
 }

@@ -19,14 +19,22 @@
  */
 package org.onap.aai.interceptors.post;
 
+/**
+ * Response Filter order is done reverse sorted
+ * so in the following case the first response filter would be
+ * HEADER_MANIPULATION, RESPONSE_TRANS_LOGGING, RESET_LOGGING_CONTEXT,
+ * and INVALID_RESPONSE_STATUS
+ */
 public final class AAIResponseFilterPriority {
 	
 	private AAIResponseFilterPriority() {}
 
-	public static final int HEADER_MANIPULATION = 1000;
+	public static final int INVALID_RESPONSE_STATUS = 1000;
 
-	public static final int RESPONSE_TRANS_LOGGING = 2000;
+	public static final int RESET_LOGGING_CONTEXT = 2000;
 
-	public static final int RESET_LOGGING_CONTEXT = 3000;
+	public static final int RESPONSE_TRANS_LOGGING = 3000;
+
+	public static final int HEADER_MANIPULATION = 4000;
 
 }

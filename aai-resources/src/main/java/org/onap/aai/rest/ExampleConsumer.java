@@ -31,13 +31,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.LoaderFactory;
 import org.onap.aai.introspection.MarshallerProperties;
 import org.onap.aai.introspection.ModelType;
-import org.onap.aai.introspection.Version;
+import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.introspection.generator.CreateExample;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
@@ -45,7 +46,7 @@ import org.onap.aai.restcore.RESTAPI;
 /**
  * The Class ExampleConsumer.
  */
-@Path("/{version: v[789]|v1[01234]}/examples")
+@Path("{version: v[1-9][0-9]*|latest}/examples")
 public class ExampleConsumer extends RESTAPI {
 
 	
@@ -71,8 +72,8 @@ public class ExampleConsumer extends RESTAPI {
 			String mediaType = getMediaType(headers.getAcceptableMediaTypes());
 			org.onap.aai.restcore.MediaType outputMediaType = org.onap.aai.restcore.MediaType.getEnum(mediaType);
 			
-			Version version = Version.valueOf(versionParam);
-			Loader loader = LoaderFactory.createLoaderForVersion(ModelType.MOXY, version);
+			SchemaVersion version = new SchemaVersion(versionParam);
+			Loader loader = SpringContextAware.getBean( LoaderFactory.class).createLoaderForVersion(ModelType.MOXY, version);
 			
 			CreateExample example = new CreateExample(loader, type);
 			

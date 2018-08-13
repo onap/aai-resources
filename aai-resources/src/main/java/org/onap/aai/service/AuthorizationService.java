@@ -22,7 +22,9 @@ package org.onap.aai.service;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.util.security.Password;
+import org.onap.aai.Profiles;
 import org.onap.aai.util.AAIConstants;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+@Profile(Profiles.ONE_WAY_SSL)
 @Service
 public class AuthorizationService {
 

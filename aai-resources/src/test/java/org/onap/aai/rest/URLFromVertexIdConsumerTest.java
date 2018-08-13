@@ -29,8 +29,6 @@ import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.introspection.ModelInjestor;
-import org.onap.aai.introspection.Version;
 
 import javax.ws.rs.core.*;
 import java.io.IOException;
@@ -68,15 +66,18 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
     private List<MediaType> outputMediaTypes;
 
     private static final EELFLogger logger = EELFManager.getInstance().getLogger(LegacyMoxyConsumerTest.class.getName());
-
+    private boolean initialized = false;
     @BeforeClass
     public static void setupRest(){
-        AAIGraph.getInstance();
-        ModelInjestor.getInstance();
+       // AAIGraph.getInstance();
     }
 
     @Before
     public void setup(){
+    	if(!initialized){
+    		initialized = true;
+    		AAIGraph.getInstance();
+    	}
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
         urlFromVertexIdConsumer = new URLFromVertexIdConsumer();
@@ -129,7 +130,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
                 "",
                 "-1",
                 "-1",
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 uri,
                 "all",
                 "false",
@@ -142,7 +143,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         response = legacyMoxyConsumer.update(
                 payload,
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
@@ -164,7 +165,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         String vertexId = responseHeaders.get("vertex-id").get(0).toString();
         response = urlFromVertexIdConsumer.generateUrlFromVertexId(
                 "",
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 Long.valueOf(vertexId).longValue(),
                 httpHeaders,
                 uriInfo,
@@ -187,7 +188,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response = urlFromVertexIdConsumer.generateUrlFromVertexId(
                 "",
-                Version.getLatest().toString(),
+                schemaVersions.getDefaultVersion().toString(),
                 Long.valueOf(vertexId).longValue(),
                 httpHeaders,
                 uriInfo,

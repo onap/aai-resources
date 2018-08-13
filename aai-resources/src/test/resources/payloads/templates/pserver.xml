@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pserver xmlns="http://org.onap.aai.inventory/v11">
+    <hostname>${hostname}</hostname>
+    <ptnii-equip-name>example-ptnii-equip-name-val-35940</ptnii-equip-name>
+    <number-of-cpus>100</number-of-cpus>
+</pserver>

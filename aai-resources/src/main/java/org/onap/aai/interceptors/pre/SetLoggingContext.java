@@ -64,6 +64,7 @@ public class SetLoggingContext extends AAIContainerFilter implements ContainerRe
 		LoggingContext.component(fromAppId);
 		LoggingContext.serviceName(httpMethod + " " + uri);
 		LoggingContext.targetServiceName(httpMethod + " " + uri);
+		LoggingContext.statusCode(LoggingContext.StatusCode.COMPLETE);
 	}
 	
 }

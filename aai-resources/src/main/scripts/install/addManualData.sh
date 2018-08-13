@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 
 ###
 # ============LICENSE_START=======================================================
@@ -75,19 +75,8 @@ error_exit () {
 rel="/"$1"/"
 k=0
 
-if [ "$1" = "tenant_isolation" ]
-then
-	CR_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/cloud-region -name "*.txt" -print | sort -f`
-    AZ_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/availability-zone -name "*.txt" -print | sort -f`
-    COMPLEX_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/complex -name "*.txt" -print | sort -f`
-    ZONE_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/zone -name "*.txt" -print | sort -f`
-    PSERVER_TEXT_PATH=`find $PROJECT_HOME/resources/etc/scriptdata/addmanualdata/tenant_isolation/pserver -name "*.txt" -print | sort -f`
-    TEXT_PATH="${CR_TEXT_PATH} ${AZ_TEXT_PATH} ${COMPLEX_TEXT_PATH} ${ZONE_TEXT_PATH} ${PSERVER_TEXT_PATH}"
-    COMMAND=${TEXT_PATH}
-else
-	TEXT_PATH=$PROJECT_HOME/resources/etc/scriptdata/addmanualdata/*/*.txt
-	COMMAND=`ls ${TEXT_PATH} | sort -f`
-fi
+TEXT_PATH=$PROJECT_HOME/resources/etc/scriptdata/addmanualdata/*/*.txt
+COMMAND=`ls ${TEXT_PATH} | sort -f`
 
 ls  ${TEXT_PATH} >/dev/null 2>&1
 if [ $? -ne 0 ]
@@ -107,7 +96,8 @@ while IFS=\n read -r i
 do
 echo "##### Begin putTool for $i ##### from file $filepath" | tee -a $OUTFILE
 resource=`echo $i | tr -d '\r'`
-$PROJECT_HOME/scripts/putTool.sh $resource $jsonfile 1 0 na 1 >> $OUTFILE 2>&1 || error_exit "$resource" $j $filepath
+errorcode=412
+$PROJECT_HOME/scripts/putTool.sh $resource $jsonfile $errorcode 1 0 na 1 >> $OUTFILE 2>&1 || error_exit "$resource" $j $filepath
 echo "##### End putTool for $resource #####" | tee -a $OUTFILE
 echo "Begin getTool for $resource" | tee -a $OUTFILE
 $PROJECT_HOME/scripts/getTool.sh $resource >> $OUTFILE 2>&1 || error_exit "$i" $j $filepath

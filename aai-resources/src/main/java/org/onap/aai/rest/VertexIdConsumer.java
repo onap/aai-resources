@@ -41,7 +41,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.javatuples.Pair;
-
+import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.db.props.AAIProperties;
 import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
@@ -49,7 +49,6 @@ import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.MarshallerProperties;
 import org.onap.aai.introspection.ModelType;
-import org.onap.aai.introspection.Version;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
@@ -58,17 +57,20 @@ import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.db.DBSerializer;
 import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.onap.aai.setup.SchemaVersion;
 
 /**
  * The Class VertexIdConsumer.
  */
-@Path("{version: v[789]|v1[01234]}/resources")
+@Path("{version: v[1-9][0-9]*|latest}/resources")
 public class VertexIdConsumer extends RESTAPI {
-	
+
 	private ModelType introspectorFactoryType = ModelType.MOXY;
-	private QueryStyle queryStyle = QueryStyle.TRAVERSAL;
+	private QueryStyle queryStyle = QueryStyle.TRAVERSAL_URI;
 
 	private final String ID_ENDPOINT = "/id/{vertexid: \\d+}";
+	
+	private HttpEntry resourceHttpEntry;
 	
 	/**
 	 * Gets the by vertex id.
@@ -91,7 +93,7 @@ public class VertexIdConsumer extends RESTAPI {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
-		Version version = Version.valueOf(versionParam);
+		SchemaVersion version = new SchemaVersion(versionParam);
 		Status status = Status.NOT_FOUND;
 		String result = "";
 		Response response = null;
@@ -99,9 +101,10 @@ public class VertexIdConsumer extends RESTAPI {
 		try {
 			int depth = setDepth(depthParam);
 			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
-			HttpEntry httpEntry = new HttpEntry(version, introspectorFactoryType, queryStyle, type);
-			dbEngine = httpEntry.getDbEngine();
-			Loader loader = httpEntry.getLoader();
+			resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			resourceHttpEntry.setHttpEntryProperties(version, type);
+		    dbEngine = resourceHttpEntry.getDbEngine();
+			Loader loader = resourceHttpEntry.getLoader();
 
 			DBSerializer serializer = new DBSerializer(version, dbEngine, introspectorFactoryType, sourceOfTruth);
 			
@@ -127,7 +130,7 @@ public class VertexIdConsumer extends RESTAPI {
 			
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = httpEntry.process(requests, sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = resourceHttpEntry.process(requests, sourceOfTruth);
 			response = responsesTuple.getValue1().get(0).getValue1();
 		} catch (AAIException e){
 			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, e);

@@ -22,10 +22,10 @@ package org.onap.aai.rest;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.config.PropertyPasswordConfiguration;
+import org.onap.aai.config.SpringContextAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;
@@ -47,13 +46,12 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test REST requests against configuration resource
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = ResourcesApp.class)
-@TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(initializers = PropertyPasswordConfiguration.class)
-@Import(ResourcesTestConfiguration.class)
-public class ConfigurationTest {
 
+@TestPropertySource(locations = "classpath:application-test.properties")
+@ContextConfiguration(initializers = PropertyPasswordConfiguration.class, classes = {SpringContextAware.class})
+@Import(ResourcesTestConfiguration.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {SpringContextAware.class, ResourcesApp.class})
+public class ConfigurationTest extends AbstractSpringRestTest {
     @Autowired
     RestTemplate restTemplate;
 
@@ -85,18 +83,23 @@ public class ConfigurationTest {
 
     @Test
     public void testGetPutPatchConfiguration() {
-    	String hostname = "pservertest" + UUID.randomUUID().toString();
-        String endpoint = "/aai/v13/cloud-infrastructure/pservers/pserver/" + hostname;
+    	String cid = "configtest" + UUID.randomUUID().toString();
+        String endpoint = "/aai/v12/network/configurations/configuration/" + cid;
 
         ResponseEntity responseEntity = null;
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
+        //String putBody = " configuration-id, configuration-type configuration-sub-type";
         String putBody = "{" +
-        		"\"hostname\": \"" + hostname + "\"," +
-        		"\"ptnii-equip-name\": \"type1\"," +
-        		"\"equip-type\": \"subtype1\" " +
+        		"\"configuration-id\": \"" + cid + "\"," +
+        		"\"configuration-type\": \"type1\"," +
+        		"\"configuration-sub-type\": \"subtype1\", " +
+                "\"operational-status\": \"example1\", " +
+                "\"orchestration-status\": \"example1\", " +
+                "\"configuration-selflink\": \"example1\", " +
+                "\"model-customization-id\": \"example1\" " +
         	"}";
         httpEntityPut = new HttpEntity<String>(putBody, headers);
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntityPut, String.class);
@@ -110,9 +113,13 @@ public class ConfigurationTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         
         String patchBody = "{" +
-        		"\"hostname\": \"" + hostname + "\"," +
-        		"\"ptnii-equip-name\": \"type2\"," +
-        		"\"equip-type\": \"subtype2\" " +
+        		"\"configuration-id\": \"" + cid + "\"," +
+        		"\"configuration-type\": \"type2\"," +
+        		"\"configuration-sub-type\": \"subtype2\", " +
+                "\"operational-status\": \"example1\", " +
+                "\"orchestration-status\": \"example1\", " +
+                "\"configuration-selflink\": \"example1\", " +
+                "\"model-customization-id\": \"example1\" " +
         	"}";
         headers.put("Content-Type", Arrays.asList("application/merge-patch+json"));
         headers.add("X-HTTP-Method-Override", "PATCH");
@@ -126,14 +133,14 @@ public class ConfigurationTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         
         String body = responseEntity.getBody().toString();
-        String ptniiEquipName = JsonPath.read(body, "$.ptnii-equip-name");
+        String configurationType = JsonPath.read(body, "$.configuration-type");
 
-        assertEquals("type2", ptniiEquipName);
+        assertEquals("type2", configurationType);
         
         patchBody = "{" +
-        		"\"hostname\": \"" + hostname + "\"," +
-        		"\"ptnii-equip-name\": \"type3\"," +
-        		"\"equip-type\": \"subtype3\" " +
+        		"\"configuration-id\": \"" + cid + "\"," +
+        		"\"configuration-type\": \"type3\"," +
+        		"\"configuration-sub-type\": \"subtype3\" " +
         	"}";
         
         httpEntityPatch = new HttpEntity<String>(patchBody, headers);
@@ -144,9 +151,9 @@ public class ConfigurationTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         
         body = responseEntity.getBody().toString();
-        ptniiEquipName = JsonPath.read(body, "$.ptnii-equip-name");
+        configurationType = JsonPath.read(body, "$.configuration-type");
 
-        assertEquals("type3", ptniiEquipName);
+        assertEquals("type3", configurationType);
         
     }
     
