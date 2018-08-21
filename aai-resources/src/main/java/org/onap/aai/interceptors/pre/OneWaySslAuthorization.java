@@ -19,54 +19,104 @@
  */
 package org.onap.aai.interceptors.pre;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.onap.aai.Profiles;
+import org.onap.aai.ResourcesApp;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.interceptors.AAIContainerFilter;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.service.AuthorizationService;
+import org.onap.aai.web.AafFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 
 import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.container.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Profile(Profiles.ONE_WAY_SSL)
 @PreMatching
 @Priority(AAIRequestFilterPriority.AUTHORIZATION)
 public class OneWaySslAuthorization extends AAIContainerFilter implements ContainerRequestFilter {
 
+    private static final EELFLogger logger = EELFManager.getInstance().getLogger(OneWaySslAuthorization.class.getName());
+
+    @Context
+    HttpServletRequest request;
+
+    @Context
+    HttpServletResponse response;
+
     @Autowired
     private AuthorizationService authorizationService;
 
-    @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException
-    {
+    private AafFilter filter;
 
-        String basicAuth = containerRequestContext.getHeaderString("Authorization");
-        List<MediaType> acceptHeaderValues = containerRequestContext.getAcceptableMediaTypes();
+    private boolean noAuthentication;
+
+    public OneWaySslAuthorization() throws IOException, ServletException {
+        Properties cadiProperties = new Properties();
+        cadiProperties.load(ResourcesApp.class.getClassLoader().getResourceAsStream("cadi.properties"));
+        filter = new AafFilter(cadiProperties);
+        noAuthentication = "true".equals(System.getProperty("NO_AUTH"));
+
+        if(noAuthentication) {
+            logger.info("Authentication using AAF is turned off");
+        }
+    }
+
+    /**
+     * Will be replaced by AAF
+     */
+    @Deprecated
+    private boolean isUserValid(ContainerRequestContext requestContext){
+        String basicAuth = requestContext.getHeaderString("Authorization");
 
         if(basicAuth == null || !basicAuth.startsWith("Basic ")){
-            Optional<Response> responseOptional = errorResponse("AAI_3300", acceptHeaderValues);
-            containerRequestContext.abortWith(responseOptional.get());
-            return;
+            return false;
         }
 
         basicAuth = basicAuth.replaceAll("Basic ", "");
+        return authorizationService.checkIfUserAuthorized(basicAuth);
+    }
 
-        if(!authorizationService.checkIfUserAuthorized(basicAuth)){
-            Optional<Response> responseOptional = errorResponse("AAI_3300", acceptHeaderValues);
-            containerRequestContext.abortWith(responseOptional.get());
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        if(noAuthentication){
             return;
         }
 
+        if(isUserValid(requestContext)){
+            return;
+        }
+
+        try {
+            filter.doFilter(request, response, (request, response) -> {});
+            check(requestContext, response.getStatus() >= 400 );
+
+            if(response.getStatus() >= 500){
+                logger.error("The AAF authentication service is not working properly, returned status " + response.getStatus());
+            }
+
+        } catch (ServletException e) {
+            logger.error("Unable to authenticate user, AAF servlet error", e);
+        }
+    }
+
+    public void check(ContainerRequestContext containerRequestContext, boolean invalidUser){
+        List<MediaType> acceptHeaderValues = containerRequestContext.getAcceptableMediaTypes();
+        if(invalidUser){
+            Optional<Response> responseOptional = errorResponse("AAI_3300", acceptHeaderValues);
+            containerRequestContext.abortWith(responseOptional.get());
+        }
     }
 
     private Optional<Response> errorResponse(String errorCode, List<MediaType> acceptHeaderValues) {
@@ -74,6 +124,5 @@ public class OneWaySslAuthorization extends AAIContainerFilter implements Contai
         return Optional.of(Response.status(aaie.getErrorObject().getHTTPResponseCode())
                 .entity(ErrorLogHelper.getRESTAPIErrorResponse(acceptHeaderValues, aaie, new ArrayList<>()))
                 .build());
-
     }
 }
