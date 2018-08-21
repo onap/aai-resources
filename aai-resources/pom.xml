@@ -67,6 +67,7 @@
         <dom4j.version>1.6.1</dom4j.version>
         <commons.lang.version>2.6</commons.lang.version>
         <eelf.core.version>1.0.0</eelf.core.version>
+        <aaf.version>2.1.2</aaf.version>
         <logback.version>1.2.3</logback.version>
         <hamcrest.junit.version>2.0.0.0</hamcrest.junit.version>
         <junit.version>4.12</junit.version>
@@ -556,6 +557,11 @@
             <groupId>com.github.fge</groupId>
             <artifactId>json-patch</artifactId>
             <version>${json.patch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.onap.aaf.authz</groupId>
+            <artifactId>aaf-cadi-aaf</artifactId>
+            <version>${aaf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.javatuples</groupId>
