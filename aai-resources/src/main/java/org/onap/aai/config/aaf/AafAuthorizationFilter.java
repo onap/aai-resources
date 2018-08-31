@@ -17,61 +17,49 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
-package org.onap.aai.config;
+package org.onap.aai.config.aaf;
 
-import org.onap.aaf.cadi.PropAccess;
-import org.onap.aaf.cadi.filter.CadiFilter;
 import org.onap.aai.Profiles;
-import org.onap.aai.ResourcesApp;
-import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.logging.ErrorLogHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.filter.OrderedRequestContextFilter;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.Ordered;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Properties;
+
+import static org.onap.aai.config.aaf.ResponseFormatter.errorResponse;
 
 /**
- * AAF authentication filter
+ * AAF authorization filter
  */
 
 @Component
 @Profile(Profiles.AAF_AUTHENTICATION)
-public class AafFilter extends OrderedRequestContextFilter {
+@PropertySource("file:${server.local.startpath}/aaf/permissions.properties")
+public class AafAuthorizationFilter extends OrderedRequestContextFilter {
 
-    private static final String ACCEPT_HEADER = "accept";
-    private final CadiFilter cadiFilter;
+    @Value("${permission.type}")
+    String type;
 
-    public AafFilter() throws IOException, ServletException {
-        Properties cadiProperties = new Properties();
-        cadiProperties.load(ResourcesApp.class.getClassLoader().getResourceAsStream("cadi.properties"));
-        cadiFilter = new CadiFilter(new PropAccess(cadiProperties));
-        this.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    @Value("${permission.instance}")
+    String instance;
+
+    public AafAuthorizationFilter() {
+        this.setOrder(FilterPriority.AAF_AUTHORIZATION.getPriority());
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        cadiFilter.doFilter(request, response, filterChain);
-        if(response.getStatus() >=400 && response.getStatus() < 500){
+        String permission = String.format("%s|%s|%s", type, instance, request.getMethod().toLowerCase());
+        if(!request.isUserInRole(permission)){
             errorResponse(request, response);
+        }else{
+            filterChain.doFilter(request,response);
         }
     }
-
-    private void errorResponse(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String accept = request.getHeader(ACCEPT_HEADER) == null ? MediaType.APPLICATION_XML : request.getHeader(ACCEPT_HEADER);
-        AAIException aaie = new AAIException("AAI_3300");
-        response.setStatus(aaie.getErrorObject().getHTTPResponseCode().getStatusCode());
-        response.getWriter().write(ErrorLogHelper.getRESTAPIErrorResponse(Collections.singletonList(MediaType.valueOf(accept)), aaie, new ArrayList<>()));
-        response.getWriter().flush();
-        response.getWriter().close();
     }
-}
