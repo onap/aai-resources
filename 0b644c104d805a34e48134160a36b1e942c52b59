@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_1e2f9f40",
+        "filename": "aai-resources/src/main/java/org/onap/aai/config/aaf/AafAuthorizationFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 75
+      },
+      "writtenOn": "2018-09-03T04:39:35Z",
+      "side": 1,
+      "message": "Use property source @PropertySource(\"file:${server.local.startpath}/aaf/permissions.properties\")\nAs this will give the ability to override the properties file for different environments if needed.",
+      "revId": "0b644c104d805a34e48134160a36b1e942c52b59",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
