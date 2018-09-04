@@ -127,7 +127,7 @@
         <license.goal.type>check</license.goal.type>
         <jacoco.line.coverage.limit>0.68</jacoco.line.coverage.limit>
 
-        <spring.web.version>4.3.6.RELEASE</spring.web.version>
+        <spring.web.version>4.3.18.RELEASE</spring.web.version>
         <netty.handler.version>4.1.9.Final</netty.handler.version>
         <netty.version>4.0.37.Final</netty.version>
         <spring.test.version>4.3.6.RELEASE</spring.test.version>
