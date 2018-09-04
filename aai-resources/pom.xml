@@ -77,7 +77,7 @@
         <gremlin.driver.version>3.2.2</gremlin.driver.version>
         <gremlin.core.version>3.2.2</gremlin.core.version>
         <gremlin.version>3.2.2</gremlin.version>
-        <groovy.version>2.4.4</groovy.version>
+        <groovy.version>2.4.15</groovy.version>
         <hbase.version>1.0.2</hbase.version>
         <smack.version>3.0.4</smack.version>
         <json.simple.version>1.1.1</json.simple.version>
