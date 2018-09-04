@@ -16,6 +16,24 @@
       "revId": "0b644c104d805a34e48134160a36b1e942c52b59",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_49e323a4",
+        "filename": "aai-resources/src/main/java/org/onap/aai/config/aaf/AafAuthorizationFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2381
+      },
+      "writtenOn": "2018-09-04T19:37:16Z",
+      "side": 1,
+      "message": "Correct me please if I am wrong but:\n\n1. server.local.startpath is defined inside application.properties, how do we change this property? Isn\u0027t it the same as if you directly change the value in permissions.properties?\n\n2. it seems (but maybe I am wrong) application.properties is not even being read by the application, so the server.local.startpath is undefined throught the application\n\nIf 1. and 2. are true (which I am not 100% certain that it is), then your request doesn\u0027t make sense.",
+      "parentUuid": "1a76adc5_1e2f9f40",
+      "revId": "0b644c104d805a34e48134160a36b1e942c52b59",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
