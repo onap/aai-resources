@@ -44,7 +44,7 @@ source_profile;
 export PRE_JAVA_OPTS=${PRE_JAVA_OPTS:--Xms6g -Xmx8g};
 
 #### Step 1) clear out the database
-execute_spring_jar org.onap.aai.dbgen.DataSnapshot ${PROJECT_HOME}/resources/etc/appprops/dataSnapshot-logback.xml "CLEAR_ENTIRE_DATABASE" "$1" "$2"
+execute_spring_jar org.onap.aai.dbgen.DataSnapshot ${PROJECT_HOME}/resources/etc/appprops/dataSnapshot-logback.xml "CLEAR_ENTIRE_DATABASE" "$1"
 if [ "$?" -ne "0" ]; then
     echo "Problem clearing out database."
     exit 1
