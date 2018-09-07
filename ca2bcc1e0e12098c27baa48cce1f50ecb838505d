@@ -1,0 +1,9 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Eric Debeau <eric.debeau@orange.com>
+Code-Review+1: Venkata Harish Kajur <vk250x@att.com>
+Code-Review+2: James Forsyth <jf2512@att.com>
+Submitted-by: James Forsyth <jf2512@att.com>
+Submitted-at: Fri, 07 Sep 2018 14:28:15 +0000
+Reviewed-on: https://gerrit.onap.org/r/64849
+Project: aai/resources
+Branch: refs/heads/beijing
