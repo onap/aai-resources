@@ -56,6 +56,9 @@ public class AafAuthorizationFilter extends OrderedRequestContextFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String permission = String.format("%s|%s|%s", type, instance, request.getMethod().toLowerCase());
+        if(request.getRequestURI().matches("^.*/util/echo$")){
+            filterChain.doFilter(request, response);
+        }
         if(!request.isUserInRole(permission)){
             errorResponse(request, response);
         }else{
