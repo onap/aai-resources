@@ -94,7 +94,7 @@
         <dmaap.client.version>0.2.12</dmaap.client.version>
         <httpcore.version>4.4</httpcore.version>
         <json.path.version>2.2.0</json.path.version>
-        <activemq.version>5.15.3</activemq.version>
+        <activemq.version>5.15.6</activemq.version>
         <httpclient.version>4.5.3</httpclient.version>
         <spring.jms.version>4.3.2.RELEASE</spring.jms.version>
         <spotify.docker.version>0.4.11</spotify.docker.version>
@@ -446,6 +446,10 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -456,6 +460,10 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
