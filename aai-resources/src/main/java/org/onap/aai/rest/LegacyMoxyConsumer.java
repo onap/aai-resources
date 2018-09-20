@@ -131,7 +131,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
    	 	try {
 			validateRequest(info);
    			SchemaVersion version = new SchemaVersion(versionParam);
-   			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
+   			DBConnectionType type = DBConnectionType.REALTIME;
    			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
    			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			loader = traversalUriHttpEntry.getLoader();
@@ -352,7 +352,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 			validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
+			DBConnectionType type = DBConnectionType.REALTIME;
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
@@ -426,7 +426,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		try {
 			this.validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
+			DBConnectionType type = DBConnectionType.REALTIME;
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			loader = traversalUriHttpEntry.getLoader();
@@ -535,7 +535,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			validateRequest(info);
 
 			version = new SchemaVersion(versionParam);
-			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
+			DBConnectionType type = DBConnectionType.REALTIME;
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			loader = traversalUriHttpEntry.getLoader();

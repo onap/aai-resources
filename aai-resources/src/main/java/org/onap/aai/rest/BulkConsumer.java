@@ -126,7 +126,7 @@ public abstract class BulkConsumer extends RESTAPI {
 		Response response = null;
 
 		try {
-            DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
+            DBConnectionType type = DBConnectionType.REALTIME;
 
             String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
             LoggingContext.requestId(transId);
