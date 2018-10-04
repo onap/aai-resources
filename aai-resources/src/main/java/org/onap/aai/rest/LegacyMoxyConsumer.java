@@ -65,8 +65,8 @@ import org.onap.aai.rest.util.ValidateEncoding;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.att.eelf.configuration.EELFLogger;
@@ -131,7 +131,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
    	 	try {
 			validateRequest(info);
    			SchemaVersion version = new SchemaVersion(versionParam);
-   			DBConnectionType type = DBConnectionType.REALTIME;
+   			DBConnectionType type = null;
+   			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+   			    type = DBConnectionType.REALTIME;
+			} else {
+				type = this.determineConnectionType(sourceOfTruth, realTime);
+			}
    			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
    			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			loader = traversalUriHttpEntry.getLoader();
@@ -253,7 +258,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		try {
 			validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
+			DBConnectionType type = null;
+			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+				type = DBConnectionType.REALTIME;
+			} else {
+				type = this.determineConnectionType(sourceOfTruth, realTime);
+			}
 			final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
@@ -352,7 +362,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 			validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = DBConnectionType.REALTIME;
+			DBConnectionType type = null;
+			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+				type = DBConnectionType.REALTIME;
+			} else {
+				type = this.determineConnectionType(sourceOfTruth, realTime);
+			}
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
@@ -426,7 +441,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		try {
 			this.validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = DBConnectionType.REALTIME;
+			DBConnectionType type = null;
+			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+				type = DBConnectionType.REALTIME;
+			} else {
+				type = this.determineConnectionType(sourceOfTruth, realTime);
+			}
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			loader = traversalUriHttpEntry.getLoader();
@@ -535,7 +555,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			validateRequest(info);
 
 			version = new SchemaVersion(versionParam);
-			DBConnectionType type = DBConnectionType.REALTIME;
+			DBConnectionType type = null;
+			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+				type = DBConnectionType.REALTIME;
+			} else {
+				type = this.determineConnectionType(sourceOfTruth, realTime);
+			}
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			loader = traversalUriHttpEntry.getLoader();

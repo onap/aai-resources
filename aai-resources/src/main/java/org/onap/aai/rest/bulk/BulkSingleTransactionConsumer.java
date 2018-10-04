@@ -74,7 +74,11 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 		initLogging(req, transId, sourceOfTruth);
 
 		try {
-			type = DBConnectionType.REALTIME;
+			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+				type = DBConnectionType.REALTIME;
+			} else {
+				type = this.determineConnectionType(sourceOfTruth, realTime);
+			}
 
 			// unmarshall the payload.
 			Gson gson = new Gson();
