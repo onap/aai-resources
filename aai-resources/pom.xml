@@ -129,7 +129,7 @@
 
         <spring.web.version>4.3.18.RELEASE</spring.web.version>
         <netty.handler.version>4.1.9.Final</netty.handler.version>
-        <netty.version>4.0.37.Final</netty.version>
+        <netty.version>4.0.56.Final</netty.version>
         <spring.test.version>4.3.6.RELEASE</spring.test.version>
 
         <!-- This will be used for the docker images as the default format of maven build has issues -->
