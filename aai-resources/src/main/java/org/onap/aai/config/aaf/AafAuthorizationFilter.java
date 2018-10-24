@@ -32,8 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static org.onap.aai.config.aaf.ResponseFormatter.errorResponse;
-
 /**
  * AAF authorization filter
  */
@@ -60,7 +58,7 @@ public class AafAuthorizationFilter extends OrderedRequestContextFilter {
             filterChain.doFilter(request, response);
         }
         if(!request.isUserInRole(permission)){
-            errorResponse(request, response);
+            response.setStatus(403);
         }else{
             filterChain.doFilter(request,response);
         }
