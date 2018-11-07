@@ -25,19 +25,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.onap.aai.resources</groupId>
     <artifactId>aai-resources</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.3-SNAPSHOT</version>
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.3.2-SNAPSHOT</version>
+        <version>1.3.3-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
-        <aai.schema.version>1.3.0</aai.schema.version>
-        <aai.core.version>1.3.0</aai.core.version>
-        <aai.schema.ingest.version>1.3.0</aai.schema.ingest.version>
+        <aai.schema.version>1.3.2-SNAPSHOT</aai.schema.version>
+        <aai.core.version>1.3.2-SNAPSHOT</aai.core.version>
+        <aai.schema.ingest.version>1.3.2-SNAPSHOT</aai.schema.ingest.version>
         <hbase.version>1.0.2</hbase.version>
 
         <spring.boot.version>1.5.15.RELEASE</spring.boot.version>
