@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,122 +19,112 @@
  */
 package org.onap.aai.web;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.util.Comparator.comparingInt;
+
+import java.lang.reflect.AnnotatedElement;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.logging.Logger;
+import javax.annotation.Priority;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.onap.aai.rest.*;
+import org.onap.aai.rest.BulkAddConsumer;
+import org.onap.aai.rest.BulkProcessConsumer;
+import org.onap.aai.rest.ExampleConsumer;
+import org.onap.aai.rest.LegacyMoxyConsumer;
+import org.onap.aai.rest.URLFromVertexIdConsumer;
+import org.onap.aai.rest.VertexIdConsumer;
 import org.onap.aai.rest.bulk.BulkSingleTransactionConsumer;
 import org.onap.aai.rest.util.EchoResponse;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseFilter;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-@Component
-public class JerseyConfiguration extends ResourceConfig {
+@Configuration
+public class JerseyConfiguration {
 
     private static final Logger log = Logger.getLogger(JerseyConfiguration.class.getName());
 
-    private Environment env;
+    private static final String LOGGING_ENABLED_PROPERTY = "aai.request.logging.enabled";
+    private static final String INTERCEPTOR_PACKAGE = "org.onap.aai.interceptors";
+    private static final boolean ENABLE_RESPONSE_LOGGING = false;
+
+    private final Environment environment;
+    private final ResourceConfig resourceConfig = new ResourceConfig();
 
     @Autowired
-    public JerseyConfiguration(Environment env) {
+    JerseyConfiguration(Environment environment) {
+        this.environment = environment;
+    }
 
-        this.env = env;
+    @Bean
+    public ResourceConfig resourceConfig() {
+        resourceConfig.register(EchoResponse.class);
+        resourceConfig.register(VertexIdConsumer.class);
+        resourceConfig.register(ExampleConsumer.class);
+        resourceConfig.register(BulkAddConsumer.class);
+        resourceConfig.register(BulkProcessConsumer.class);
+        resourceConfig.register(BulkSingleTransactionConsumer.class);
+        resourceConfig.register(LegacyMoxyConsumer.class);
+        resourceConfig.register(URLFromVertexIdConsumer.class);
 
-        register(EchoResponse.class);
-        register(VertexIdConsumer.class);
-        register(ExampleConsumer.class);
-        register(BulkAddConsumer.class);
-        register(BulkProcessConsumer.class);
-        register(BulkSingleTransactionConsumer.class);
-        register(LegacyMoxyConsumer.class);
-        register(URLFromVertexIdConsumer.class);
+        registerFiltersForClasses(ContainerRequestFilter.class, ContainerResponseFilter.class);
 
-        //Request Filters
-        registerFiltersForRequests();
-        // Response Filters
-        registerFiltersForResponses();
+        if (loggingEnabled()) {
+            logRequests();
+        }
 
-        // Following registers the request headers and response headers
-        // If the LoggingFilter second argument is set to true, it will print response value as well
-        if ("true".equalsIgnoreCase(env.getProperty("aai.request.logging.enabled"))) {
-            register(new LoggingFilter(log, false));
+        return resourceConfig;
+    }
+
+    private void registerFiltersForClasses(Class<?>... classes) {
+        Reflections reflections = new Reflections(INTERCEPTOR_PACKAGE);
+        for (Class<?> clazz : classes) {
+            registerFiltersFor(clazz, reflections);
         }
     }
 
-    public void registerFiltersForRequests() {
+    private <T> void registerFiltersFor(Class<T> clazz, Reflections reflections) {
+        Set<Class<? extends T>> filters = reflections.getSubTypesOf(clazz);
 
-        // Find all the classes within the interceptors package
-        Reflections reflections = new Reflections("org.onap.aai.interceptors");
-        // Filter them based on the clazz that was passed in
-        Set<Class<? extends ContainerRequestFilter>> filters = reflections.getSubTypesOf(ContainerRequestFilter.class);
+        throwIfPriorityAnnotationAbsent(filters);
 
-
-        // Check to ensure that each of the filter has the @Priority annotation and if not throw exception
-        for (Class filterClass : filters) {
-            if (filterClass.getAnnotation(Priority.class) == null) {
-                throw new RuntimeException("Container filter " + filterClass.getName() + " does not have @Priority annotation");
-            }
-        }
-
-        // Turn the set back into a list
-        List<Class<? extends ContainerRequestFilter>> filtersList = filters
-                .stream()
-                .filter(f -> {
-                    if (f.isAnnotationPresent(Profile.class)
-                            && !env.acceptsProfiles(f.getAnnotation(Profile.class).value())) {
-                        return false;
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
-
-        // Sort them by their priority levels value
-        filtersList.sort((c1, c2) -> Integer.valueOf(c1.getAnnotation(Priority.class).value()).compareTo(c2.getAnnotation(Priority.class).value()));
-
-        // Then register this to the jersey application
-        filtersList.forEach(this::register);
+        filters.stream()
+            .filter(this::isEnabledByActiveProfiles)
+            .sorted(priorityComparator())
+            .forEach(resourceConfig::register);
     }
 
-    public void registerFiltersForResponses() {
-
-        // Find all the classes within the interceptors package
-        Reflections reflections = new Reflections("org.onap.aai.interceptors");
-        // Filter them based on the clazz that was passed in
-        Set<Class<? extends ContainerResponseFilter>> filters = reflections.getSubTypesOf(ContainerResponseFilter.class);
-
-
-        // Check to ensure that each of the filter has the @Priority annotation and if not throw exception
-        for (Class filterClass : filters) {
-            if (filterClass.getAnnotation(Priority.class) == null) {
-                throw new RuntimeException("Container filter " + filterClass.getName() + " does not have @Priority annotation");
+    private <T> void throwIfPriorityAnnotationAbsent(Collection<Class<? extends T>> classes) {
+        for (Class clazz : classes) {
+            if (!clazz.isAnnotationPresent(Priority.class)) {
+                throw new RuntimeException(
+                    "Container filter " + clazz.getName() + " does not have @Priority annotation");
             }
         }
+    }
 
-        // Turn the set back into a list
-        List<Class<? extends ContainerResponseFilter>> filtersList = filters.stream()
-                .filter(f -> {
-                    if (f.isAnnotationPresent(Profile.class)
-                            && !env.acceptsProfiles(f.getAnnotation(Profile.class).value())) {
-                        return false;
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
+    private <T> Comparator<Class<? extends T>> priorityComparator() {
+        return comparingInt(clazz -> clazz.getAnnotation(Priority.class).value());
+    }
 
-        // Sort them by their priority levels value
-        filtersList.sort((c1, c2) -> Integer.valueOf(c1.getAnnotation(Priority.class).value()).compareTo(c2.getAnnotation(Priority.class).value()));
+    private void logRequests() {
+        resourceConfig.register(new LoggingFilter(log, ENABLE_RESPONSE_LOGGING));
+    }
 
-        // Then register this to the jersey application
-        filtersList.forEach(this::register);
+    private boolean loggingEnabled() {
+        return parseBoolean(environment.getProperty(LOGGING_ENABLED_PROPERTY));
+    }
+
+    private boolean isEnabledByActiveProfiles(AnnotatedElement annotatedElement) {
+        return !annotatedElement.isAnnotationPresent(Profile.class) ||
+            environment.acceptsProfiles(annotatedElement.getAnnotation(Profile.class).value());
     }
 }
