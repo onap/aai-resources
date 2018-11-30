@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_c59ad562",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 2731
+      },
+      "writtenOn": "2018-11-30T08:26:54Z",
+      "side": 1,
+      "message": "Not sure what you mean about this one. \n\nAt this point behaviour is plainly generic. Also using this construction I can reuse gathered by Reflections classes in both cases. Old version fetched all classes two times, then filtering them for concrete sub classes.",
+      "parentUuid": "9adffdf1_4504a5bf",
+      "range": {
+        "startLine": 78,
+        "startChar": 8,
+        "endLine": 78,
+        "endChar": 95
+      },
+      "revId": "f407c47badf89055236aefc8876989d0e90ebaf8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_052e9d43",
         "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
         "patchSetId": 5
@@ -82,6 +106,30 @@
       "writtenOn": "2018-11-30T07:24:26Z",
       "side": 1,
       "message": "Perhaps this test confirms the re-factor did not break anything (it would need to be run on the original implementation though), but what else does it do except promote ossification?",
+      "range": {
+        "startLine": 63,
+        "startChar": 8,
+        "endLine": 63,
+        "endChar": 38
+      },
+      "revId": "f407c47badf89055236aefc8876989d0e90ebaf8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_058a1d1b",
+        "filename": "aai-resources/src/test/java/org/onap/aai/web/JerseyConfigurationTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 2731
+      },
+      "writtenOn": "2018-11-30T08:26:54Z",
+      "side": 1,
+      "message": "\u003e it would need to be run on the original implementation though\n\nI expected this will be pointed out, please refer to patch set 1 in which original code is tested.\n\n\u003e but what else does it do except promote ossification?\n\nFair point, I still not feel right about it, major reason I wrote this dummy test was to make best effort to not break anything. Probably I will remove it after draft.",
+      "parentUuid": "9adffdf1_a51c7114",
       "range": {
         "startLine": 63,
         "startChar": 8,
