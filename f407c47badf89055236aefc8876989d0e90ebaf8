@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_c5109503",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2018-11-30T07:24:26Z",
+      "side": 1,
+      "message": "The original implementation used inheritance; the new implementation uses composition, so +1 for good design patterns.",
+      "range": {
+        "startLine": 60,
+        "startChar": 4,
+        "endLine": 60,
+        "endChar": 71
+      },
+      "revId": "f407c47badf89055236aefc8876989d0e90ebaf8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4504a5bf",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2018-11-30T07:24:26Z",
+      "side": 1,
+      "message": "The original implementation had public interfaces for registering filters for requests and responses, so allowing for divergent behaviours for each.",
+      "range": {
+        "startLine": 78,
+        "startChar": 8,
+        "endLine": 78,
+        "endChar": 95
+      },
+      "revId": "f407c47badf89055236aefc8876989d0e90ebaf8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_052e9d43",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2018-11-30T07:24:26Z",
+      "side": 1,
+      "message": "The new implementation has reusable helper functions that are private, so there is no possible reuse permitted, though it does highlight the fact that the behaviours for requests and responses were actually identical in this case. Again +1 for cool re-factor.",
+      "range": {
+        "startLine": 87,
+        "startChar": 4,
+        "endLine": 87,
+        "endChar": 63
+      },
+      "revId": "f407c47badf89055236aefc8876989d0e90ebaf8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_a51c7114",
+        "filename": "aai-resources/src/test/java/org/onap/aai/web/JerseyConfigurationTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2018-11-30T07:24:26Z",
+      "side": 1,
+      "message": "Perhaps this test confirms the re-factor did not break anything (it would need to be run on the original implementation though), but what else does it do except promote ossification?",
+      "range": {
+        "startLine": 63,
+        "startChar": 8,
+        "endLine": 63,
+        "endChar": 38
+      },
+      "revId": "f407c47badf89055236aefc8876989d0e90ebaf8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
