@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_6a2649d0",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 2795
+      },
+      "writtenOn": "2018-12-05T12:20:25Z",
+      "side": 1,
+      "message": "Why isn\u0027t constructor public?",
+      "range": {
+        "startLine": 63,
+        "startChar": 4,
+        "endLine": 63,
+        "endChar": 23
+      },
+      "revId": "6cffd8fcc0fd6c13745cf1c220aea65ed8225ff2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_8a212db6",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 2795
+      },
+      "writtenOn": "2018-12-05T12:20:25Z",
+      "side": 1,
+      "message": "I think it would be better to create resourceConfig here. This is just a result of this function, not a state of this class.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 30
+      },
+      "revId": "6cffd8fcc0fd6c13745cf1c220aea65ed8225ff2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2a304100",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 2795
+      },
+      "writtenOn": "2018-12-05T12:20:25Z",
+      "side": 1,
+      "message": "reflections could be field in this class.",
+      "range": {
+        "startLine": 88,
+        "startChar": 8,
+        "endLine": 88,
+        "endChar": 71
+      },
+      "revId": "6cffd8fcc0fd6c13745cf1c220aea65ed8225ff2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0a369d03",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 2795
+      },
+      "writtenOn": "2018-12-05T12:20:25Z",
+      "side": 1,
+      "message": "Thy to avoid throwing RuntimeException directly. For example create new exception class that extends RuntimeException.",
+      "range": {
+        "startLine": 108,
+        "startChar": 26,
+        "endLine": 108,
+        "endChar": 42
+      },
+      "revId": "6cffd8fcc0fd6c13745cf1c220aea65ed8225ff2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_aa3c31e3",
+        "filename": "aai-resources/src/main/java/org/onap/aai/web/JerseyConfiguration.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 2795
+      },
+      "writtenOn": "2018-12-05T12:20:25Z",
+      "side": 1,
+      "message": "isLoggingEnabled",
+      "range": {
+        "startLine": 122,
+        "startChar": 20,
+        "endLine": 122,
+        "endChar": 34
+      },
+      "revId": "6cffd8fcc0fd6c13745cf1c220aea65ed8225ff2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
