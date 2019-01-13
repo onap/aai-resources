@@ -50,6 +50,8 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.jaxrs.PATCH;
 import org.javatuples.Pair;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.onap.aai.concurrent.AaiCallable;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.DBConnectionType;
@@ -93,6 +95,16 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 	}
 
+	/**
+	 *
+	 * @param content
+	 * @param versionParam
+	 * @param uri
+	 * @param headers
+	 * @param info
+	 * @param req
+	 * @return
+	 */
 	@PUT
 	@Path("/{uri: .+}")
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -128,17 +140,17 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		TransactionalGraphEngine dbEngine = null;
 		boolean success = true;
 
-   	 	try {
+		try {
 			validateRequest(info);
-   			SchemaVersion version = new SchemaVersion(versionParam);
-   			DBConnectionType type = null;
-   			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-   			    type = DBConnectionType.REALTIME;
+			SchemaVersion version = new SchemaVersion(versionParam);
+			DBConnectionType type = null;
+			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+				type = DBConnectionType.REALTIME;
 			} else {
 				type = this.determineConnectionType(sourceOfTruth, realTime);
 			}
-   			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-   			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			traversalUriHttpEntry.setHttpEntryProperties(version, type);
 			loader = traversalUriHttpEntry.getLoader();
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 
@@ -199,7 +211,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info);
 
 	}
-	
+
 	/**
 	 * Gets the legacy.
 	 *
@@ -230,12 +242,12 @@ public class LegacyMoxyConsumer extends RESTAPI {
 						return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>(), resultIndex, resultSize);
 					}
 				}
-				);
+		);
 	}
 
 	/**
 	 * This method exists as a workaround for filtering out undesired query params while routing between REST consumers
-	 * 
+	 *
 	 * @param content
 	 * @param versionParam
 	 * @param uri
@@ -296,7 +308,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
-			
+
 		} catch (AAIException e) {
 			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, e);
 		} catch (Exception e ) {
@@ -377,7 +389,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
 			String objType = uriQuery.getResultType();
-	        Introspector obj = loader.introspectorFromName(objType);
+			Introspector obj = loader.introspectorFromName(objType);
 
 			DBRequest request = new DBRequest.Builder(HttpMethod.DELETE, uriObject, uriQuery, obj, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
@@ -462,7 +474,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 			Introspector wrappedEntity = loader.unmarshal("relationship", content, org.onap.aai.restcore.MediaType.getEnum(this.getInputMediaType(inputMediaType)));
 
-    		DBRequest request = new DBRequest.Builder(HttpMethod.DELETE_EDGE, uriObject, uriQuery, wrappedEntity, headers, info, transId).build();
+			DBRequest request = new DBRequest.Builder(HttpMethod.DELETE_EDGE, uriObject, uriQuery, wrappedEntity, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
 			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests, sourceOfTruth);
@@ -488,7 +500,103 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 		return response;
 	}
-	
+
+	@GET
+	@Path("/{uri: .+}/relationship-list")
+	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	public Response getRelationshipList (@DefaultValue("-1") @QueryParam("resultIndex") String resultIndex, @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context UriInfo info) {
+		return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED,
+				AAIConstants.AAI_CRUD_TIMEOUT_APP,
+				AAIConstants.AAI_CRUD_TIMEOUT_LIMIT,
+				headers,
+				info,
+				HttpMethod.GET,
+				new AaiCallable<Response>() {
+					@Override
+					public Response process() {
+						return getRelationshipList(versionParam, uri, cleanUp, headers, info, resultIndex, resultSize);
+					}
+				}
+		);
+	}
+
+	/**
+	 *
+	 * @param versionParam
+	 * @param uri
+	 * @param cleanUp
+	 * @param headers
+	 * @param info
+	 * @return
+	 */
+	public Response getRelationshipList(String versionParam, String uri, String cleanUp, HttpHeaders headers, UriInfo info, String resultIndex, String resultSize) {
+		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
+		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
+		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
+		Response response = null;
+		TransactionalGraphEngine dbEngine = null;
+		Loader loader = null;
+
+		try {
+			validateRequest(info);
+			SchemaVersion version = new SchemaVersion(versionParam);
+			DBConnectionType type = null;
+			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
+				type = DBConnectionType.REALTIME;
+			} else {
+				type = this.determineConnectionType(sourceOfTruth, realTime);
+			}
+			final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			dbEngine = traversalUriHttpEntry.getDbEngine();
+			loader = traversalUriHttpEntry.getLoader();
+			MultivaluedMap<String, String> params = info.getQueryParameters();
+
+			params = removeNonFilterableParams(params);
+
+			uri = uri.split("\\?")[0];
+
+			URI uriObject = UriBuilder.fromPath(uri).build();
+
+			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject, params);
+
+			String objType = "";
+			if (!uriQuery.getContainerType().equals("")) {
+				objType = uriQuery.getContainerType();
+			} else {
+				objType = uriQuery.getResultType();
+			}
+			Introspector obj = loader.introspectorFromName(objType);
+			DBRequest request =
+					new DBRequest.Builder(HttpMethod.GET_RELATIONSHIP, uriObject, uriQuery, obj, headers, info, transId).build();
+			List<DBRequest> requests = new ArrayList<>();
+			requests.add(request);
+			if (resultIndex != null && resultIndex != "-1" && resultSize != null && resultSize != "-1") {
+				traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
+				traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
+			}
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth);
+
+			response = responsesTuple.getValue1().get(0).getValue1();
+		} catch (AAIException e) {
+			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET_RELATIONSHIP, e);
+		} catch (Exception e ) {
+			AAIException ex = new AAIException("AAI_4000", e);
+
+			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET_RELATIONSHIP, ex);
+		} finally {
+			if (dbEngine != null) {
+				if (cleanUp.equals("true")) {
+					dbEngine.commit();
+				} else {
+					dbEngine.rollback();
+				}
+			}
+		}
+		return response;
+	}
+
 	/**
 	 * Validate request.
 	 *
@@ -502,7 +610,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			throw new AAIException("AAI_3008", "uri=" + getPath(info));
 		}
 	}
-	
+
 	/**
 	 * Gets the path.
 	 *
@@ -523,11 +631,11 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		if (map.keySet().size() > 0) {
 			path += params + queryParams;
 		}
-		
+
 		return path;
-		
+
 	}
-	
+
 	/**
 	 * Handle writes.
 	 *
@@ -568,32 +676,32 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			URI uriObject = UriBuilder.fromPath(uri).build();
 			this.validateURI(uriObject);
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
-	        String objName = uriQuery.getResultType();
-	        if (content.length() == 0) {
-	        	if (mediaType.toString().contains(MediaType.APPLICATION_JSON)) {
-		        	content = "{}";
-	        	} else {
-	        		content = "<empty/>";
-	        	}
-	        }
-	        Introspector obj = loader.unmarshal(objName, content, org.onap.aai.restcore.MediaType.getEnum(this.getInputMediaType(mediaType)));
-	        if (obj == null) {
-	        	throw new AAIException("AAI_3000", "object could not be unmarshalled:" + content);
-	        }
-	       
-	        if (mediaType.toString().contains(MediaType.APPLICATION_XML) && !content.equals("<empty/>") && isEmptyObject(obj)) {
-		        throw new AAIInvalidXMLNamespace(content);
-	        }
-	        
-	        this.validateIntrospector(obj, loader, uriObject, method);
-	        
-			DBRequest request = 
+			String objName = uriQuery.getResultType();
+			if (content.length() == 0) {
+				if (mediaType.toString().contains(MediaType.APPLICATION_JSON)) {
+					content = "{}";
+				} else {
+					content = "<empty/>";
+				}
+			}
+			Introspector obj = loader.unmarshal(objName, content, org.onap.aai.restcore.MediaType.getEnum(this.getInputMediaType(mediaType)));
+			if (obj == null) {
+				throw new AAIException("AAI_3000", "object could not be unmarshalled:" + content);
+			}
+
+			if (mediaType.toString().contains(MediaType.APPLICATION_XML) && !content.equals("<empty/>") && isEmptyObject(obj)) {
+				throw new AAIInvalidXMLNamespace(content);
+			}
+
+			this.validateIntrospector(obj, loader, uriObject, method);
+
+			DBRequest request =
 					new DBRequest.Builder(method, uriObject, uriQuery, obj, headers, info, transId)
-					.rawRequestContent(content).build();
+							.rawRequestContent(content).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
 			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests,  sourceOfTruth);
-	        
+
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
 		} catch (AAIException e) {
@@ -612,21 +720,21 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				}
 			}
 		}
-		
+
 		return response;
 	}
-	
+
 	private void validateURI(URI uri) throws AAIException {
 		if (hasRelatedTo(uri)) {
 			throw new AAIException("AAI_3010");
 		}
 	}
 	private boolean hasRelatedTo(URI uri) {
-		
+
 		return uri.toString().contains("/" + RestTokens.COUSIN + "/");
 	}
-	
+
 	protected boolean isEmptyObject(Introspector obj) {
-       return "{}".equals(obj.marshal(false));
+		return "{}".equals(obj.marshal(false));
 	}
 }

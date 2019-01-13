@@ -204,6 +204,22 @@
 			<pattern>${eelfLogPattern}</pattern>
 		</encoder>
 	</appender>
+	<appender name="dmaapAAIEventConsumerInfo"
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<File>${logDirectory}/dmaapAAIEventConsumer/dmaap-transaction.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/dmaap-transaction.log.%d{yyyy-MM-dd}
+			</fileNamePattern>
+		</rollingPolicy>
+		<encoder class="org.onap.aai.logging.EcompEncoder">
+			<pattern>${eelfLogPattern}</pattern>
+		</encoder>
+	</appender>
 	<appender name="dmaapAAIEventConsumerMetric"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -248,29 +264,9 @@
 	<logger name="com.blog.spring.jms" level="WARN" />
 	<logger name="com.jayway.jsonpath" level="WARN" />
 
-	<!-- AJSC Services (bootstrap services) -->
-	<logger name="ajsc" level="WARN" />
-	<logger name="ajsc.RouteMgmtService" level="WARN" />
-	<logger name="ajsc.ComputeService" level="WARN" />
-	<logger name="ajsc.VandelayService" level="WARN" />
-	<logger name="ajsc.FilePersistenceService" level="WARN" />
-	<logger name="ajsc.UserDefinedJarService" level="WARN" />
-	<logger name="ajsc.UserDefinedBeansDefService" level="WARN" />
-	<logger name="ajsc.LoggingConfigurationService" level="WARN" />
-
-	<!-- AJSC related loggers (DME2 Registration, csi logging, restlet, servlet 
+	<!-- AJSC related loggers (DME2 Registration, csi logging, restlet, servlet
 		logging) -->
 	<logger name="org.codehaus.groovy" level="WARN" />
-	<logger name="com.att.scamper" level="WARN" />
-	<logger name="ajsc.utils" level="WARN" />
-	<logger name="ajsc.utils.DME2Helper" level="WARN" />
-	<logger name="ajsc.filters" level="WARN" />
-	<logger name="ajsc.beans.interceptors" level="WARN" />
-	<logger name="ajsc.restlet" level="WARN" />
-	<logger name="ajsc.servlet" level="WARN" />
-	<logger name="com.att.ajsc" level="WARN" />
-	<logger name="com.att.ajsc.csi.logging" level="WARN" />
-	<logger name="com.att.ajsc.filemonitor" level="WARN" />
 	<logger name="com.netflix.loadbalancer" level="WARN" />
 
 	<logger name="org.apache.zookeeper" level="OFF" />
@@ -369,6 +365,10 @@
 		<appender-ref ref="dmaapAAIEventConsumer" />
 		<appender-ref ref="dmaapAAIEventConsumerDebug" />
 		<appender-ref ref="dmaapAAIEventConsumerMetric" />
+	</logger>
+
+	<logger name="com.att.nsa.mr" level="INFO" >
+		<appender-ref ref="dmaapAAIEventConsumerInfo" />
 	</logger>
 
 	<logger name="org.apache" level="OFF" />

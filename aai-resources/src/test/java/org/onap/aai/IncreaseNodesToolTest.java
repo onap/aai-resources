@@ -48,11 +48,8 @@ public class IncreaseNodesToolTest extends AAISetup {
 
     @Mock
     GraphTraversal<org.apache.tinkerpop.gremlin.structure.Vertex, org.apache.tinkerpop.gremlin.structure.Vertex> graphTraversalVertex;
-
     private IncreaseNodesTool increaseNodesTool;
-
-
-    String [] args = {"-numberOfNodes", "5" ,"-nodeType", "pserver", "-uri", "/cloud-infrastructure/pservers/pserver/"};
+    String [] args = {"-numberOfNodes", "5" ,"-nodeType", "pserver", "-uri", "/cloud-infrastructure/pservers/pserver/", "-child", "false"};
 
     @Before
     public void setup(){

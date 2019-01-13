@@ -1,0 +1,16 @@
+{
+  "physical-location-id" : "e13d4587-19ad-4bf5-80f5-c021efb5b61e",
+  "physical-location-type" : "complextype2",
+  "street1" : "NewJerseyWay",
+  "city" : "Middletown",
+  "postal-code" : "07701",
+  "country" : "USA",
+  "region" : "NE",
+  "ctag-pools" : {
+    "ctag-pool" : [ {
+      "target-pe" : "5dbe73c6-cedf-4e68-a7c5-699ba6d90e1e",
+      "availability-zone-name" : "819ec2fa-fb9f-49f0-8fd8-5feb941aad1g",
+      "ctag-pool-purpose" : "4TMeWJ"
+    } ]
+  }
+}

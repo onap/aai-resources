@@ -21,6 +21,9 @@ package org.onap.aai.rest;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import org.json.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -121,6 +124,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         Mockito.doReturn(null).when(queryParameters).remove(anyObject());
 
         when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
+
+
     }
 
     @Test
@@ -731,6 +736,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         int timeout = legacyMoxyConsumer.getTimeoutLimit("JUNITTESTAPP2", AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
         assertEquals(-1, timeout);
     }
+    @Ignore("Time sensitive test only times out if the response takes longer than 1 second")
     @Test
     public void testTimeoutGetCall() throws Exception{
         String uri = getUri();
@@ -786,6 +792,199 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 uriInfo,
                 mockReqGet
         );
+
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testGetRelationshipWithoutFormat() throws IOException, JSONException {
+        String payload = getRelationshipPayload("pserver-complex-relationship-list2");
+        String pserverData = getRelationshipPayload("pserver2");
+        String complexData = getRelationshipPayload("complex2");
+
+        String hostname = "590a8943-1200-43b3-825b-75dde6b8f44b";
+        String physicalLocationId ="e13d4587-19ad-4bf5-80f5-c021efb5b61d";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        String cloudRegionUri = String.format("cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+
+        doSetupResource(pserverUri, pserverData);
+        doSetupResource(cloudRegionUri, complexData);
+
+        String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship2");
+        String cloudToPserverRelationshipUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
+        Response response = legacyMoxyConsumer.updateRelationship(
+                cloudToPserverRelationshipData,
+                schemaVersions.getDefaultVersion().toString(),
+                cloudToPserverRelationshipUri,
+                httpHeaders,
+                uriInfo,
+                mockReq
+        );
+
+        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+
+        assertEquals("Expected to return status created from the response",
+                Response.Status.OK.getStatusCode(), response.getStatus());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+
+        String getRelationshipMockRequestUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
+        String getRelationshipUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s", hostname);
+        response = legacyMoxyConsumer.getRelationshipList(
+                "1",
+                "1",
+                schemaVersions.getDefaultVersion().toString(),
+                getRelationshipUri,
+                "false",
+                httpHeaders,
+                uriInfo
+        );
+
+        String s = response.getEntity().toString();
+
+        code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        JSONAssert.assertEquals(payload, response.getEntity().toString(), false);
+    }
+
+    @Test
+    public void testGetRelationshipWithFormat() throws IOException, JSONException, ParseException {
+        String payload = getRelationshipPayload("pserver-complex-relationship-list3");
+        String pserverData = getRelationshipPayload("pserver3");
+        String complexData = getRelationshipPayload("complex3");
+
+        String hostname = "590a8943-1200-43b3-825b-75dde6b8f44c";
+        String physicalLocationId ="e13d4587-19ad-4bf5-80f5-c021efb5b61e";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        String cloudRegionUri = String.format("cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+
+        doSetupResource(pserverUri, pserverData);
+        doSetupResource(cloudRegionUri, complexData);
+
+        String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship3");
+        String cloudToPserverRelationshipUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
+        Response response = legacyMoxyConsumer.updateRelationship(
+                cloudToPserverRelationshipData,
+                schemaVersions.getDefaultVersion().toString(),
+                cloudToPserverRelationshipUri,
+                httpHeaders,
+                uriInfo,
+                mockReq
+        );
+
+        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+
+        assertEquals("Expected to return status created from the response",
+                Response.Status.OK.getStatusCode(), response.getStatus());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+
+        String getRelationshipMockRequestUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
+        String getRelationshipUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s", hostname);
+        queryParameters.add("format", "resource");
+        response = legacyMoxyConsumer.getRelationshipList(
+                "1",
+                "1",
+                schemaVersions.getDefaultVersion().toString(),
+                getRelationshipUri,
+                "false",
+                httpHeaders,
+                uriInfo
+        );
+        queryParameters.remove("format");
+
+        code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        String responsePayload = response.getEntity().toString();
+        JSONObject payloadJsonObject = new JSONObject(payload);
+        JSONObject responseJsonObject = new JSONObject(responsePayload);
+
+        JSONArray payloadResultsArray = payloadJsonObject.getJSONArray("results");
+        JSONArray responseResultsArray = responseJsonObject.getJSONArray("results");
+        assertEquals(payloadResultsArray.length(), responseResultsArray.length());
+
+        for (int i = 0; i < payloadResultsArray.length(); i++) {
+            String payloadResults = payloadResultsArray.get(i).toString();
+            String responseResults = responseResultsArray.get(i).toString();
+
+            JSONObject pserverPayloadObject = new JSONObject(payloadResults);
+            JSONObject pserverResponseObject = new JSONObject(responseResults);
+            String pserverPayload = pserverPayloadObject.get("pserver").toString();
+            String pserverResponse = pserverResponseObject.get("pserver").toString();
+
+            JSONObject pserverPayloadFields = new JSONObject(pserverPayload);
+            JSONObject pserverResponseFields = new JSONObject(pserverResponse);
+            String pserverPayloadHostname = pserverPayloadFields.get("hostname").toString();
+            String pserverResponseHostname = pserverResponseFields.get("hostname").toString();
+            String pserverPayloadInmaint = pserverPayloadFields.get("in-maint").toString();
+            String pserverResponseInmaint = pserverResponseFields.get("in-maint").toString();
+            String pserverPayloadRelationshipList = pserverPayloadFields.get("relationship-list").toString();
+            String pserverResponseRelationshipList = pserverResponseFields.get("relationship-list").toString();
+
+            assertEquals(pserverPayloadHostname, pserverResponseHostname);
+            assertEquals(pserverPayloadInmaint, pserverResponseInmaint);
+            assertEquals(pserverPayloadRelationshipList, pserverResponseRelationshipList);
+        }
+    }
+
+    @Test
+    public void testGetRelationshipWithoutSuppliedRelationship() throws IOException, JSONException {
+        String pserverData = getRelationshipPayload("pserver4");
+        String complexData = getRelationshipPayload("complex4");
+
+        String hostname = "590a8943-1200-43b3-825b-75dde6b8f44d";
+        String physicalLocationId ="e13d4587-19ad-4bf5-80f5-c021efb5b61f";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        String cloudRegionUri = String.format("cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+
+        doSetupResource(pserverUri, pserverData);
+        doSetupResource(cloudRegionUri, complexData);
+
+        String getRelationshipMockRequestUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
+        String getRelationshipUri = String.format(
+                "cloud-infrastructure/pservers/pserver/%s", hostname);
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("GET_RELATIONSHIP", getRelationshipMockRequestUri);
+        Response response = legacyMoxyConsumer.getRelationshipList(
+                "1",
+                "1",
+                schemaVersions.getDefaultVersion().toString(),
+                getRelationshipUri,
+                "false",
+                httpHeaders,
+                uriInfo
+        );
+
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ksh
 
 ###
 # ============LICENSE_START=======================================================
@@ -46,7 +46,7 @@ display_usage() {
         cat <<EOF
         Usage: $0 [options]
 
-        1. Usage: putTool.sh <resource-path> <json payload file> <optional -display>
+        1. Usage: putTool.sh <resource-path> <json payload file> <optional -display> <optional -XFROMAPPID> <optional -XTRANSID>
         2. This script requires two arguments, a resource path and a file path to a json file containing the payload.
         3. Example: resource-path and payload for a particular customer is: business/customers/customer/JohnDoe customerpayload.json
         4. Adding the optional "-display" argument will display all data returned from the request.
@@ -75,6 +75,14 @@ ALLOWHTTPRESPONSES=$3
 
 XFROMAPPID="AAI-TOOLS"
 XTRANSID=`uuidgen`
+
+if [ ! -z "$4" ]; then
+   XFROMAPPID=$4
+fi
+
+if [ ! -z "$5" ]; then
+   XTRANSID=$5
+fi
 
 userid=$( id | cut -f2 -d"(" | cut -f1 -d")" )
 if [ "${userid}" != "aaiadmin" ]; then

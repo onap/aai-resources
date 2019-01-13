@@ -108,7 +108,7 @@ public class RetiredConsumerSpringTest extends AbstractSpringRestTest {
     private void setupNamedQueriesRetired() {
         httpStatusMap = new HashMap<>();
 
-        httpStatusMap.put("/aai/v8/cloud-infrastructure/pservers/pserver/samomaisdjfajsfoas", HttpStatus.NOT_FOUND);
+        httpStatusMap.put("/aai/v13/cloud-infrastructure/pservers/pserver/samomaisdjfajsfoas", HttpStatus.NOT_FOUND);
 
         httpStatusMap.put("/aai/v8/service-design-and-creation/named-queries/named-query/samomaisdjfajsfoas", HttpStatus.GONE);
     }
@@ -130,13 +130,16 @@ public class RetiredConsumerSpringTest extends AbstractSpringRestTest {
         httpStatusMap.put("/aai/v4/cloud-infrastructure/pservers/pserver/test-pserver1", HttpStatus.GONE);
         httpStatusMap.put("/aai/v5/cloud-infrastructure/pservers/pserver/test-pserver1", HttpStatus.GONE);
         httpStatusMap.put("/aai/v6/cloud-infrastructure/pservers/pserver/test-pserver1", HttpStatus.GONE);
+        httpStatusMap.put("/aai/v7/cloud-infrastructure/pservers/pserver/test-pserver1", HttpStatus.GONE);
+        httpStatusMap.put("/aai/v8/cloud-infrastructure/pservers/pserver/test-pserver1", HttpStatus.GONE);
+        httpStatusMap.put("/aai/v9/cloud-infrastructure/pservers/pserver/test-pserver1", HttpStatus.GONE);
     }
 
     private void setupModelsRetired() {
 
         httpStatusMap = new HashMap<>();
 
-        httpStatusMap.put("/aai/v8/cloud-infrastructure/pservers/pserver/samomaisdjfajsfoas", HttpStatus.NOT_FOUND);
+        httpStatusMap.put("/aai/v8/cloud-infrastructure/pservers/pserver/samomaisdjfajsfoas", HttpStatus.GONE);
 
         httpStatusMap.put("/aai/v8/service-design-and-creation/models/model/samomaisdjfajsfoas", HttpStatus.GONE);
     }

@@ -25,11 +25,13 @@ import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.onap.aai.config.PropertyPasswordConfiguration;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 
+import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.logging.LoggingContext.StatusCode;
 import org.onap.aai.util.AAIConfig;
@@ -135,13 +137,27 @@ public class ResourcesApp {
 		LoggingContext.serviceName(APP_NAME);
 		LoggingContext.targetServiceName("contextInitialized");
 		LoggingContext.statusCode(StatusCode.COMPLETE);
-		
-	    
-		SpringApplication app = new SpringApplication(ResourcesApp.class);
-		app.setLogStartupInfo(false);
-		app.setRegisterShutdownHook(true);
-		app.addInitializers(new PropertyPasswordConfiguration());
-		Environment env = app.run(args).getEnvironment();
+
+		Environment env =null;
+		AAIConfig.init();
+		try {
+			SpringApplication app = new SpringApplication(ResourcesApp.class);
+			app.setLogStartupInfo(false);
+			app.setRegisterShutdownHook(true);
+			app.addInitializers(new PropertyPasswordConfiguration());
+			env = app.run(args).getEnvironment();
+		}
+		catch(Exception ex){
+			AAIException aai = schemaServiceExceptionTranslator(ex);
+			LoggingContext.statusCode(LoggingContext.StatusCode.ERROR);
+			LoggingContext.responseCode(LoggingContext.DATA_ERROR);
+			logger.error("Problems starting ResourcesApp "+aai.getMessage());
+			ErrorLogHelper.logException(aai);
+			ErrorLogHelper.logError(aai.getCode(), ex.getMessage() + ", resolve and restart Resources");
+			//ErrorLogHelper.logError(aai.getCode(), aai.getMessage() + aai.getCause().toString());
+			throw aai;
+		}
+
 		MDC.setContextMap (contextMap);
 		logger.info(
 				"Application '{}' is running on {}!" ,
@@ -186,5 +202,22 @@ public class ResourcesApp {
 				System.setProperty("BUNDLECONFIG_DIR", "aai-resources/src/main/resources");
 			}
 		}
+	}
+	private static AAIException schemaServiceExceptionTranslator(Exception ex) {
+		AAIException aai = null;
+		if(ExceptionUtils.getRootCause(ex).getMessage().contains("NodeIngestor")){
+			aai = new  AAIException("AAI_3026","Error reading OXM from SchemaService - Investigate");
+		}
+		else if(ExceptionUtils.getRootCause(ex).getMessage().contains("EdgeIngestor")){
+			aai = new  AAIException("AAI_3027","Error reading EdgeRules from SchemaService - Investigate");
+		}
+		else if(ExceptionUtils.getRootCause(ex).getMessage().contains("Connection refused")){
+			aai = new  AAIException("AAI_3025","Error connecting to SchemaService - Investigate");
+		}
+		else {
+			aai = new  AAIException("AAI_3025","Error connecting to SchemaService - Please Investigate");
+		}
+
+		return aai;
 	}
 }

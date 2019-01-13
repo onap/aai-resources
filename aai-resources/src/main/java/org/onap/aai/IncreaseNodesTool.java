@@ -23,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
@@ -37,18 +36,22 @@ import org.onap.aai.introspection.exceptions.AAIUnknownObjectException;
 import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.util.AAISystemExitUtil;
 import org.onap.aai.util.PositiveNumValidator;
-
+import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.onap.aai.serialization.db.EdgeSerializer;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class IncreaseNodesTool {
 
    public static long nodeCount = 0;
-
+    protected EdgeSerializer edgeSerializer;
    private LoaderFactory loaderFactory;
    private SchemaVersions schemaVersions;
+   protected TransactionalGraphEngine engine;
+    Vertex parentVtx;
+
+
 
    public IncreaseNodesTool(LoaderFactory loaderFactory, SchemaVersions schemaVersions){
        this.loaderFactory = loaderFactory;
@@ -88,20 +91,18 @@ public class IncreaseNodesTool {
         nodeCount = Long.parseLong(cArgs.numberOfNodes);
         addVertex(janusGraph, cArgs.nodeType,propList,cArgs);
     }
-
     /***
      * adds a vertex based on user inputs of node type number of nodes and the node uri
      * /cloud-infrastructure/pservers/pserver/
      * /network/pnfs/pnf/
-     * /cloud-infrastructure/pservers/pserver/random-056fd6c4-7313-4fa0-b854-0d9983bdb0ab/DevB/p-interfaces/p-interface/
-     * @param nodeType
-     * @param propList
+     * /cloud-infrastructure/pservers/pserver/random-056fd6c4-7313-4fa0-b854-0d9983bdb0ab/p-interfaces/p-interface/
+     * @param
+     * @param
      * @param cArgs
      */
     public  void addVertex(JanusGraph janusGraph, String nodeType, List<String> propList,CommandLineArgs cArgs){
 
         long startTime = System.currentTimeMillis();
-
         try (JanusGraphTransaction transaction = janusGraph.newTransaction()) {
             boolean success = true;
 
@@ -110,9 +111,26 @@ public class IncreaseNodesTool {
                 for (long i = 1; i <= nodeCount; i++) {
                     String randomId = UUID.randomUUID().toString();
                     Vertex v = g.addV().next();
+
+                    if(cArgs.child.equals(true)){
+
+                        if(parentVtx == null){
+                            String[] uriTokens = cArgs.uri.split("//");
+                            String ParentNodeType = uriTokens[uriTokens.length-4]; //parent node type
+                            String keyVal = uriTokens[uriTokens.length-3]; // parent unique key
+                            parentVtx = g.V().has(ParentNodeType,keyVal).next();
+                            edgeSerializer.addTreeEdgeIfPossible(g,parentVtx,v);
+
+                        }
+                        else{
+                            edgeSerializer.addTreeEdgeIfPossible(g,parentVtx,v);
+                        }
+                    }
+
                     v.property("aai-node-type", nodeType);
                     v.property("source-of-truth", "IncreaseNodesTool");
                     v.property("aai-uri", cArgs.uri+"random-"+randomId);
+
 
                     for(String propName : propList){
                         if(propName.equals("in-maint")){
@@ -137,17 +155,23 @@ public class IncreaseNodesTool {
         }
     }
 
-}
+   }
+
+
 
 class CommandLineArgs {
 
     @Parameter(names = "-numberOfNodes", description = "how many nodes you would like to enter", required = true , validateWith = PositiveNumValidator.class)
     public String numberOfNodes;
 
-    @Parameter(names = "-nodeType", description = "They aai-node-type of the node being entered", required = true)
+    @Parameter(names = "-nodeType", description = "The aai-node-type of the node being entered", required = true)
     public String nodeType;
 
-    @Parameter(names = "-uri", description = "uri to be passed for the node")
+    @Parameter(names = "-uri", description = "uri to be passed for the node",required = true)
     public String uri;
+
+    @Parameter(names = "-child", description = "is this a child node",required = true)
+    public String child;
+
 }
 

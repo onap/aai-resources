@@ -38,7 +38,7 @@ if [ $(cat /etc/passwd | grep aaiadmin | wc -l) -eq 0 ]; then
 	}
 fi;
 
-chown -R aaiadmin:aaiadmin /opt/app /opt/aai/logroot
+chown -R aaiadmin:aaiadmin /opt/app /opt/aai/logroot /opt/bulkprocess_load
 find /opt/app/ -name "*.sh" -exec chmod +x {} +
 
 if [ -f ${APP_HOME}/aai.sh ]; then
@@ -65,6 +65,13 @@ if [ -f ${APP_HOME}/aai.sh ]; then
         fi;
 
         exit 0;
+    fi;
+
+    if [ ! -f ${APP_HOME}/scripts/updatePem.sh ]; then
+        echo "Unable to find the updatePem script";
+        exit 1;
+    else
+        gosu aaiadmin ${APP_HOME}/scripts/updatePem.sh
     fi;
 
 fi;
@@ -117,12 +124,16 @@ JVM_OPTS="${JVM_OPTS} -Dsun.net.inetaddr.ttl=180";
 JVM_OPTS="${JVM_OPTS} -XX:+HeapDumpOnOutOfMemoryError";
 JVM_OPTS="${JVM_OPTS} ${POST_JVM_ARGS}";
 JAVA_OPTS="${PRE_JAVA_OPTS} -DAJSC_HOME=$APP_HOME";
+if [ -f ${INTROSCOPE_LIB}/Agent.jar ] && [ -f ${INTROSCOPE_AGENTPROFILE} ]; then
+        JAVA_OPTS="${JAVA_OPTS} -javaagent:${INTROSCOPE_LIB}/Agent.jar -noverify -Dcom.wily.introscope.agentProfile=${INTROSCOPE_AGENTPROFILE} -Dintroscope.agent.agentName=resources"
+fi
 JAVA_OPTS="${JAVA_OPTS} -Dserver.port=${SERVER_PORT}";
 JAVA_OPTS="${JAVA_OPTS} -DBUNDLECONFIG_DIR=./resources";
 JAVA_OPTS="${JAVA_OPTS} -Dserver.local.startpath=${RESOURCES_HOME}";
 JAVA_OPTS="${JAVA_OPTS} -DAAI_CHEF_ENV=${AAI_CHEF_ENV}";
 JAVA_OPTS="${JAVA_OPTS} -DSCLD_ENV=${SCLD_ENV}";
 JAVA_OPTS="${JAVA_OPTS} -DAFT_ENVIRONMENT=${AFT_ENVIRONMENT}";
+JAVA_OPTS="${JAVA_OPTS} -DlrmName=com.att.ajsc.aai-resources";
 JAVA_OPTS="${JAVA_OPTS} -DAAI_BUILD_VERSION=${AAI_BUILD_VERSION}";
 JAVA_OPTS="${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom";
 JAVA_OPTS="${JAVA_OPTS} -Dlogback.configurationFile=./resources/logback.xml";

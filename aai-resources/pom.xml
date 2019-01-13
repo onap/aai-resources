@@ -35,9 +35,9 @@
         <java.version>1.8</java.version>
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
-        <aai.schema.version>1.4.0</aai.schema.version>
-        <aai.core.version>1.4.0</aai.core.version>
-        <aai.schema.ingest.version>1.4.0</aai.schema.ingest.version>
+        <aai.schema.version>1.4.1-SNAPSHOT</aai.schema.version>
+        <aai.core.version>1.4.1-SNAPSHOT</aai.core.version>
+        <aai.schema.ingest.version>1.4.1-SNAPSHOT</aai.schema.ingest.version>
         <hbase.version>1.0.2</hbase.version>
 
         <spring.boot.version>1.5.18.RELEASE</spring.boot.version>
@@ -141,14 +141,17 @@
         <schema.configuration.location>N/A</schema.configuration.location>
         <schema.nodes.location>${project.basedir}/src/main/resources/schema/${schema.source.name}/oxm</schema.nodes.location>
         <schema.edges.location>${project.basedir}/src/main/resources/schema/${schema.source.name}/dbedgerules</schema.edges.location>
-        <schema.version.depth.start>v9</schema.version.depth.start>
+        <schema.version.depth.start>v10</schema.version.depth.start>
         <schema.version.related.link.start>v10</schema.version.related.link.start>
         <schema.version.app.root.start>v11</schema.version.app.root.start>
         <schema.version.namespace.change.start>v12</schema.version.namespace.change.start>
         <schema.version.edge.label.start>v12</schema.version.edge.label.start>
-        <schema.version.api.default>v14</schema.version.api.default>
-        <schema.version.list>v8,v9,v10,v11,v12,v13,v14</schema.version.list>
+        <schema.version.api.default>v15</schema.version.api.default>
+        <schema.version.list>v10,v11,v12,v13,v14,v15</schema.version.list>
         <schema.uri.base.path>/aai</schema.uri.base.path>
+        <!-- <schema.translator.list>config</schema.translator.list> -->
+        <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>
+
         <!-- End of Default ONAP Schema Properties -->
 
         <!-- Setting some default value to not complain by editor but it will be overridden by gmaven plugin -->
@@ -228,7 +231,8 @@
             <properties>
                 <schema.source.name>onap</schema.source.name>
                 <schema.version.namespace.change.start>v12</schema.version.namespace.change.start>
-                <schema.version.list>v8,v9,v10,v11,v12,v13,v14</schema.version.list>
+                <schema.version.list>v10,v11,v12,v13,v14,v15</schema.version.list>
+                <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>
             </properties>
         </profile>
         <!-- End of ONAP Profile -->
@@ -307,6 +311,10 @@
                                 <property>
                                     <key>schema.uri.base.path</key>
                                     <value>${schema.uri.base.path}</value>
+                                </property>
+                                <property>
+                                    <key>schema.ingest.file</key>
+                                    <value>${schema.ingest.file}</value>
                                 </property>
                             </systemProperties>
                             <executable>java</executable>
