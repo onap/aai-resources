@@ -1,0 +1,10 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Lukasz Biniek <lukasz.biniek@nokia.com>
+Code-Review+1: Michal Kabaj <michal.kabaj@nokia.com>
+Code-Review+1: Keong Lim <keong.lim@huawei.com>
+Code-Review+2: James Forsyth <jf2512@att.com>
+Submitted-by: James Forsyth <jf2512@att.com>
+Submitted-at: Wed, 16 Jan 2019 17:35:04 +0000
+Reviewed-on: https://gerrit.onap.org/r/73917
+Project: aai/resources
+Branch: refs/heads/master
