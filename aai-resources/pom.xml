@@ -124,7 +124,6 @@
         <maven.skip.tests>true</maven.skip.tests>
         <snapshot.file>${project.basedir}/snapshots/snapshot.graphson</snapshot.file>
 
-        <license.goal.type>check</license.goal.type>
         <jacoco.line.coverage.limit>0.68</jacoco.line.coverage.limit>
 
         <spring.web.version>4.3.21.RELEASE</spring.web.version>
@@ -920,15 +919,6 @@
                         <skipExistingHeaders>false</skipExistingHeaders>
                         <skip>false</skip>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <!-- Set goal to "format" to auto update license headers -->
-                                <goal>${license.goal.type}</goal>
-                            </goals>
-                            <phase>process-sources</phase>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
