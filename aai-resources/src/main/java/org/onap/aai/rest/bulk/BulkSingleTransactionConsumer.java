@@ -19,6 +19,8 @@
  */
 package org.onap.aai.rest.bulk;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.javatuples.Pair;
@@ -58,7 +60,8 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 	private static final String TARGET_ENTITY = "aai-resources";
 	private static final Set<String> validOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("put", "patch", "delete")));
 	private int allowedOperationCount = 30;
-	private TransactionalGraphEngine dbEngine = null;
+
+	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(BulkSingleTransactionConsumer.class);
 
 	@POST
 	@Consumes(value = javax.ws.rs.core.MediaType.APPLICATION_JSON)
@@ -72,6 +75,11 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 		DBConnectionType type;
 
 		initLogging(req, transId, sourceOfTruth);
+		boolean success = true;
+
+		TransactionalGraphEngine dbEngine = null;
+		TransactionResponse transactionResponse;
+		Response response;
 
 		try {
 			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
@@ -101,7 +109,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 			HttpEntry resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			resourceHttpEntry.setHttpEntryProperties(version, type);
 			Loader loader = resourceHttpEntry.getLoader();
-			TransactionalGraphEngine dbEngine = resourceHttpEntry.getDbEngine();
+			dbEngine = resourceHttpEntry.getDbEngine();
 
 			//populate uri query
 			populateUriQuery(bulkOperations, dbEngine);
@@ -116,28 +124,32 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 			Pair<Boolean, List<Pair<URI, Response>>> results = resourceHttpEntry.process(dbRequests, sourceOfTruth, this.enableResourceVersion());
 
 			//process result of db requests
-			TransactionResponse transactionResponse = buildTransactionResponse(transaction, results.getValue1());
+			transactionResponse = buildTransactionResponse(transaction, results.getValue1());
 
 			//commit/rollback based on results
-			if (results.getValue0()) { //everything was processed without error
-				dbEngine.commit();
-			} else { //something failed
-				dbEngine.rollback();
-			}
+			success = results.getValue0();
 
-			return Response
+			response = Response
 					.status(Response.Status.CREATED)
 					.entity(new GsonBuilder().serializeNulls().create().toJson(transactionResponse))
 					.build();
 
 		} catch (AAIException e) {
-			return consumerExceptionResponseGenerator(headers, info, javax.ws.rs.HttpMethod.POST, e);
+			response = consumerExceptionResponseGenerator(headers, info, javax.ws.rs.HttpMethod.POST, e);
+			success  = false;
 		} finally {
 			if (dbEngine != null) {
-				dbEngine.rollback();
+				if(success){
+					dbEngine.commit();
+					LOGGER.info("Successfully committed the transaction to the database");
+				} else {
+					dbEngine.rollback();
+					LOGGER.info("Rolled back the transaction due to failure");
+				}
 			}
 		}
 
+		return response;
 	}
 
 
