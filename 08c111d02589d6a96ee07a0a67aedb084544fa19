@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c4ef0740_d06cd220",
+        "filename": "aai-resources/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-03-06T03:52:00Z",
+      "side": 1,
+      "message": "would it be better to push the schema version up or keep it the same, even though schema-service is new? This line makes it look like a regression to an older version.",
+      "range": {
+        "startLine": 38,
+        "startChar": 28,
+        "endLine": 38,
+        "endChar": 42
+      },
+      "revId": "08c111d02589d6a96ee07a0a67aedb084544fa19",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
