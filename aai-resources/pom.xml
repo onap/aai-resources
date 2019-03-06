@@ -35,7 +35,7 @@
         <java.version>1.8</java.version>
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
-        <aai.schema.version>1.4.1-SNAPSHOT</aai.schema.version>
+        <aai.schema.version>1.0.1-SNAPSHOT</aai.schema.version>
         <aai.core.version>1.4.1-SNAPSHOT</aai.core.version>
         <aai.schema.ingest.version>1.4.1-SNAPSHOT</aai.schema.ingest.version>
         <hbase.version>1.0.2</hbase.version>
@@ -847,7 +847,7 @@
                             <configuration>
                                 <artifactItems>
                                     <artifactItem>
-                                        <groupId>org.onap.aai.aai-common</groupId>
+                                        <groupId>org.onap.aai.schema-service</groupId>
                                         <artifactId>aai-schema</artifactId>
                                         <version>${aai.schema.version}</version>
                                         <outputDirectory>${project.basedir}/src/main/resources/schema/</outputDirectory>
@@ -866,7 +866,7 @@
                             <configuration>
                                 <artifactItems>
                                     <artifactItem>
-                                        <groupId>org.onap.aai.aai-common</groupId>
+                                        <groupId>org.onap.aai.schema-service</groupId>
                                         <artifactId>aai-schema</artifactId>
                                         <version>${aai.schema.version}</version>
                                         <outputDirectory>${project.basedir}/src/main/resources/schema/</outputDirectory>
