@@ -35,12 +35,12 @@
         <java.version>1.8</java.version>
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
-        <aai.schema.version>1.0.1-SNAPSHOT</aai.schema.version>
-        <aai.core.version>1.4.1-SNAPSHOT</aai.core.version>
-        <aai.schema.ingest.version>1.4.1-SNAPSHOT</aai.schema.ingest.version>
+        <aai.schema.version>1.0.1</aai.schema.version>
+        <aai.core.version>1.4.1</aai.core.version>
+        <aai.schema.ingest.version>1.4.1</aai.schema.ingest.version>
         <hbase.version>1.0.2</hbase.version>
 
-        <spring.boot.version>1.5.18.RELEASE</spring.boot.version>
+        <spring.boot.version>1.5.19.RELEASE</spring.boot.version>
 
         <!-- Start of the jacoco plugin properties -->
         <sonar.language>java</sonar.language>
