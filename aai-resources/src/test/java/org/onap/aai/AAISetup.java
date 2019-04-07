@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
+import org.onap.aai.config.ConfigConfiguration;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.config.IntrospectionConfig;
 import org.onap.aai.introspection.LoaderFactory;
@@ -51,8 +52,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 @ContextConfiguration(classes = {
-        SchemaLocationsBean.class,
-        SchemaVersions.class,
+        ConfigConfiguration.class,
         AAIConfigTranslator.class,
         NodeIngestor.class,
         EdgeIngestor.class,
