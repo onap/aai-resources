@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0339672_be959fde",
+        "filename": "aai-resources/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-08T06:29:19Z",
+      "side": 1,
+      "message": "needs the aai-common version to be released first before it can work?",
+      "range": {
+        "startLine": 40,
+        "startChar": 35,
+        "endLine": 40,
+        "endChar": 40
+      },
+      "revId": "54756d32bf51dac3327d6ae507b77802bf447867",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
