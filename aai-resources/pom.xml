@@ -36,8 +36,8 @@
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
         <aai.schema.version>1.0.1</aai.schema.version>
-        <aai.core.version>1.4.1</aai.core.version>
-        <aai.schema.ingest.version>1.4.1</aai.schema.ingest.version>
+        <aai.core.version>1.4.2</aai.core.version>
+        <aai.schema.ingest.version>1.4.2</aai.schema.ingest.version>
         <hbase.version>1.0.2</hbase.version>
 
         <spring.boot.version>1.5.20.RELEASE</spring.boot.version>
