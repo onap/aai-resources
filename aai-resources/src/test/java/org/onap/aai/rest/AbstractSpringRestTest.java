@@ -98,7 +98,7 @@ public abstract class AbstractSpringRestTest {
 
         headers.add("Authorization", "Basic " + authorization);
         httpEntity = new HttpEntity(headers);
-        baseUrl = "https://localhost:" + randomPort;
+        baseUrl = "http://localhost:" + randomPort;
     }
 
     @After

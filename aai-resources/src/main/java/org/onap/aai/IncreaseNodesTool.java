@@ -23,16 +23,26 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
+import org.springframework.context.ApplicationContext;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphTransaction;
+import org.onap.aai.config.PropertyPasswordConfiguration;
+import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.AAIGraph;
+import org.onap.aai.edges.EdgeIngestor;
+import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.LoaderFactory;
 import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.exceptions.AAIUnknownObjectException;
+import org.onap.aai.logging.ErrorLogHelper;
+import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.util.AAISystemExitUtil;
 import org.onap.aai.util.PositiveNumValidator;
@@ -41,35 +51,56 @@ import org.onap.aai.serialization.db.EdgeSerializer;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class IncreaseNodesTool {
 
    public static long nodeCount = 0;
-    protected EdgeSerializer edgeSerializer;
+   
+   @Autowired
+   protected static EdgeSerializer edgeSerializer;
+   
    private LoaderFactory loaderFactory;
    private SchemaVersions schemaVersions;
    protected TransactionalGraphEngine engine;
     Vertex parentVtx;
 
-
+    private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(IncreaseNodesTool.class);
 
    public IncreaseNodesTool(LoaderFactory loaderFactory, SchemaVersions schemaVersions){
        this.loaderFactory = loaderFactory;
        this.schemaVersions = schemaVersions;
    }
 
-   public static void main(String[] args) throws AAIUnknownObjectException, UnsupportedEncodingException {
+   public static void main(String[] args) throws AAIUnknownObjectException, UnsupportedEncodingException, AAIException {
 
-       AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-               "org.onap.aai.config",
-               "org.onap.aai.setup"
-       );
+       AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+       PropertyPasswordConfiguration initializer = new PropertyPasswordConfiguration();
+       initializer.initialize(context);
+       try {
+           context.scan(
+                   "org.onap.aai.config",
+                   "org.onap.aai.setup"
+           );
+           context.refresh();
+       } catch (Exception e) {
+           AAIException aai = ResourcesApp.schemaServiceExceptionTranslator(e);
+           LOGGER.error("Problems running the tool "+aai.getMessage());
+           LoggingContext.statusCode(LoggingContext.StatusCode.ERROR);
+           LoggingContext.responseCode(LoggingContext.DATA_ERROR);
+           ErrorLogHelper.logError(aai.getCode(), e.getMessage() + ", resolve and retry");
+           throw aai;
+       }
 
        LoaderFactory loaderFactory = context.getBean(LoaderFactory.class);
        SchemaVersions schemaVersions = context.getBean(SchemaVersions.class);
 
        IncreaseNodesTool increaseNodesTool = new IncreaseNodesTool(loaderFactory, schemaVersions);
        JanusGraph janusGraph = AAIGraph.getInstance().getGraph();
+       
+       ApplicationContext ctx = (ApplicationContext) SpringContextAware.getApplicationContext();
+       edgeSerializer = ctx.getBean(EdgeSerializer.class);
+       
        increaseNodesTool.run(janusGraph,args);
        AAISystemExitUtil.systemExitCloseAAIGraph(0);
 
@@ -111,22 +142,7 @@ public class IncreaseNodesTool {
                 for (long i = 1; i <= nodeCount; i++) {
                     String randomId = UUID.randomUUID().toString();
                     Vertex v = g.addV().next();
-
-                    if(cArgs.child.equals(true)){
-
-                        if(parentVtx == null){
-                            String[] uriTokens = cArgs.uri.split("//");
-                            String ParentNodeType = uriTokens[uriTokens.length-4]; //parent node type
-                            String keyVal = uriTokens[uriTokens.length-3]; // parent unique key
-                            parentVtx = g.V().has(ParentNodeType,keyVal).next();
-                            edgeSerializer.addTreeEdgeIfPossible(g,parentVtx,v);
-
-                        }
-                        else{
-                            edgeSerializer.addTreeEdgeIfPossible(g,parentVtx,v);
-                        }
-                    }
-
+                    
                     v.property("aai-node-type", nodeType);
                     v.property("source-of-truth", "IncreaseNodesTool");
                     v.property("aai-uri", cArgs.uri+"random-"+randomId);
@@ -135,10 +151,41 @@ public class IncreaseNodesTool {
                     for(String propName : propList){
                         if(propName.equals("in-maint")){
                             v.property(propName,"false");
+                            continue;
                         }
                         v.property(propName, "random-" + randomId);
                         System.out.println("node " + i + " added " + propList.get(0)+": " + "random-"+randomId);
                     }
+                    
+                    if(cArgs.child.equals("true")){
+
+                        if(parentVtx == null){
+                            String[] uriTokens = cArgs.uri.split("/");
+                            String ParentNodeType = uriTokens[uriTokens.length-4]; //parent node type
+                            String keyVal = uriTokens[uriTokens.length-3]; // parent unique key
+                            Loader loader = loaderFactory.createLoaderForVersion(ModelType.MOXY, schemaVersions.getDefaultVersion());
+                            if (loader != null)
+                            {
+	                            Introspector objParent = loader.introspectorFromName(ParentNodeType);
+	                            if (objParent != null)
+	                            {
+		                            List<String> parentPropList = new ArrayList<String>();
+		                            parentPropList.addAll(objParent.getRequiredProperties());
+		                            if (parentPropList.size() > 0)
+		                            { 
+		                            	System.out.println("parent node (" + ParentNodeType + ") key (" + parentPropList.get(0)+" ) =" + keyVal);
+			                            parentVtx = g.V().has(parentPropList.get(0),keyVal).next();
+			                            edgeSerializer.addTreeEdgeIfPossible(g,parentVtx,v);
+		                            }
+	                            }
+                            }
+
+                        }
+                        else{
+                            edgeSerializer.addTreeEdgeIfPossible(g,parentVtx,v);
+                        }
+                    }
+
                 }
             } catch (Exception ex) {
                 success = false;

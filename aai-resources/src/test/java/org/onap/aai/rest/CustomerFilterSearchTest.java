@@ -49,7 +49,7 @@ public class CustomerFilterSearchTest extends AbstractSpringRestTest {
         String body = PayloadUtil.getResourcePayload("customer.json");
 
         httpEntity = new HttpEntity(body, headers);
-        baseUrl = "https://localhost:" + randomPort;
+        baseUrl = "http://localhost:" + randomPort;
 
         ResponseEntity responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
