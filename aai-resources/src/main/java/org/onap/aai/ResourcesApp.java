@@ -188,6 +188,7 @@ public class ResourcesApp {
 		}
 
 		String currentDirectory = System.getProperty("user.dir");
+		System.setProperty("aai.service.name", ResourcesApp.class.getSimpleName());
 
 		if (System.getProperty("AJSC_HOME") == null) {
 			System.setProperty("AJSC_HOME", ".");
@@ -203,7 +204,7 @@ public class ResourcesApp {
 			}
 		}
 	}
-	private static AAIException schemaServiceExceptionTranslator(Exception ex) {
+	public static AAIException schemaServiceExceptionTranslator(Exception ex) {
 		AAIException aai = null;
 		if(ExceptionUtils.getRootCause(ex).getMessage().contains("NodeIngestor")){
 			aai = new  AAIException("AAI_3026","Error reading OXM from SchemaService - Investigate");

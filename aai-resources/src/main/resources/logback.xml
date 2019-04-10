@@ -34,7 +34,6 @@
 	<property name="eelfLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
 	<property name="eelfAuditLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n|\r\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
 	<property name="eelfMetricLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%X{targetEntity}|%X{targetServiceName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{targetVirtualEntity}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
-	<!--  <property name="eelfErrorLogPattern" value="%ecompStartTime|%X{requestId}|%-10t|%ecompServiceName|%X{partnerName}|%X{targetEntity}|%X{targetServiceName}|%ecompErrorCategory|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n|\r\n', '^'}|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/> -->
 	<property name="eelfErrorLogPattern" value="%ecompStartTime|%X{requestId}|%-10t|%ecompServiceName|%X{partnerName}|%X{targetEntity}|%X{targetServiceName}|%ecompErrorCategory|%ecompResponseCode|%ecompResponseDescription|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
     <property name="eelfTransLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{partnerName}:%m%n"/>
 
@@ -250,106 +249,36 @@
 			<pattern>${eelfLogPattern}</pattern>
 		</encoder>
 	</appender>
+	<!-- logback internals logging -->
+
+	<logger name="ch.qos.logback.classic" level="WARN" />
+	<logger name="ch.qos.logback.core" level="WARN" />
+
+	<logger name="com.att.aft.dme2" level="WARN" />
+	<logger name="com.jayway.jsonpath" level="WARN" />
+
+	<logger name="org.apache" level="OFF" />
+	<logger name="org.apache.commons" level="WARN" />
+	<logger name="org.apache.zookeeper" level="OFF" />
+	<logger name="org.codehaus.groovy" level="WARN" />
+	<logger name="org.eclipse.jetty" level="WARN" />
+	<!-- Spring related loggers -->
+	<logger name="org.springframework" level="WARN" />
+	<logger name="org.springframework.beans" level="WARN" />
+	<logger name="org.springframework.web" level="WARN" />
+	<logger name="org.janusgraph" level="WARN" />
+	<logger name="org.zookeeper" level="OFF" />
+
+
 	<logger name="org.onap.aai" level="DEBUG" additivity="false">
 		<appender-ref ref="asyncDEBUG" />
 		<appender-ref ref="asyncERROR" />
 		<appender-ref ref="asyncMETRIC" />
 		<appender-ref ref="asyncSANE" />
+		<appender-ref ref="STDOUT" />
 	</logger>
 
-	<!-- Spring related loggers -->
-	<logger name="org.springframework" level="WARN" />
-	<logger name="org.springframework.beans" level="WARN" />
-	<logger name="org.springframework.web" level="WARN" />
-	<logger name="com.blog.spring.jms" level="WARN" />
-	<logger name="com.jayway.jsonpath" level="WARN" />
-
-	<!-- AJSC related loggers (DME2 Registration, csi logging, restlet, servlet
-		logging) -->
-	<logger name="org.codehaus.groovy" level="WARN" />
-	<logger name="com.netflix.loadbalancer" level="WARN" />
-
-	<logger name="org.apache.zookeeper" level="OFF" />
-
-	<!-- Other Loggers that may help troubleshoot -->
-	<logger name="net.sf" level="WARN" />
-	<logger name="org.apache.commons.httpclient" level="WARN" />
-	<logger name="org.apache.commons" level="WARN" />
-	<logger name="org.apache.coyote" level="WARN" />
-	<logger name="org.apache.jasper" level="WARN" />
-
-	<!-- Camel Related Loggers (including restlet/servlet/jaxrs/cxf logging. 
-		May aid in troubleshooting) -->
-	<logger name="org.apache.camel" level="WARN" />
-	<logger name="org.apache.cxf" level="WARN" />
-	<logger name="org.apache.camel.processor.interceptor" level="WARN" />
-	<logger name="org.apache.cxf.jaxrs.interceptor" level="WARN" />
-	<logger name="org.apache.cxf.service" level="WARN" />
-	<logger name="org.restlet" level="WARN" />
-	<logger name="org.apache.camel.component.restlet" level="WARN" />
-
-	<logger name="org.hibernate.validator" level="WARN" />
-	<logger name="org.hibernate" level="WARN" />
-	<logger name="org.hibernate.ejb" level="OFF" />
-
-	<!-- logback internals logging -->
-	<logger name="ch.qos.logback.classic" level="WARN" />
-	<logger name="ch.qos.logback.core" level="WARN" />
-
-	<logger name="org.eclipse.jetty" level="WARN" />
-
-	<!-- logback jms appenders & loggers definition starts here -->
-	<appender name="auditLogs"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter" />
-		<file>${logDirectory}/perf-audit/Audit-${lrmRVer}-${lrmRO}-${Pid}.log
-		</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<fileNamePattern>${logDirectory}/perf-audit/Audit-${lrmRVer}-${lrmRO}-${Pid}.%i.log.zip
-			</fileNamePattern>
-			<minIndex>1</minIndex>
-			<maxIndex>9</maxIndex>
-		</rollingPolicy>
-		<triggeringPolicy
-			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<maxFileSize>5MB</maxFileSize>
-		</triggeringPolicy>
-		<encoder>
-			<pattern>"%d [%thread] %-5level %logger{1024} - %msg%n"</pattern>
-		</encoder>
-	</appender>
-	<appender name="perfLogs"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter" />
-		<file>${logDirectory}/perf-audit/Perform-${lrmRVer}-${lrmRO}-${Pid}.log
-		</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<fileNamePattern>${logDirectory}/perf-audit/Perform-${lrmRVer}-${lrmRO}-${Pid}.%i.log.zip
-			</fileNamePattern>
-			<minIndex>1</minIndex>
-			<maxIndex>9</maxIndex>
-		</rollingPolicy>
-		<triggeringPolicy
-			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<maxFileSize>5MB</maxFileSize>
-		</triggeringPolicy>
-		<encoder>
-			<pattern>"%d [%thread] %-5level %logger{1024} - %msg%n"</pattern>
-		</encoder>
-	</appender>
-	<logger name="AuditRecord" level="INFO" additivity="false">
-		<appender-ref ref="auditLogs" />
-	</logger>
-	<logger name="AuditRecord_DirectCall" level="INFO" additivity="false">
-		<appender-ref ref="auditLogs" />
-	</logger>
-	<logger name="PerfTrackerRecord" level="INFO" additivity="false">
-		<appender-ref ref="perfLogs" />
-	</logger>
-	<!-- logback jms appenders & loggers definition ends here -->
-
-	<logger name="org.onap.aai.interceptors.post" level="DEBUG"
-			additivity="false">
+	<logger name="org.onap.aai.interceptors.post" level="DEBUG" additivity="false">
 		<appender-ref ref="asynctranslog" />
 	</logger>
 
@@ -371,11 +300,6 @@
 		<appender-ref ref="dmaapAAIEventConsumerInfo" />
 	</logger>
 
-	<logger name="org.apache" level="OFF" />
-	<logger name="org.zookeeper" level="OFF" />
-	<logger name="org.janusgraph" level="WARN" />
-	<logger name="com.att.aft.dme2" level="WARN" />
-
 	<!-- ============================================================================ -->
 	<!-- General EELF logger -->
 	<!-- ============================================================================ -->
@@ -387,5 +311,6 @@
 
 	<root level="DEBUG">
 		<appender-ref ref="external" />
+		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>

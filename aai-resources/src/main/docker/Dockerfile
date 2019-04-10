@@ -9,7 +9,7 @@ WORKDIR /opt/app/aai-resources
 EXPOSE 8447
 
 
-HEALTHCHECK --interval=40s --timeout=10s --retries=3 CMD nc -z -v localhost 8447 || exit 1
+HEALTHCHECK --interval=40s --timeout=10s --retries=3 CMD nc -z -v localhost ${SERVER_PORT:-8447} || exit 1
 
 ENTRYPOINT ["/bin/bash", "/opt/app/aai-resources/docker-entrypoint.sh"]
 

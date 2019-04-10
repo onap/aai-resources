@@ -78,7 +78,7 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         headers.add("Authorization", "Basic " + authorization);
 
         httpEntity = new HttpEntity<String>(headers);
-        baseUrl = "https://localhost:" + randomPort;
+        baseUrl = "http://localhost:" + randomPort;
     }
 
     @Test

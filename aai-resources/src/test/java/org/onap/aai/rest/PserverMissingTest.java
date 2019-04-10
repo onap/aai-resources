@@ -50,7 +50,7 @@ public class PserverMissingTest extends AbstractSpringRestTest {
         String body = PayloadUtil.getTemplatePayload("pserver.json", templateMap);
 
         httpEntity = new HttpEntity(body, headers);
-        baseUrl = "https://localhost:" + randomPort;
+        baseUrl = "http://localhost:" + randomPort;
 
         ResponseEntity responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
@@ -72,7 +72,7 @@ public class PserverMissingTest extends AbstractSpringRestTest {
         headers.add("Authorization", "Basic " + authorization);
 
         httpEntity = new HttpEntity(headers);
-        baseUrl = "https://localhost:" + randomPort;
+        baseUrl = "http://localhost:" + randomPort;
 
         ResponseEntity responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);

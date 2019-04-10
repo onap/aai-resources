@@ -125,6 +125,7 @@
         <snapshot.file>${project.basedir}/snapshots/snapshot.graphson</snapshot.file>
 
         <jacoco.line.coverage.limit>0.68</jacoco.line.coverage.limit>
+        <license.goal.type>check</license.goal.type>
 
         <spring.web.version>4.3.21.RELEASE</spring.web.version>
         <netty.handler.version>4.1.9.Final</netty.handler.version>
