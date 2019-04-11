@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "256e7049_b8838e5e",
+        "filename": "aai-resources/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:28:35Z",
+      "side": 1,
+      "message": "should include version bumps for recent merges?",
+      "range": {
+        "startLine": 38,
+        "startChar": 8,
+        "endLine": 40,
+        "endChar": 68
+      },
+      "revId": "2e971ba4b99e987a18237675e50adc4a5f21d0d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d612c9bd_cd0cbf7d",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:28:35Z",
+      "side": 1,
+      "message": "should use SERVER_PORT variable as well?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 11
+      },
+      "revId": "2e971ba4b99e987a18237675e50adc4a5f21d0d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6581a7da_ae1df410",
+        "filename": "aai-resources/src/test/java/org/onap/aai/rest/AbstractSpringRestTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:28:35Z",
+      "side": 1,
+      "message": "there should be testing for both http and https scenarios",
+      "range": {
+        "startLine": 101,
+        "startChar": 8,
+        "endLine": 101,
+        "endChar": 51
+      },
+      "revId": "2e971ba4b99e987a18237675e50adc4a5f21d0d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5088de17_245d2730",
+        "filename": "aai-resources/src/test/java/org/onap/aai/rest/ConfigurationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:28:35Z",
+      "side": 1,
+      "message": "there should be testing for both http and https scenarios",
+      "range": {
+        "startLine": 81,
+        "startChar": 8,
+        "endLine": 81,
+        "endChar": 51
+      },
+      "revId": "2e971ba4b99e987a18237675e50adc4a5f21d0d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ec3317a_789e538c",
+        "filename": "aai-resources/src/test/java/org/onap/aai/rest/CustomerFilterSearchTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:28:35Z",
+      "side": 1,
+      "message": "there should be testing for both http and https scenarios",
+      "range": {
+        "startLine": 52,
+        "startChar": 8,
+        "endLine": 52,
+        "endChar": 51
+      },
+      "revId": "2e971ba4b99e987a18237675e50adc4a5f21d0d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62b52322_d89e0aac",
+        "filename": "aai-resources/src/test/java/org/onap/aai/rest/PserverMissingTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:28:35Z",
+      "side": 1,
+      "message": "there should be testing for both http and https scenarios",
+      "range": {
+        "startLine": 53,
+        "startChar": 8,
+        "endLine": 53,
+        "endChar": 51
+      },
+      "revId": "2e971ba4b99e987a18237675e50adc4a5f21d0d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fd8e476a_73a4af4d",
+        "filename": "aai-resources/src/test/resources/application-test.properties",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:28:35Z",
+      "side": 1,
+      "message": "there should be testing for both http and https scenarios",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 30
+      },
+      "revId": "2e971ba4b99e987a18237675e50adc4a5f21d0d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
