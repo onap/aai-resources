@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dde28d64_12b9bc09",
+        "filename": "aai-resources/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-04-11T06:49:12Z",
+      "side": 1,
+      "message": "should this include a schema version bump too?",
+      "range": {
+        "startLine": 38,
+        "startChar": 8,
+        "endLine": 38,
+        "endChar": 54
+      },
+      "revId": "ea1623741e29b32a525686777e920b5f99494aff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
