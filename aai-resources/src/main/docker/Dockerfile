@@ -1,5 +1,7 @@
 FROM aaionap/aai-common:1.3.0
 
+# install openssl to update .pems
+RUN apk add --no-cache openssl
 
 # Add the proper files into the docker image from your build
 WORKDIR /opt/app/aai-resources
