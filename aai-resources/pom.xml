@@ -74,6 +74,7 @@
         <janino.version>2.7.8</janino.version>
         <google.guava.version>19.0</google.guava.version>
         <janusgraph.version>0.2.0</janusgraph.version>
+        <jnr.ffi.version>2.1.9</jnr.ffi.version>
         <gremlin.driver.version>3.2.2</gremlin.driver.version>
         <gremlin.core.version>3.2.2</gremlin.core.version>
         <gremlin.version>3.2.2</gremlin.version>
@@ -106,12 +107,14 @@
 
         <eclipse.jetty.version>9.4.1.v20170120</eclipse.jetty.version>
 
-        <docker.fabric.version>0.23.0</docker.fabric.version>
+        <docker.fabric.version>0.28.0</docker.fabric.version>
         <!-- Default docker registry that maven fabric plugin will try to pull from -->
         <docker.registry>docker.io</docker.registry>
         <!-- Specifying the docker push registry where the image should be pushed -->
         <!-- This value should be overwritten at runtime to wherever need to be pushed to -->
         <docker.push.registry>localhost:5000</docker.push.registry>
+        <aai.docker.version>1.0.0</aai.docker.version>
+        <aai.base.image>alpine</aai.base.image>
 
         <!--
              Location where assembly of our scripts, resources and main jar will be held
@@ -139,8 +142,10 @@
         <!-- Start of Default ONAP Schema Properties -->
         <schema.source.name>onap</schema.source.name>
         <schema.configuration.location>N/A</schema.configuration.location>
-        <schema.nodes.location>${project.basedir}/src/main/resources/schema/${schema.source.name}/oxm</schema.nodes.location>
-        <schema.edges.location>${project.basedir}/src/main/resources/schema/${schema.source.name}/dbedgerules</schema.edges.location>
+        <schema.nodes.location>${project.basedir}/src/main/resources/schema/${schema.source.name}/oxm
+        </schema.nodes.location>
+        <schema.edges.location>${project.basedir}/src/main/resources/schema/${schema.source.name}/dbedgerules
+        </schema.edges.location>
         <schema.version.depth.start>v10</schema.version.depth.start>
         <schema.version.related.link.start>v10</schema.version.related.link.start>
         <schema.version.app.root.start>v11</schema.version.app.root.start>
@@ -163,6 +168,33 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.groovy.maven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <version>1.0</version>
+                        <executions>
+                            <execution>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source>
+                                        def userAaiBaseImage = session.userProperties['aai.base.image'];
+                                        def userAaiDockerVersion = session.userProperties['aai.docker.version'];
+                                        if (userAaiDockerVersion != null) {
+                                            project.properties['aai.docker.version'] = userAaiDockerVersion;
+                                        }
+                                        if (userAaiBaseImage != null) {
+                                            project.properties['aai.base.image'] = userAaiBaseImage;
+                                        }
+                                        log.info 'Base image flavour: ' + project.properties['aai.base.image'];
+                                        log.info 'Base image version: ' + project.properties['aai.docker.version'];
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
                         <version>${docker.fabric.version}</version>
@@ -171,13 +203,14 @@
                             <apiVersion>1.23</apiVersion>
                             <images>
                                 <image>
-                                    <name>${docker.push.registry}/${aai.docker.namespace}/${project.artifactId}:%l</name>
+                                    <name>${docker.push.registry}/${aai.docker.namespace}/${project.artifactId}:%l
+                                    </name>
                                     <build>
                                         <filter>@</filter>
                                         <tags>
                                             <tag>latest</tag>
                                             <tag>${project.docker.latesttag.version}</tag>
-                                            <tag>${project.major.version}.${project.minor.version}-STAGING-${maven.build.timestamp}</tag>
+                                             <tag>${project.major.version}.${project.minor.version}-STAGING-${maven.build.timestamp}</tag>
                                         </tags>
                                         <cleanup>try</cleanup>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
@@ -475,6 +508,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--
+            indirect janusgraph-cassandra dependency
+            need to be newer than default one
+            in order to support multiple cpu archs
+        -->
+        <dependency>
+            <groupId>com.github.jnr</groupId>
+            <artifactId>jnr-ffi</artifactId>
+            <version>${jnr.ffi.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.janusgraph</groupId>
             <artifactId>janusgraph-cql</artifactId>
@@ -766,7 +809,9 @@
                     <include>logback.xml</include>
                     <include>localhost-access-logback.xml</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig</targetPath>
+                <targetPath>
+                    ${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig
+                </targetPath>
                 <filtering>false</filtering>
             </resource>
             <resource>
@@ -783,7 +828,9 @@
                     <include>janusgraph-cached.properties</include>
                     <include>aaiconfig.properties</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig</targetPath>
+                <targetPath>
+                    ${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig
+                </targetPath>
                 <filtering>false</filtering>
             </resource>
             <resource>
@@ -793,7 +840,9 @@
                     <include>tomcat_keystore</include>
                     <include>aai_policy.json</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig</targetPath>
+                <targetPath>
+                    ${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig
+                </targetPath>
                 <filtering>true</filtering>
             </resource>
             <resource>
@@ -803,7 +852,9 @@
                     <include>localhost-access-logback.xml</include>
                     <include>hbase-site.xml</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig</targetPath>
+                <targetPath>
+                    ${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig
+                </targetPath>
                 <filtering>true</filtering>
             </resource>
             <resource>
@@ -812,7 +863,9 @@
                     <include>**/oxm/**/*.xml</include>
                     <include>**/dbedgerules/**/*.json</include>
                 </includes>
-                <targetPath>${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig/schema</targetPath>
+                <targetPath>
+                    ${project.build.directory}/swm/package/nix/dist_files/opt/app/${project.artifactId}/appconfig/schema
+                </targetPath>
                 <filtering>false</filtering>
             </resource>
             <resource>
