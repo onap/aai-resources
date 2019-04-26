@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09d9a7ee_39790c4e",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 75
+      },
+      "writtenOn": "2019-04-26T16:08:35Z",
+      "side": 1,
+      "message": "Isn\u0027t this already done in the aai-common alpine image",
+      "revId": "3886ac755d73ef16d8581bc02f7d6edc8899e609",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
