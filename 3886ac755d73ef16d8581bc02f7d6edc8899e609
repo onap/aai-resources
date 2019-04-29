@@ -16,6 +16,24 @@
       "revId": "3886ac755d73ef16d8581bc02f7d6edc8899e609",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f20cb15_b5589d9f",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5040
+      },
+      "writtenOn": "2019-04-29T10:32:27Z",
+      "side": 1,
+      "message": "No, it\u0027s not. openssl installed only where required.",
+      "parentUuid": "09d9a7ee_39790c4e",
+      "revId": "3886ac755d73ef16d8581bc02f7d6edc8899e609",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
