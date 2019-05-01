@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3494305d_2668e29c",
+        "filename": "aai-resources/src/main/docker/aai.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-05-01T01:56:37Z",
+      "side": 0,
+      "message": "does this work portably between the alpine version and ubuntu version, so that side-by-side before-and-after comparison tests can be done?",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 44
+      },
+      "revId": "ef4780b231e864d50bb871ba57bafb24f77b116f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

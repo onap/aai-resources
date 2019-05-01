@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8fd2d48_74cdf624",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-05-01T01:56:37Z",
+      "side": 1,
+      "message": "does this dockerhub image need to be bumped to a new version? or is the alpine container using the same version as the ubuntu container?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 29
+      },
+      "revId": "b867b03b1281d61a9a3c208083aea7b3b3a769e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16254eca_82e3efa5",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-05-01T01:56:37Z",
+      "side": 1,
+      "message": "does this work portably between the alpine version and ubuntu version, so that side-by-side before-and-after comparison tests can be done?",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 30
+      },
+      "revId": "b867b03b1281d61a9a3c208083aea7b3b3a769e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ca9654b8_8201d0df",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-05-01T01:56:37Z",
+      "side": 1,
+      "message": "reported as AAI-2389. should it be fixed while you are here?",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 42
+      },
+      "revId": "b867b03b1281d61a9a3c208083aea7b3b3a769e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
