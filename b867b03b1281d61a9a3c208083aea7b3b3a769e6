@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "067d6a3b_f0325607",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5040
+      },
+      "writtenOn": "2019-05-02T13:20:47Z",
+      "side": 1,
+      "message": "It depends if aai team needs to keep ubuntu based image.\nIf so, I\u0027d rather tag images like this: aai-common:1.3.0 for ubuntu based and aai-common:1.3.0-alpine for alpine based to have both images available and pass image tag via maven props: FROM aai-common:@aai.common.tag@",
+      "parentUuid": "e8fd2d48_74cdf624",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 29
+      },
+      "revId": "b867b03b1281d61a9a3c208083aea7b3b3a769e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "16254eca_82e3efa5",
         "filename": "aai-resources/src/main/docker/Dockerfile",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "caec4da9_568843bc",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5040
+      },
+      "writtenOn": "2019-05-02T13:20:47Z",
+      "side": 1,
+      "message": "Do you mean if we change aai-common based on ubuntu to aai-common based on alpine back and forth? Good spot! Answer: no, it\u0027s not portable. If one moves this part to aai-common, it will be portable. Fixing.",
+      "parentUuid": "16254eca_82e3efa5",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 30
+      },
+      "revId": "b867b03b1281d61a9a3c208083aea7b3b3a769e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ca9654b8_8201d0df",
         "filename": "aai-resources/src/main/docker/Dockerfile",
         "patchSetId": 3
@@ -59,6 +107,30 @@
       "writtenOn": "2019-05-01T01:56:37Z",
       "side": 1,
       "message": "reported as AAI-2389. should it be fixed while you are here?",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 42
+      },
+      "revId": "b867b03b1281d61a9a3c208083aea7b3b3a769e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b38e5844_2c3eada8",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5040
+      },
+      "writtenOn": "2019-05-02T13:20:47Z",
+      "side": 1,
+      "message": "Please, find my comments in AAI-2389, I\u0027ll fix it.",
+      "parentUuid": "ca9654b8_8201d0df",
       "range": {
         "startLine": 17,
         "startChar": 0,

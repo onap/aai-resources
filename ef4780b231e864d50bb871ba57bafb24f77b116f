@@ -22,6 +22,30 @@
       "revId": "ef4780b231e864d50bb871ba57bafb24f77b116f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81449a2e_deb7238d",
+        "filename": "aai-resources/src/main/docker/aai.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5040
+      },
+      "writtenOn": "2019-05-02T13:20:47Z",
+      "side": 0,
+      "message": "No, it doesn\u0027t\n\n$JAVA_HOME is set by default in openjdk:8-jre-alpine which is base for aai-common image.\n\njava executable path is also added to $PATH in openjdk:8-jre-alpine by default\n\nin ubuntu version container at least $JAVA_HOME should be set explicitly.",
+      "parentUuid": "3494305d_2668e29c",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 44
+      },
+      "revId": "ef4780b231e864d50bb871ba57bafb24f77b116f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
