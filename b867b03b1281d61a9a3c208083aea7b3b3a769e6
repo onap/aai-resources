@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "ba83a05f_467ec5b1",
+        "filename": "aai-resources/src/main/docker/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4341
+      },
+      "writtenOn": "2019-05-03T01:02:07Z",
+      "side": 1,
+      "message": "Yes, I think tagging as \"aai-common:1.3.0-alpine\" and have both images available would be a good idea.",
+      "parentUuid": "067d6a3b_f0325607",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 29
+      },
+      "revId": "b867b03b1281d61a9a3c208083aea7b3b3a769e6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "16254eca_82e3efa5",
         "filename": "aai-resources/src/main/docker/Dockerfile",
         "patchSetId": 3
