@@ -113,8 +113,9 @@
         <!-- Specifying the docker push registry where the image should be pushed -->
         <!-- This value should be overwritten at runtime to wherever need to be pushed to -->
         <docker.push.registry>localhost:5000</docker.push.registry>
-        <aai.docker.version>1.3.0</aai.docker.version>
+        <aai.docker.version>1.0.0</aai.docker.version>
         <aai.base.image>alpine</aai.base.image>
+        <aai.base.image.version>1.6.0</aai.base.image.version>
 
         <!--
              Location where assembly of our scripts, resources and main jar will be held
@@ -177,16 +178,16 @@
                                 </goals>
                                 <configuration>
                                     <source>
-                                        def userAaiBaseImage = session.userProperties['aai.base.image'];
-                                        def userAaiDockerVersion = session.userProperties['aai.docker.version'];
-                                        if (userAaiDockerVersion != null) {
-                                            project.properties['aai.docker.version'] = userAaiDockerVersion;
+                                        def userAaiBaseImage = session.userProperties['aai.base.image']
+                                        def userAaiCommonVersion = session.userProperties['aai.base.image.version']
+                                        if (userAaiCommonVersion != null) {
+                                            project.properties['aai.base.image.version'] = userAaiCommonVersion
                                         }
                                         if (userAaiBaseImage != null) {
-                                            project.properties['aai.base.image'] = userAaiBaseImage;
+                                            project.properties['aai.base.image'] = userAaiBaseImage
                                         }
-                                        log.info 'Base image flavour: ' + project.properties['aai.base.image'];
-                                        log.info 'Base image version: ' + project.properties['aai.docker.version'];
+                                        log.info 'Base image flavour: ' + project.properties['aai.base.image']
+                                        log.info 'Base image version: ' + project.properties['aai.base.image.version']
                                     </source>
                                 </configuration>
                             </execution>
