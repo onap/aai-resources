@@ -1,4 +1,4 @@
-FROM aaionap/aai-common:@aai.docker.version@-@aai.base.image@
+FROM @aai.docker.namespace@/aai-common-@aai.base.image@:@aai.base.image.version@
 
 RUN  mkdir -p /opt/aaihome/aaiadmin /opt/aai/logroot/AAI-RES
 
