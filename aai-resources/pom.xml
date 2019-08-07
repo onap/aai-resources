@@ -36,11 +36,11 @@
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
         <aai.schema.version>1.5.0</aai.schema.version>
-        <aai.core.version>1.5.1</aai.core.version>
-        <aai.schema.ingest.version>1.5.1</aai.schema.ingest.version>
+        <aai.core.version>1.5.2</aai.core.version>
+        <aai.schema.ingest.version>1.5.2</aai.schema.ingest.version>
         <hbase.version>1.0.2</hbase.version>
 
-        <spring.boot.version>1.5.20.RELEASE</spring.boot.version>
+        <spring.boot.version>1.5.21.RELEASE</spring.boot.version>
 
         <!-- Start of the jacoco plugin properties -->
         <sonar.language>java</sonar.language>
@@ -73,7 +73,7 @@
         <aaf.version>2.1.4</aaf.version>
         <janino.version>2.7.8</janino.version>
         <google.guava.version>19.0</google.guava.version>
-        <janusgraph.version>0.2.0</janusgraph.version>
+        <janusgraph.version>0.2.3</janusgraph.version>
         <gremlin.driver.version>3.2.2</gremlin.driver.version>
         <gremlin.core.version>3.2.2</gremlin.core.version>
         <gremlin.version>3.2.2</gremlin.version>
