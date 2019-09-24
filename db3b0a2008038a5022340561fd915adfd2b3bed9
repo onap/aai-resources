@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bae75588_a55d678f",
+        "filename": "aai-resources/src/main/resources/application.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 2381
+      },
+      "writtenOn": "2019-09-24T12:37:57Z",
+      "side": 1,
+      "message": "Maybe I misunderstood, but shouldn\u0027t server.ssl.key-store-password be obsolete now as the password is being read from AAF generated .password file? The same probably goes for trust-store",
+      "revId": "db3b0a2008038a5022340561fd915adfd2b3bed9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
