@@ -1,0 +1,7 @@
+distribution_type: container
+container_release_tag: 1.6.1
+project: resources
+ref: 5fa84a565f4fa06872a9ad8b36100c5df61c37e4
+containers:
+    - name: aai-resources
+      version: 1.6-STAGING-20200117T204811Z
