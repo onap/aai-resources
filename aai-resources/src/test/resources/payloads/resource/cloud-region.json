@@ -1,0 +1,18 @@
+{
+  "cloud-owner": "testOwner",
+  "cloud-region-id": "testRegionOne",
+  "esr-system-info-list": {
+    "esr-system-info": [
+      {
+        "esr-system-info-id": "test-esr-info-id",
+        "service-url": "http://localhost:5000/v3",
+        "user-name": "test",
+        "password": "fjasifjs",
+        "system-type": "VIM",
+        "ssl-insecure": true,
+        "cloud-domain": "Default",
+        "default-tenant": "admin"
+      }
+    ]
+  }
+}
