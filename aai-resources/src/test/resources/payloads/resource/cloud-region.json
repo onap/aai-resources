@@ -1,0 +1,12 @@
+{
+  "cloud-owner": "testOwner",
+  "cloud-region-id": "testRegionOne",
+  "tenants": {
+    "tenant": [
+      {
+        "tenant-id": "test-tenant-id",
+        "tenant-name": "tenant-name"
+      }
+    ]
+  }
+}
