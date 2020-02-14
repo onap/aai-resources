@@ -26,11 +26,11 @@
     <parent>
         <groupId>org.onap.aai.aai-common</groupId>
         <artifactId>aai-parent</artifactId>
-        <version>1.6.4</version>
+        <version>1.6.5-SNAPSHOT</version>
     </parent>
     <groupId>org.onap.aai.resources</groupId>
     <artifactId>resources</artifactId>
-    <version>1.6.4-SNAPSHOT</version>
+    <version>1.6.5-SNAPSHOT</version>
     <name>aai-resources</name>
     <packaging>pom</packaging>
     <modules>
@@ -84,11 +84,6 @@
                 <!-- https://github.com/diffplug/spotless/tree/master/plugin-maven
                      use mvn spotless:apply to rewrite source files
                      use mvn spotless:check to validate source files -->
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
