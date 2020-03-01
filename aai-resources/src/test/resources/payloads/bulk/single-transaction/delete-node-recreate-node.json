@@ -1,0 +1,41 @@
+{
+  "array": [
+    {
+      "operations": [
+        {
+          "action": "put",
+          "uri": "/network/logical-links/logical-link/ll",
+          "body": {
+            "speed-value": "10",
+            "link-type": "INL",
+            "link-name": "ll",
+            "speed-units": "Mbps",
+            "prov-status": "PROV",
+            "routing-protocol": "802.3ah"
+          }
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "action": "delete",
+          "uri": "/network/logical-links/logical-link/ll?resource-version=38cf3090-6a0c-4e9d-8142-4332a7352846",
+          "body": {}
+        },
+        {
+          "action": "put",
+          "uri": "/network/logical-links/logical-link/ll",
+          "body": {
+            "speed-value": "100",
+            "link-type": "INL",
+            "link-name": "ll",
+            "speed-units": "Gbps",
+            "prov-status": "PREPROV",
+            "routing-protocol": "802.3ah"
+          }
+        }
+      ]
+    }
+  ]
+}

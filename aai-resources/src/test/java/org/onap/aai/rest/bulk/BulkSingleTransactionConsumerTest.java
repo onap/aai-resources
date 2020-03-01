@@ -19,6 +19,8 @@
  */
 package org.onap.aai.rest.bulk;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
@@ -33,6 +35,7 @@ import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.rest.BulkConsumer;
 import org.onap.aai.rest.BulkProcessorTestAbstraction;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
@@ -44,9 +47,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
+@TestPropertySource(properties = {
+		"delta.events.enabled=true",
+})
 public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstraction {
 
-	private BulkSingleTransactionConsumer bulkSingleTransactionConsumer = new BulkSingleTransactionConsumer();
+	private BulkSingleTransactionConsumer bulkSingleTransactionConsumer = new BulkSingleTransactionConsumer("/aai");
 
 	@Rule
 	public TestName name = new TestName();
@@ -220,6 +226,8 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
 		assertThat("Response contains 204 status.",
 				response.getEntity().toString(),
 				containsString("\"response-status-code\":204"));
+
+
 	}
 
 	@Test
@@ -244,8 +252,10 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
 				.replaceAll("<methodName>", name.getMethodName());
 		Response response = executeRequest(payload);
 
+		System.out.println(response.getEntity().toString());
+
 		assertEquals("Request failed",
-				Response.Status.BAD_REQUEST.getStatusCode(),
+				Response.Status.PRECONDITION_FAILED.getStatusCode(),
 				response.getStatus());
 
 		assertEquals("1 vertex exists after payload due to failure",
@@ -253,13 +263,17 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
 				AAIGraph.getInstance().getGraph().newTransaction().traversal().
 					V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
 
-		assertThat("Response contains correct index of failed operation.",
-				response.getEntity().toString(),
-				containsString("Operation 3 failed with status code (412) and msg"));
-
 		assertThat("Response contains resource version msg for failed transaction.",
 				response.getEntity().toString(),
 				containsString("Precondition Failed:resource-version MISMATCH for delete of generic-vnf"));
+
+		assertThat("Response contains correct index of failed operation.",
+				response.getEntity().toString(),
+				containsString("Operation 3"));
+
+		assertThat("Response contains correct status code.",
+				response.getEntity().toString(),
+				containsString("failed with status code (412"));
 
 	}
 
@@ -342,7 +356,81 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
 
 	}
 
+	@Test
+	public void putComplexWithRelToNonExistentPserverBetween() throws IOException {
 
+		String payload = getBulkPayload("single-transaction/put-complex-with-rel-to-non-existent").replaceAll("<methodName>", name.getMethodName());
+		Response response = executeRequest(payload);
+
+		assertEquals("Request success",
+				Response.Status.NOT_FOUND.getStatusCode(),
+				response.getStatus());
+		assertEquals("0 vertex from this test in graph",
+				Long.valueOf(0L),
+				AAIGraph.getInstance().getGraph().newTransaction().traversal().
+						V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
+		assertEquals("Request fails with 404",
+				Response.Status.NOT_FOUND.getStatusCode(),
+				response.getStatus());
+
+		assertThat("Response contains correct index of failed operation.",
+				response.getEntity().toString(),
+				containsString("Operation 0"));
+
+		assertThat("Response contains correct status code.",
+				response.getEntity().toString(),
+				containsString("failed with status code (404"));
+
+		assertThat("Response contains correct msg.",
+				response.getEntity().toString(),
+				containsString("target node:Node of type pserver. Could not find"));
+
+		assertThat("Response contains correct Error Code.",
+				response.getEntity().toString(),
+				containsString("ERR.5.4.6129"));
+
+	}
+
+
+	@Test
+	public void deleteChildRecreateChildTest() throws IOException {
+		JsonArray requests = new JsonParser().parse(
+				getBulkPayload("single-transaction/delete-child-recreate-child").replaceAll("<methodName>", name.getMethodName()))
+				.getAsJsonObject().getAsJsonArray("array");
+		String payload = requests.get(0).toString();
+		Response response = executeRequest(payload);
+		System.out.println(response.getEntity().toString());
+		assertEquals("Request success",
+				Response.Status.CREATED.getStatusCode(),
+				response.getStatus());
+
+		payload = requests.get(1).toString();
+		response = executeRequest(payload);
+		System.out.println(response.getEntity().toString());
+		assertEquals("Request success",
+				Response.Status.CREATED.getStatusCode(),
+				response.getStatus());
+	}
+
+	@Test
+	public void deleteNodeRecreateNodeTest() throws IOException {
+		JsonArray requests = new JsonParser().parse(
+				getBulkPayload("single-transaction/delete-node-recreate-node").replaceAll("<methodName>", name.getMethodName()))
+				.getAsJsonObject().getAsJsonArray("array");
+		String payload = requests.get(0).toString();
+		Response response = executeRequest(payload);
+		System.out.println(response.getEntity().toString());
+		assertEquals("Request success",
+				Response.Status.CREATED.getStatusCode(),
+				response.getStatus());
+
+		payload = requests.get(1).toString();
+		response = executeRequest(payload);
+		System.out.println(response.getEntity().toString());
+		assertEquals("Request success",
+				Response.Status.CREATED.getStatusCode(),
+				response.getStatus());
+	}
 
 
 	protected Response executeRequest(String finalPayload) {
@@ -364,6 +452,6 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
 
 	@Override
 	protected String getUri() {
-		return "/aai/" + schemaVersions.getDefaultVersion().toString() + "/bulk-single-transaction-multi-operation";
+		return "/aai/" + schemaVersions.getDefaultVersion().toString() + "/bulk/single-transaction";
 	}
 }

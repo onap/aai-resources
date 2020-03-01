@@ -1,0 +1,27 @@
+{
+  "cloud-owner": "Sample-att-aic",
+  "cloud-region-id": "Sample-AAIAIC25",
+  "tenants": {
+    "tenant": [
+      {
+        "tenant-id" : "Sample-TenantId",
+        "tenant-name" : "Sample-TenantName"
+      }
+    ]
+  },
+  "relationship-list": {
+    "relationship": [
+      {
+        "related-link": "/aai/v12/cloud-infrastructure/complexes/complex/complex1",
+        "related-to": "complex",
+        "relationship-data": [
+          {
+            "relationship-key": "complex.physical-location-id",
+            "relationship-value": "complex1"
+          }
+        ],
+        "relationship-label": "org.onap.relationships.inventory.LocatedIn"
+      }
+    ]
+  }
+}

@@ -21,16 +21,18 @@ package org.onap.aai;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphTransaction;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 public class IncreaseNodesToolTest extends AAISetup {
 
@@ -45,6 +47,9 @@ public class IncreaseNodesToolTest extends AAISetup {
 
     @Mock
     Vertex mockVertex;
+
+    @Captor
+    ArgumentCaptor<String> nodeTypeCapture;
 
     @Mock
     GraphTraversal<org.apache.tinkerpop.gremlin.structure.Vertex, org.apache.tinkerpop.gremlin.structure.Vertex> graphTraversalVertex;
@@ -61,13 +66,13 @@ public class IncreaseNodesToolTest extends AAISetup {
 
         when(janusGraph.newTransaction()).thenReturn(janusGraphtransaction);
         when(janusGraphtransaction.traversal()).thenReturn(graphTraversalSource);
-        when(graphTraversalSource.addV()).thenReturn(graphTraversalVertex);
+        when(graphTraversalSource.addV(nodeTypeCapture.capture())).thenReturn(graphTraversalVertex);
         when(graphTraversalVertex.next()).thenReturn(mockVertex);
         increaseNodesTool.run(janusGraph,args);
 
         Mockito.verify(janusGraph).newTransaction();
 
-        Mockito.verify(graphTraversalSource,times(5)).addV();
+        Mockito.verify(graphTraversalSource,times(5)).addV(nodeTypeCapture.capture());
     }
 
     @Test

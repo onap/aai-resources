@@ -19,23 +19,17 @@
  */
 package org.onap.aai;
 
-import java.util.Map;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.onap.aai.config.PropertyPasswordConfiguration;
+import org.onap.aai.aailog.logs.AaiDebugLog;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
-
 import org.onap.aai.logging.ErrorLogHelper;
-import org.onap.aai.logging.LoggingContext;
-import org.onap.aai.logging.LoggingContext.StatusCode;
+import org.onap.aai.nodes.NodeIngestor;
+import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.util.AAIConfig;
-import org.slf4j.MDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -45,36 +39,42 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
-import org.onap.aai.nodes.NodeIngestor;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
-
-@SpringBootApplication
+@SpringBootApplication(
+	exclude = {
+		DataSourceAutoConfiguration.class,
+		DataSourceTransactionManagerAutoConfiguration.class,
+		HibernateJpaAutoConfiguration.class
+	}
+)
 // Component Scan provides a way to look for spring beans
 // It only searches beans in the following packages
 // Any method annotated with @Bean annotation or any class
 // with @Component, @Configuration, @Service will be picked up
 @ComponentScan(basePackages = {
-		"org.onap.aai.config",
-		"org.onap.aai.web",
-		"org.onap.aai.setup",
-		"org.onap.aai.tasks",
-		"org.onap.aai.service",
-		"org.onap.aai.rest"
-})
-@EnableAutoConfiguration(exclude = {
-		DataSourceAutoConfiguration.class,
-		DataSourceTransactionManagerAutoConfiguration.class,
-		HibernateJpaAutoConfiguration.class
+     "org.onap.aai.config",
+     "org.onap.aai.web",
+     "org.onap.aai.setup",
+     "org.onap.aai.tasks",
+     "org.onap.aai.service",
+     "org.onap.aai.rest",
+     "org.onap.aai.aaf",
+     "org.onap.aai.TenantIsolation",
+     "org.onap.aai.aailog",
+     "org.onap.aai.prevalidation"
 })
 public class ResourcesApp {
 
-	private static final EELFLogger logger = EELFManager.getInstance().getLogger(ResourcesApp.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
 
 	private static final String APP_NAME = "aai-resources";
-	private static Map<String,String> contextMap;
+	private static AaiDebugLog debugLog = new AaiDebugLog();
+	static {
+		debugLog.setupMDC();
+	}
 
 	@Autowired
 	private Environment env;
@@ -93,17 +93,6 @@ public class ResourcesApp {
 	private void init() throws AAIException {
 		System.setProperty("org.onap.aai.serverStarted", "false");
 		setDefaultProps();
-
-		LoggingContext.save();
-		LoggingContext.component("init");
-		LoggingContext.partnerName("NA");
-		LoggingContext.targetEntity(APP_NAME);
-		LoggingContext.requestId(UUID.randomUUID().toString());
-		LoggingContext.serviceName(APP_NAME);
-		LoggingContext.targetServiceName("contextInitialized");
-		LoggingContext.statusCode(StatusCode.COMPLETE);
-		
-		contextMap = MDC.getCopyOfContextMap();
 		logger.info("AAI Server initialization started...");
 
 		// Setting this property to allow for encoded slash (/) in the path parameter
@@ -116,7 +105,6 @@ public class ResourcesApp {
 	        logger.warn("You have seriously misconfigured your application");
 	    }
 
-		LoggingContext.restoreIfPossible();
 	}
 
 	@PreDestroy
@@ -129,15 +117,6 @@ public class ResourcesApp {
 
 	    setDefaultProps();
 	    
-	    LoggingContext.save();
-		LoggingContext.component("init");
-		LoggingContext.partnerName("NA");
-		LoggingContext.targetEntity(APP_NAME);
-		LoggingContext.requestId(UUID.randomUUID().toString());
-		LoggingContext.serviceName(APP_NAME);
-		LoggingContext.targetServiceName("contextInitialized");
-		LoggingContext.statusCode(StatusCode.COMPLETE);
-
 		Environment env =null;
 		AAIConfig.init();
 		try {
@@ -148,21 +127,21 @@ public class ResourcesApp {
 			env = app.run(args).getEnvironment();
 		}
 		catch(Exception ex){
-			AAIException aai = schemaServiceExceptionTranslator(ex);
-			LoggingContext.statusCode(LoggingContext.StatusCode.ERROR);
-			LoggingContext.responseCode(LoggingContext.DATA_ERROR);
-			logger.error("Problems starting ResourcesApp "+aai.getMessage());
+		    AAIException aai = null;
+			if(ex.getCause() instanceof AAIException){
+				aai = (AAIException)ex.getCause();
+			} else {
+				aai = schemaServiceExceptionTranslator(ex);
+			}
+			logger.error("Problems starting the ResourcesApp due to {}", aai.getMessage());
 			ErrorLogHelper.logException(aai);
-			ErrorLogHelper.logError(aai.getCode(), ex.getMessage() + ", resolve and restart Resources");
-			//ErrorLogHelper.logError(aai.getCode(), aai.getMessage() + aai.getCause().toString());
 			throw aai;
 		}
 
-		MDC.setContextMap (contextMap);
 		logger.info(
-				"Application '{}' is running on {}!" ,
-				env.getProperty("spring.application.name"),
-				env.getProperty("server.port")
+			"Application '{}' is running on {}!" ,
+			env.getProperty("spring.application.name"),
+			env.getProperty("server.port")
 		);
 
 		// The main reason this was moved from the constructor is due
@@ -173,12 +152,10 @@ public class ResourcesApp {
 		AAIGraph.getInstance();
 
 		logger.info("Resources MicroService Started");
-		logger.error("Resources MicroService Started");
 		logger.debug("Resources MicroService Started");
 
 		System.out.println("Resources Microservice Started");
 		
-		LoggingContext.restoreIfPossible();
 	}
 
 	public static void setDefaultProps(){
@@ -206,17 +183,18 @@ public class ResourcesApp {
 	}
 	public static AAIException schemaServiceExceptionTranslator(Exception ex) {
 		AAIException aai = null;
-		if(ExceptionUtils.getRootCause(ex).getMessage().contains("NodeIngestor")){
+		String message = ExceptionUtils.getRootCause(ex).getMessage();
+		if(message.contains("NodeIngestor")){
 			aai = new  AAIException("AAI_3026","Error reading OXM from SchemaService - Investigate");
 		}
-		else if(ExceptionUtils.getRootCause(ex).getMessage().contains("EdgeIngestor")){
+		else if(message.contains("EdgeIngestor")){
 			aai = new  AAIException("AAI_3027","Error reading EdgeRules from SchemaService - Investigate");
 		}
-		else if(ExceptionUtils.getRootCause(ex).getMessage().contains("Connection refused")){
+		else if(message.contains("Connection refused")){
 			aai = new  AAIException("AAI_3025","Error connecting to SchemaService - Investigate");
 		}
 		else {
-			aai = new  AAIException("AAI_3025","Error connecting to SchemaService - Please Investigate");
+			aai = new  AAIException("AAI_3025","Unable to determine what the error is, please check external.log");
 		}
 
 		return aai;

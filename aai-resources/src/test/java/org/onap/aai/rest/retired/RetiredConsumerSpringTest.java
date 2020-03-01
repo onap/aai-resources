@@ -19,8 +19,8 @@
  */
 package org.onap.aai.rest.retired;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Test;
 import org.onap.aai.rest.AbstractSpringRestTest;
 import org.springframework.http.HttpMethod;
@@ -33,7 +33,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 public class RetiredConsumerSpringTest extends AbstractSpringRestTest {
 
-    private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(RetiredConsumerSpringTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RetiredConsumerSpringTest.class);
 
     private Map<String, HttpStatus> httpStatusMap;
 

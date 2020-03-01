@@ -28,6 +28,8 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.annotation.Priority;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import jersey.repackaged.com.google.common.collect.Sets;
@@ -41,6 +43,7 @@ import org.onap.aai.rest.URLFromVertexIdConsumer;
 import org.onap.aai.rest.VertexIdConsumer;
 import org.onap.aai.rest.bulk.BulkSingleTransactionConsumer;
 import org.onap.aai.rest.util.EchoResponse;
+import org.onap.logging.filter.base.AuditLogContainerFilter;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -55,9 +58,11 @@ public class JerseyConfiguration {
 
     private static final String LOGGING_ENABLED_PROPERTY = "aai.request.logging.enabled";
     private static final String INTERCEPTOR_PACKAGE = "org.onap.aai.interceptors";
+    private static final String LOGGING_INTERCEPTOR_PACKAGE = "org.onap.aai.aailog.filter";
     private static final boolean ENABLE_RESPONSE_LOGGING = false;
 
     private final Reflections reflections = new Reflections(INTERCEPTOR_PACKAGE);
+    private final Reflections loggingReflections = new Reflections(LOGGING_INTERCEPTOR_PACKAGE);
     private final Environment environment;
 
     @Autowired
@@ -80,7 +85,7 @@ public class JerseyConfiguration {
             URLFromVertexIdConsumer.class
         );
         resourceConfig.registerClasses(classes);
-        registerFiltersForClasses(resourceConfig, ContainerRequestFilter.class, ContainerResponseFilter.class);
+        registerFiltersForClasses(resourceConfig, ContainerRequestFilter.class, ContainerResponseFilter.class, AuditLogContainerFilter.class);
 
         if (isLoggingEnabled()) {
             logRequests(resourceConfig);
@@ -96,8 +101,8 @@ public class JerseyConfiguration {
     }
 
     private <T> void registerFiltersFor(Class<T> clazz, ResourceConfig resourceConfig) {
-        Set<Class<? extends T>> filters = reflections.getSubTypesOf(clazz);
-
+        Set<Class<? extends T>> filters = loggingReflections.getSubTypesOf(clazz);
+        filters.addAll(reflections.getSubTypesOf(clazz));
         throwIfPriorityAnnotationAbsent(filters);
 
         filters.stream()

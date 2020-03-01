@@ -19,46 +19,13 @@
  */
 package org.onap.aai.rest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
 import io.swagger.jaxrs.PATCH;
 import org.javatuples.Pair;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.onap.aai.concurrent.AaiCallable;
 import org.onap.aai.config.SpringContextAware;
-import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
-import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
@@ -67,13 +34,19 @@ import org.onap.aai.rest.util.ValidateEncoding;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
-import org.onap.aai.util.AAIConfig;
+import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.util.AAIConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
-import com.google.common.base.Joiner;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The Class LegacyMoxyConsumer.
@@ -82,18 +55,7 @@ import com.google.common.base.Joiner;
 @Path("{version: v[1-9][0-9]*|latest}")
 public class LegacyMoxyConsumer extends RESTAPI {
 
-	private static final EELFLogger logger = EELFManager.getInstance().getLogger(LegacyMoxyConsumer.class.getName());
-
-//	private HttpEntry traversalUriHttpEntry;
-
-//	@Autowired
-//	public LegacyMoxyConsumer(HttpEntry traversalUriHttpEntry){
-//		this.traversalUriHttpEntry = traversalUriHttpEntry;
-//	}
-
-	public LegacyMoxyConsumer(){
-
-	}
+	private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumer.class.getName());
 
 	/**
 	 *
@@ -133,24 +95,18 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		MediaType inputMediaType = headers.getMediaType();
-		Response response = null;
-		Loader loader = null;
+		Response response;
+		Loader loader;
 		TransactionalGraphEngine dbEngine = null;
 		boolean success = true;
 
 		try {
 			validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = null;
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
+
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			traversalUriHttpEntry.setHttpEntryProperties(version);
 			loader = traversalUriHttpEntry.getLoader();
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 
@@ -262,22 +218,16 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	public Response getLegacy(String content, String versionParam, String uri, String depthParam, String cleanUp,  HttpHeaders headers, UriInfo info, HttpServletRequest req, Set<String> removeQueryParams, String resultIndex, String resultSize) {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
-		Response response = null;
+		Response response;
 		TransactionalGraphEngine dbEngine = null;
-		Loader loader = null;
+		Loader loader;
 
 		try {
 			validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = null;
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
+
 			final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			traversalUriHttpEntry.setHttpEntryProperties(version);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 			loader = traversalUriHttpEntry.getLoader();
 			MultivaluedMap<String, String> params = info.getQueryParameters();
@@ -301,7 +251,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 					new DBRequest.Builder(HttpMethod.GET, uriObject, uriQuery, obj, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			if (resultIndex != null && resultIndex != "-1" && resultSize != null && resultSize != "-1") {
+			if (resultIndex != null && !"-1".equals(resultIndex) && resultSize != null && !"-1".equals(resultSize)) {
 				traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
 				traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
 			}
@@ -330,11 +280,11 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 	private MultivaluedMap<String, String> removeNonFilterableParams(MultivaluedMap<String, String> params) {
 
-		String[] toRemove = { "depth", "cleanup", "nodes-only", "format", "resultIndex", "resultSize"};
+		String[] toRemove = { "depth", "cleanup", "nodes-only", "format", "resultIndex", "resultSize", "skip-related-to"};
 		Set<String> toRemoveSet = Arrays.stream(toRemove).collect(Collectors.toSet());
 
 		MultivaluedMap<String, String> cleanedParams = new MultivaluedHashMap<>();
-		params.keySet().stream().forEach(k -> {
+		params.keySet().forEach(k -> {
 			if (!toRemoveSet.contains(k)) {
 				cleanedParams.addAll(k, params.get(k));
 			}
@@ -362,11 +312,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 
 		TransactionalGraphEngine dbEngine = null;
-		Response response = Response.status(404)
-				.type(outputMediaType).build();
+		Response response;
 
 		boolean success = true;
 
@@ -374,14 +322,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 			validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = null;
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
+
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			traversalUriHttpEntry.setHttpEntryProperties(version);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 			Loader loader = traversalUriHttpEntry.getLoader();
 
@@ -437,30 +380,20 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	public Response deleteRelationship (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
 
 		MediaType inputMediaType = headers.getMediaType();
-
-		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
-
-		Loader loader = null;
+		Loader loader;
 		TransactionalGraphEngine dbEngine = null;
-		Response response = Response.status(404)
-				.type(outputMediaType).build();
+		Response response;
 
 		boolean success = true;
 
 		try {
 			this.validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = null;
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
+
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			traversalUriHttpEntry.setHttpEntryProperties(version);
 			loader = traversalUriHttpEntry.getLoader();
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 
@@ -533,7 +466,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	public Response getRelationshipList(String versionParam, String uri, String cleanUp, HttpHeaders headers, UriInfo info, String resultIndex, String resultSize) {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
 		Loader loader = null;
@@ -541,14 +473,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		try {
 			validateRequest(info);
 			SchemaVersion version = new SchemaVersion(versionParam);
-			DBConnectionType type = null;
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
+
 			final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			traversalUriHttpEntry.setHttpEntryProperties(version);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 			loader = traversalUriHttpEntry.getLoader();
 			MultivaluedMap<String, String> params = info.getQueryParameters();
@@ -572,7 +499,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 					new DBRequest.Builder(HttpMethod.GET_RELATIONSHIP, uriObject, uriQuery, obj, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			if (resultIndex != null && resultIndex != "-1" && resultSize != null && resultSize != "-1") {
+			if (resultIndex != null && !"-1".equals(resultIndex) && resultSize != null && !"-1".equals(resultSize)) {
 				traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
 				traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
 			}
@@ -627,8 +554,8 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				parmList.add(key + "=" + value);
 			}
 		}
-		String queryParams = Joiner.on("&").join(parmList);
-		if (map.keySet().size() > 0) {
+		String queryParams = String.join("&", parmList);
+		if (!map.isEmpty()) {
 			path += params + queryParams;
 		}
 
@@ -650,27 +577,21 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 */
 	private Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam, String uri, HttpHeaders headers, UriInfo info) {
 
-		Response response = null;
+		Response response;
 		TransactionalGraphEngine dbEngine = null;
-		Loader loader = null;
-		SchemaVersion version = null;
+		Loader loader;
+		SchemaVersion version;
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
-		Boolean success = true;
+		boolean success = true;
 
 		try {
 			validateRequest(info);
 
 			version = new SchemaVersion(versionParam);
-			DBConnectionType type = null;
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
+
 			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version, type);
+			traversalUriHttpEntry.setHttpEntryProperties(version);
 			loader = traversalUriHttpEntry.getLoader();
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 			URI uriObject = UriBuilder.fromPath(uri).build();

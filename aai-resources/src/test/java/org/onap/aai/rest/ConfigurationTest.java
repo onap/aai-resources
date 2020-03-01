@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
-import org.onap.aai.config.PropertyPasswordConfiguration;
+import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.config.SpringContextAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;

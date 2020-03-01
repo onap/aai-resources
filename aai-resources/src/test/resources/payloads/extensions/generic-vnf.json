@@ -1,0 +1,28 @@
+{
+  "vnf-id": "Sample-Vnf-Id",
+  "vnf-name": "example-vnf-name-val-15051",
+  "vnf-name2": "example-vnf-name2-val-19349",
+  "vnf-type": "example-vnf-type-val-21675",
+  "vf-modules": {
+    "vf-module": [
+      {
+        "vf-module-id": "SampleVfModule1",
+        "vf-module-name": "example-vf-module-name-val-31932",
+        "heat-stack-id": "example-heat-stack-id-val-98980",
+        "relationship-list": {
+          "relationship": [
+            {
+              "related-to": "vnfc",
+              "relationship-data": [
+                {
+                  "relationship-key": "vnfc.vnfc-name",
+                  "relationship-value": "Sample-VserverName1"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

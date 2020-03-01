@@ -42,8 +42,8 @@ import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BulkProcessorTestAbstraction extends AAISetup {
 
@@ -73,7 +73,7 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
     protected String uri;
 
     private boolean initialized = false;
-    private static final EELFLogger logger = EELFManager.getInstance().getLogger(BulkProcessorTestAbstraction.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BulkProcessorTestAbstraction.class.getName());
 
     @BeforeClass
     public static void setupRest(){

@@ -129,36 +129,34 @@ fi
 #or 
 #'physical-location-id:complex-id, city:New York'
 thirdarg=$3
-isjson = false
+isjson=false
 if [[ "$thirdarg" == *json || "$thirdarg" == *JSON ]]; then 
-	isjson = true
+	isjson=true
 else 
 	#For Usage 2, format input into JSON string format
 	JSONSTRING="{"
 	INPUT=$3
 
 	#replace any spaces with %20
-	INPUT=${INPUT// /%20}
+	INPUT=$(echo ${INPUT} | sed 's/ /%20/g');
 	
-	for i in ${INPUT//,/ };
+	for i in $(echo ${INPUT} | sed 's/,/ /g');
 	do
 		#change any %20 back to space )
-		i=${i//%20/ }
-		#echo "after change to space=$i"
+		i=$(echo ${i} | sed 's/%20/ /g');
 		
 		#trim modstring to remove any beginning spaces (" city" becomes "city")
-		i="${i##*( )}"	
-		
+		i=$(echo ${i} | sed 's/^[ \t]*//');
+
 		#add JSON quotes
 		MODSTRING=" \"$i\","	
 		
-		MODSTRING=${MODSTRING//[:]/'": "'}
-		#echo "MODSTRING=$MODSTRING"
+		MODSTRING=$(echo ${MODSTRING} | sed 's/:/": "/g');
 		
-		JSONSTRING+=$MODSTRING
+		JSONSTRING="${JSONSTRING}${MODSTRING}"
 	done
 	JSONSTRING="${JSONSTRING%?}"
-	JSONSTRING+=" }"
+	JSONSTRING="${JSONSTRING} }"
 	echo "JSON string is $JSONSTRING"
 fi
 

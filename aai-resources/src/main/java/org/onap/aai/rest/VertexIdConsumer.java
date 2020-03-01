@@ -19,31 +19,10 @@
  */
 package org.onap.aai.rest;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.db.props.AAIProperties;
-import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
@@ -54,10 +33,16 @@ import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
-import org.onap.aai.serialization.db.DBSerializer;
-import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersion;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * The Class VertexIdConsumer.
@@ -66,7 +51,6 @@ import org.onap.aai.setup.SchemaVersion;
 public class VertexIdConsumer extends RESTAPI {
 
 	private ModelType introspectorFactoryType = ModelType.MOXY;
-	private QueryStyle queryStyle = QueryStyle.TRAVERSAL_URI;
 
 	private final String ID_ENDPOINT = "/id/{vertexid: \\d+}";
 	
@@ -92,22 +76,16 @@ public class VertexIdConsumer extends RESTAPI {
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		SchemaVersion version = new SchemaVersion(versionParam);
-		Status status = Status.NOT_FOUND;
-		String result = "";
 		Response response = null;
 		TransactionalGraphEngine dbEngine = null;
 		try {
-			int depth = setDepth(depthParam);
-			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
 			resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			resourceHttpEntry.setHttpEntryProperties(version, type);
+			resourceHttpEntry.setHttpEntryProperties(version);
 		    dbEngine = resourceHttpEntry.getDbEngine();
 			Loader loader = resourceHttpEntry.getLoader();
 
-			DBSerializer serializer = new DBSerializer(version, dbEngine, introspectorFactoryType, sourceOfTruth);
-			
+
 			//get type of the object represented by the given id
 			Vertex thisVertex = null;
 			Iterator<Vertex> itr = dbEngine.asAdmin().getTraversalSource().V(vertexid);

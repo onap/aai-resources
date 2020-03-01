@@ -19,40 +19,15 @@
  */
 package org.onap.aai.rest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.gson.*;
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
-import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.ModelType;
-import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.introspection.exceptions.AAIUnmarshallingException;
 import org.onap.aai.logging.ErrorObjectNotFoundException;
-import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.bulk.BulkOperation;
 import org.onap.aai.rest.bulk.BulkOperationResponse;
@@ -63,18 +38,24 @@ import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.QueryStyle;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * The Class BulkAddConsumer.
@@ -120,26 +101,11 @@ public abstract class BulkConsumer extends RESTAPI {
 		
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		SchemaVersion version = new SchemaVersion(versionParam);
 		Response response = null;
 
 		try {
-            DBConnectionType type = null;
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
-
-            String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
-            LoggingContext.requestId(transId);
-            LoggingContext.partnerName(sourceOfTruth);
-            LoggingContext.serviceName(serviceName);
-            LoggingContext.targetEntity(TARGET_ENTITY);
-            LoggingContext.targetServiceName(serviceName);
-
 
             /* A Response will be generated for each object in each transaction.
              * To keep track of what came from where to give organized feedback to the client,
@@ -152,7 +118,7 @@ public abstract class BulkConsumer extends RESTAPI {
 			
 			for (int i = 0; i < transactions.size(); i++){
 				HttpEntry resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-				resourceHttpEntry.setHttpEntryProperties(version, type);
+				resourceHttpEntry.setHttpEntryProperties(version);
 				Loader loader = resourceHttpEntry.getLoader();
 				TransactionalGraphEngine dbEngine = resourceHttpEntry.getDbEngine();
 				URI thisUri = null;
@@ -515,8 +481,7 @@ public abstract class BulkConsumer extends RESTAPI {
 	 * @param headers the headers
 	 * @param info the info
 	 * @param templateAction the template action
-	 * @param logline Generates a Response based on the given exception and adds it to the collection of responses for this request.
-	 * @throws ErrorObjectNotFoundException 
+	 * @throws ErrorObjectNotFoundException
 	 */
 	private void addExceptionCaseFailureResponse(List<List<BulkOperationResponse>> allResponses, Exception e, int index, URI thisUri, HttpHeaders headers, UriInfo info, HttpMethod templateAction) {
 		AAIException ex = null;
