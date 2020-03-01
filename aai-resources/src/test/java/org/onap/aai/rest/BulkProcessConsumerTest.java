@@ -33,13 +33,13 @@ import org.junit.Test;
 import org.onap.aai.dbmap.AAIGraph;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
 
-    private static final EELFLogger logger = EELFManager.getInstance().getLogger(BulkProcessConsumerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BulkProcessConsumerTest.class.getName());
     private LegacyMoxyConsumer legacyMoxyConsumer;
 
 	@Test

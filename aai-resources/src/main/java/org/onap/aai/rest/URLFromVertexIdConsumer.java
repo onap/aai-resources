@@ -19,34 +19,27 @@
  */
 package org.onap.aai.rest;
 
-import java.net.URI;
-import java.util.Iterator;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.onap.aai.config.SpringContextAware;
+import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.introspection.ModelType;
+import org.onap.aai.rest.db.HttpEntry;
+import org.onap.aai.restcore.HttpMethod;
+import org.onap.aai.restcore.RESTAPI;
+import org.onap.aai.serialization.db.DBSerializer;
+import org.onap.aai.serialization.engines.TransactionalGraphEngine;
+import org.onap.aai.setup.SchemaVersion;
+import org.onap.aai.util.AAIConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.onap.aai.config.SpringContextAware;
-import org.onap.aai.dbmap.DBConnectionType;
-import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.introspection.ModelType;
-import org.onap.aai.setup.SchemaVersion;
-import org.onap.aai.rest.db.HttpEntry;
-import org.onap.aai.restcore.HttpMethod;
-import org.onap.aai.restcore.RESTAPI;
-import org.onap.aai.serialization.db.DBSerializer;
-import org.onap.aai.serialization.engines.QueryStyle;
-import org.onap.aai.serialization.engines.TransactionalGraphEngine;
-import org.onap.aai.util.AAIConfig;
+import java.net.URI;
+import java.util.Iterator;
 
 /**
  * The Class URLFromVertexIdConsumer.
@@ -54,8 +47,7 @@ import org.onap.aai.util.AAIConfig;
 @Path("{version: v[1-9][0-9]*|latest}/generateurl")
 public class URLFromVertexIdConsumer extends RESTAPI {
 	private ModelType introspectorFactoryType = ModelType.MOXY;
-	private QueryStyle queryStyle = QueryStyle.TRAVERSAL_URI;
-	
+
 	private final String ID_ENDPOINT = "/id/{vertexid: \\d+}";
 	
 	/**
@@ -75,16 +67,14 @@ public class URLFromVertexIdConsumer extends RESTAPI {
 	public Response generateUrlFromVertexId(String content, @PathParam("version")String versionParam, @PathParam("vertexid")long vertexid, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
 		
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 
 		SchemaVersion version = new SchemaVersion(versionParam);
 		StringBuilder result = new StringBuilder();
-		Response response = null;
+		Response response;
 		TransactionalGraphEngine dbEngine = null;
 		try {
-			DBConnectionType type = this.determineConnectionType(sourceOfTruth, realTime);
 			HttpEntry resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			resourceHttpEntry.setHttpEntryProperties(version, type);
+			resourceHttpEntry.setHttpEntryProperties(version);
 			dbEngine = resourceHttpEntry.getDbEngine();
 			
 			DBSerializer serializer = new DBSerializer(version, dbEngine, introspectorFactoryType, sourceOfTruth);

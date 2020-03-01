@@ -1,0 +1,46 @@
+{
+  "array": [
+    {
+      "operations": [
+        {
+          "action": "put",
+          "uri": "/network/pnfs/pnf/pnf-1",
+          "body": {
+            "pnf-name": "pnf-1",
+            "p-interfaces": {
+              "p-interface": [
+                {
+                  "speed-value": "10",
+                  "interface-name": "pint-a",
+                  "speed-units": "Mbps",
+                  "prov-status": "PROV",
+                  "interface-name2": "0-0-2"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "action": "delete",
+          "uri": "/network/pnfs/pnf/pnf-1/p-interfaces/p-interface/pint-a?resource-version=38cf3090-6a0c-4e9d-8142-4332a7352846",
+          "body": {}
+        },
+        {
+          "action": "put",
+          "uri": "/network/pnfs/pnf/pnf-1/p-interfaces/p-interface/pint-a",
+          "body": {
+            "speed-value": "100",
+            "interface-name": "pint-a",
+            "speed-units": "Gbps",
+            "prov-status": "PREPROV",
+            "interface-name2": "0-0-22"
+          }
+        }
+      ]
+    }
+  ]
+}

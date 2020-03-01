@@ -19,8 +19,10 @@
  */
 package org.onap.aai.rest;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -45,8 +47,7 @@ import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 
@@ -77,7 +78,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
     private boolean initialized = false;
     
 
-    private static final EELFLogger logger = EELFManager.getInstance().getLogger(LegacyMoxyConsumerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
 
     @BeforeClass
     public static void setupRest(){
@@ -172,7 +173,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         int code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -194,7 +195,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         String pserverEntity        = response.getEntity().toString();
@@ -220,7 +221,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -300,7 +301,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         int code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals("Expected to return status created from the response",
@@ -320,8 +321,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -359,7 +359,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         );
 
         int code = response.getStatus();
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
     }
 
@@ -384,7 +384,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         int code = response.getStatus();
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
 
         response = legacyMoxyConsumer.updateRelationship(
                 payload,
@@ -398,7 +398,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         code = response.getStatus();
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         mockReq = new MockHttpServletRequest("GET", uri);
         response = legacyMoxyConsumer.getLegacy(
                 "",
@@ -459,7 +459,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         );
 
         int code = response.getStatus();
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         response = legacyMoxyConsumer.updateRelationship(
@@ -472,7 +472,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         );
 
         code = response.getStatus();
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         mockReq = new MockHttpServletRequest("GET", uri);
@@ -504,7 +504,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         );
 
         code = response.getStatus();
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         response = legacyMoxyConsumer.deleteRelationship(
@@ -560,7 +560,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         int code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -584,7 +584,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         code = response.getStatus();
         assertNotNull("Response from the patch returned null", response);
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         assertEquals(Response.Status.OK.getStatusCode(), code);
 
     }
@@ -625,7 +625,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         int code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
         assertEquals("Expected to return status created from the response",
                 Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -676,7 +676,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         );
 
         int code = response.getStatus();
-        System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
     }
 
@@ -827,7 +827,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         int code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals("Expected to return status created from the response",
@@ -852,7 +852,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -890,7 +890,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         int code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals("Expected to return status created from the response",
@@ -915,7 +915,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -983,9 +983,420 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         int code = response.getStatus();
         if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
         }
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testGetWithSkipRelatedToParam() throws IOException, JSONException {
+        String pserverData = getResourcePayload("pserver1");
+        String vserverData = getResourcePayload("vserver1");
+
+        String hostname = "pserver-hostname-test01";
+        String cloudRegionId ="testAIC01";
+        String tenant ="tenant01";
+        String vserver ="vserver01";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
+        String vserverUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true", cloudRegionId);
+
+        // PUT the resources
+        putResourceWithQueryParam(pserverUri, pserverData);
+        putResourceWithQueryParam(vserverUri, vserverData);
+
+        String pserverMockRequestUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
+        String vserverMockRequestUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true",
+                cloudRegionId, tenant, vserver);
+
+        // === GET - related-to-property should not exist ===
+        // pserver
+        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
+
+        // vserver
+        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
+        // ===
+
+        // === Clean up (DELETE) ===
+        // vserver
+        String deleteUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        Response response = deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+        // pserver
+        deleteUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
+        code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testGetWithoutSkipRelatedToParam() throws IOException, JSONException {
+        String pserverData = getResourcePayload("pserver2");
+        String vserverData = getResourcePayload("vserver2");
+
+        String hostname = "pserver-hostname-test02";
+        String cloudRegionId ="testAIC02";
+        String tenant ="tenant02";
+        String vserver ="vserver02";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        String vserverUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s", cloudRegionId);
+
+        // PUT the resources
+        doSetupResource(pserverUri, pserverData);
+        doSetupResource(vserverUri, vserverData);
+
+        String pserverMockRequestUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        String vserverMockRequestUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+
+        // === GET - related-to-property should not exist ===
+        // pserver
+        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        assertFalse(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
+
+        // vserver
+        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        assertFalse(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
+        // ===
+
+        // === Clean up (DELETE) ===
+        // vserver
+        String deleteUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        Response response = deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+        // pserver
+        deleteUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
+        code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testGetWithSkipRelatedToParamAndFormatResource() throws IOException, JSONException {
+        String pserverData = getResourcePayload("pserver3");
+        String vserverData = getResourcePayload("vserver3");
+
+        String hostname = "pserver-hostname-test03";
+        String cloudRegionId ="testAIC03";
+        String tenant ="tenant03";
+        String vserver ="vserver03";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource", hostname);
+        String vserverUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true&format=resource", cloudRegionId);
+
+        // PUT the resources
+        putResourceWithQueryParam(pserverUri, pserverData);
+        putResourceWithQueryParam(vserverUri, vserverData);
+
+        String pserverMockRequestUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource", hostname);
+        String vserverMockRequestUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true&format=resource",
+                cloudRegionId, tenant, vserver);
+
+        // === GET - related-to-property should not exist ===
+        // pserver
+        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
+
+        // vserver
+        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
+        // ===
+
+        // === Clean up (DELETE) ===
+        // vserver
+        String deleteUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        String vserverMockRequestUriNoFormat = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        Response response = deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+        // pserver
+        deleteUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
+        code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+    }
+
+    @Test
+    public void testGetWithSkipRelatedToParamAndFormatResourceAndUrl() throws IOException, JSONException {
+        String pserverData = getResourcePayload("pserver4");
+        String vserverData = getResourcePayload("vserver4");
+
+        String hostname = "pserver-hostname-test04";
+        String cloudRegionId ="testAIC04";
+        String tenant ="tenant04";
+        String vserver ="vserver04";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource_and_url", hostname);
+        String vserverUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true&format=resource_and_url", cloudRegionId);
+
+        // PUT the resources
+        putResourceWithQueryParam(pserverUri, pserverData);
+        putResourceWithQueryParam(vserverUri, vserverData);
+
+        String pserverMockRequestUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource_and_url", hostname);
+        String vserverMockRequestUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true&format=resource_and_url",
+                cloudRegionId, tenant, vserver);
+
+        // === GET - related-to-property should not exist ===
+        // pserver
+        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
+
+        // vserver
+        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
+        // ===
+
+        // === Clean up (DELETE) ===
+        // vserver
+        String deleteUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        String vserverMockRequestUriNoFormat = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        Response response = deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+        // pserver
+        deleteUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
+        code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testGetVserversWithSkipRelatedToParam() throws IOException, JSONException {
+        String pserverData = getResourcePayload("pserver5");
+        String vserverData = getResourcePayload("vserver5");
+
+        String hostname = "pserver-hostname-test05";
+        String cloudRegionId ="testAIC05";
+        String tenant ="tenant05";
+        String vserver ="vserver05";
+
+        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
+        String vserverUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true", cloudRegionId);
+
+        // PUT the resources
+        putResourceWithQueryParam(pserverUri, pserverData);
+        putResourceWithQueryParam(vserverUri, vserverData);
+
+        String pserverMockRequestUri = String.format("cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
+        String vserverMockRequestUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers?vserver-selflink=somelink05&skip-related-to=true",
+                cloudRegionId, tenant, vserver);
+
+        // === GET - related-to-property should not exist ===
+        // pserver
+        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
+
+        // vserver
+        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
+        // ===
+
+        // === Clean up (DELETE) ===
+        // vserver
+        String deleteUri = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        String vserverMockRequestUriNoFormat = String.format("cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+                cloudRegionId, tenant, vserver);
+        Response response = deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+        // pserver
+        deleteUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
+        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
+        code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    private Response deleteServerObject(String mockUri, String deleteUri, String nodeType) throws IOException, JSONException {
+        Response response = getMockResponse(mockUri);
+        String serverEntity = response.getEntity().toString();
+        JSONObject serverJsonObject = new JSONObject(serverEntity);
+        boolean noResultsArray = false;
+        String resourceVersion = "";
+        try {
+            JSONArray resultsJsonArray = (JSONArray) serverJsonObject.get("results");
+            if (resultsJsonArray != null) {
+                JSONObject servers = (JSONObject) resultsJsonArray.get(0);
+                JSONObject server = (JSONObject) servers.get(nodeType);
+                resourceVersion = server.getString("resource-version");
+            }
+        } catch (Exception e) {
+            noResultsArray = true;
+        }
+        if (noResultsArray)
+            resourceVersion = serverJsonObject.getString("resource-version");
+        queryParameters.clear();
+        queryParameters.add("resource-version", resourceVersion);
+
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("DELETE", deleteUri);
+        Response deleteResponse = legacyMoxyConsumer.delete(
+                schemaVersions.getDefaultVersion().toString(),
+                deleteUri,
+                httpHeaders,
+                uriInfo,
+                resourceVersion,
+                mockReq
+        );
+        return deleteResponse;
+    }
+
+    private void putResourceWithQueryParam(String uri, String payload) {
+
+        String[] uriSplit = uri.split("\\?");
+        if (uriSplit[1] != null && !uriSplit[1].isEmpty()) {
+            String[] params;
+            if (!uriSplit[1].contains("&")) {
+                String param = uriSplit[1];
+                params = new String[]{param};
+            } else {
+                params = uriSplit[1].split("&");
+            }
+            for (String param : params) {
+                String[] splitParam = param.split("=");
+                String key = splitParam[0];
+                String value = splitParam[1];
+                uriInfo.getQueryParameters().add(key, value);
+            }
+        }
+        uri = uriSplit[0];
+
+        when(uriInfo.getPath()).thenReturn(uri);
+        when(uriInfo.getPath(false)).thenReturn(uri);
+
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
+        Response response = legacyMoxyConsumer.update(
+                payload,
+                schemaVersions.getDefaultVersion().toString(),
+                uri,
+                httpHeaders,
+                uriInfo,
+                mockReq
+        );
+
+        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+
+        assertEquals("Expected to return status created from the response",
+                Response.Status.CREATED.getStatusCode(), response.getStatus());
+        logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+    }
+
+    private Response getMockResponse(String mockUri) throws IOException, JSONException {
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("GET", mockUri);
+        Response response = legacyMoxyConsumer.getLegacy(
+                "",
+                null,
+                null,
+                schemaVersions.getDefaultVersion().toString(),
+                mockUri,
+                "10000",
+                "false",
+                httpHeaders,
+                uriInfo,
+                mockReq
+        );
+        String responseEntity = response.getEntity().toString();
+        int code = response.getStatus();
+        if(!VALID_HTTP_STATUS_CODES.contains(code)){
+            logger.info("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        }
+        return response;
+    }
+
+    private boolean isRelatedToPropertiesFieldNullInResponse(Response response, String nodeType) throws IOException, JSONException {
+        String responseEntity = response.getEntity().toString();
+        boolean noResultsArray = false;
+        JSONObject responseJsonObj = new JSONObject(responseEntity);
+        try {
+            JSONArray resultsJsonArray = (JSONArray) responseJsonObj.get("results");
+            if (resultsJsonArray != null) {
+                JSONObject servers = (JSONObject) resultsJsonArray.get(0);
+                JSONObject server = (JSONObject) servers.get(nodeType);
+                JSONObject relationshipList = (JSONObject) server.get("relationship-list");
+                if (relationshipList != null) {
+                    JSONArray relationship = (JSONArray) relationshipList.get("relationship");
+                    if (relationship != null) {
+                        JSONObject relationshipObj = relationship.getJSONObject(0);
+                        JSONArray relatedToProperty = (JSONArray) relationshipObj.get("related-to-property");
+                        if (relatedToProperty != null)
+                            return false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            noResultsArray = true;
+        }
+
+        if (noResultsArray) {
+            try {
+                JSONObject relationshipList = (JSONObject) responseJsonObj.get("relationship-list");
+                if (relationshipList != null) {
+                    JSONArray relationship = (JSONArray) relationshipList.get("relationship");
+                    if (relationship != null) {
+                        JSONObject relationshipObj = relationship.getJSONObject(0);
+                        JSONArray relatedToProperty = (JSONArray) relationshipObj.get("related-to-property");
+                        if (relatedToProperty != null)
+                            return false;
+                    }
+                }
+            } catch (JSONException je) {
+                logger.info("JSON Exception Error: " + je);
+            } catch (Exception e) {
+                logger.info("JSON Exception Error: " + e);
+            }
+        }
+        return true;
     }
 }

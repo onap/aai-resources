@@ -27,12 +27,24 @@ start_date;
 check_user;
 source_profile;
 
-CERTPATH=$PROJECT_HOME/resources/etc/auth/
+prop_file=$PROJECT_HOME/resources/application.properties
+
+CERTPATH=${PROJECT_HOME}/resources/etc/auth/
 KEYNAME=aaiClientPrivateKey.pem
 CERTNAME=aaiClientPublicCert.pem
+CERTIFICATE_FILE=${CERTPATH}aai-client-cert.p12
 
-pw=$(execute_spring_jar org.onap.aai.util.AAIConfigCommandLinePropGetter "" "aai.keystore.passwd" 2> /dev/null | tail -1)
-openssl pkcs12 -in ${CERTPATH}/aai-client-cert.p12 -out $CERTPATH$CERTNAME -clcerts -nokeys -passin pass:$pw
-openssl pkcs12 -in ${CERTPATH}/aai-client-cert.p12 -out $CERTPATH$KEYNAME -nocerts -nodes -passin pass:$pw
+CERTMAN_PATH=`grep ^server.certs.location $prop_file |cut -d'=' -f2 |tr -d "\015"`
+if [ -z $CERTMAN_PATH ]; then
+    echo "Property [server.certs.location] not found in file $prop_file, continuing with default"
+    pw=$(execute_spring_jar org.onap.aai.util.AAIConfigCommandLinePropGetter "" "aai.keystore.passwd" 2> /dev/null | tail -1)
+else
+    # Assume AAF certificate container use
+    pw=$(< ${CERTMAN_PATH}/.password)
+    CERTIFICATE_FILE=${CERTMAN_PATH}/certificate.pkcs12
+fi
+
+openssl pkcs12 -in ${CERTIFICATE_FILE} -out $CERTPATH$CERTNAME -nokeys -nodes -passin pass:$pw
+openssl pkcs12 -in ${CERTIFICATE_FILE} -nocerts -out $CERTPATH$KEYNAME -nodes -passin pass:$pw
 end_date;
 exit 0

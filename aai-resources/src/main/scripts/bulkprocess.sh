@@ -43,10 +43,10 @@ if [ -z "$2" ]; then
    exit 1
 fi
 
-[[ "$XFROMAPPID" =~ [a-zA-Z0-9][a-zA-Z0-9]*-[a-zA-Z0-9][a-zA-Z0-9]* ]] || { 
-  echo "XFROMAPPID doesn't match the following regex [a-zA-Z0-9][a-zA-Z0-9]*-[a-zA-Z0-9][a-zA-Z0-9]*"; 
-  exit 1; 
-}
+case "${XFROMAPPID}" in
+  [a-zA-Z0-9][a-zA-Z0-9]*-[a-zA-Z0-9][a-zA-Z0-9]*) ;;
+  *) echo "XFROMAPPID doesn't match the following regex [a-zA-Z0-9][a-zA-Z0-9]*-[a-zA-Z0-9][a-zA-Z0-9]*"; exit 1; ;;
+esac
 
 XTRANSID=$3
 

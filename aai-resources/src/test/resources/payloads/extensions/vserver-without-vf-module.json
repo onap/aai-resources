@@ -1,0 +1,19 @@
+{
+  "vserver-id": "Sample-VserverId",
+  "vserver-name": "Sample-VserverName",
+  "vserver-selflink": "http://testvserverLink.com/Sample-VserverLink",
+  "in-maint": false,
+  "relationship-list": {
+    "relationship": [
+      {
+        "related-to": "pserver",
+        "relationship-data": [
+          {
+            "relationship-key": "pserver.hostname",
+            "relationship-value": "SkeletonPserver.aic.att.com"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -19,8 +19,8 @@
  */
 package org.onap.aai.rest;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -65,7 +65,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
 
-    private static final EELFLogger logger = EELFManager.getInstance().getLogger(LegacyMoxyConsumerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
     private boolean initialized = false;
     @BeforeClass
     public static void setupRest(){

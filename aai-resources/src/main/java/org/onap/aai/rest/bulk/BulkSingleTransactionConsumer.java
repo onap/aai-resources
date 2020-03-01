@@ -19,18 +19,16 @@
  */
 package org.onap.aai.rest.bulk;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
-import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.logging.ErrorLogHelper;
-import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.rest.bulk.pojos.Operation;
 import org.onap.aai.rest.bulk.pojos.OperationResponse;
 import org.onap.aai.rest.bulk.pojos.Transaction;
@@ -44,6 +42,8 @@ import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -57,11 +57,21 @@ import java.util.*;
 @Path(value = "{version: v[1-9][0-9]*|latest}/bulk/single-transaction")
 public class BulkSingleTransactionConsumer extends RESTAPI {
 
-	private static final String TARGET_ENTITY = "aai-resources";
 	private static final Set<String> validOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("put", "patch", "delete")));
+	private static final JsonParser parser = new JsonParser();
 	private int allowedOperationCount = 30;
 
-	private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(BulkSingleTransactionConsumer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(BulkSingleTransactionConsumer.class);
+
+	private final String uriPrefix;
+
+	public BulkSingleTransactionConsumer() {
+		uriPrefix = SpringContextAware.getApplicationContext().getEnvironment().getProperty("schema.uri.base.path", "");
+	}
+
+	public BulkSingleTransactionConsumer(String uriPrefix) {
+		this.uriPrefix = uriPrefix;
+	}
 
 	@POST
 	@Consumes(value = javax.ws.rs.core.MediaType.APPLICATION_JSON)
@@ -70,11 +80,8 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
-		String realTime = headers.getRequestHeaders().getFirst("Real-Time");
 		SchemaVersion version = new SchemaVersion(versionParam);
-		DBConnectionType type;
 
-		initLogging(req, transId, sourceOfTruth);
 		boolean success = true;
 
 		TransactionalGraphEngine dbEngine = null;
@@ -82,11 +89,6 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 		Response response;
 
 		try {
-			if(AAIConfig.get("aai.use.realtime", "true").equals("true")){
-				type = DBConnectionType.REALTIME;
-			} else {
-				type = this.determineConnectionType(sourceOfTruth, realTime);
-			}
 
 			// unmarshall the payload.
 			Gson gson = new Gson();
@@ -107,7 +109,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
 			//init http entry
 			HttpEntry resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			resourceHttpEntry.setHttpEntryProperties(version, type);
+			resourceHttpEntry.setHttpEntryProperties(version);
 			Loader loader = resourceHttpEntry.getLoader();
 			dbEngine = resourceHttpEntry.getDbEngine();
 
@@ -123,16 +125,19 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 			//process db requests
 			Pair<Boolean, List<Pair<URI, Response>>> results = resourceHttpEntry.process(dbRequests, sourceOfTruth, this.enableResourceVersion());
 
-			//process result of db requests
-			transactionResponse = buildTransactionResponse(transaction, results.getValue1());
-
 			//commit/rollback based on results
 			success = results.getValue0();
 
-			response = Response
-					.status(Response.Status.CREATED)
-					.entity(new GsonBuilder().serializeNulls().create().toJson(transactionResponse))
-					.build();
+			if (success) { //process result of db requests if all are successful
+				transactionResponse = buildTransactionResponse(transaction, results.getValue1());
+				response = Response
+						.status(Response.Status.CREATED)
+						.entity(new GsonBuilder().serializeNulls().create().toJson(transactionResponse))
+						.build();
+			} else {
+				response = getErrorResponseForFirstFailure(transaction, results.getValue1(), info, javax.ws.rs.HttpMethod.POST, headers);
+
+			}
 
 		} catch (AAIException e) {
 			response = consumerExceptionResponseGenerator(headers, info, javax.ws.rs.HttpMethod.POST, e);
@@ -150,6 +155,44 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 		}
 
 		return response;
+	}
+
+	private Response getErrorResponseForFirstFailure(Transaction transaction, List<Pair<URI, Response>> results, UriInfo info, String action, HttpHeaders headers) throws AAIException {
+		final String failureInResponse = "Operation %s with action (%s) on uri (%s) failed with status code (%s), error code (%s) and msg (%s)";
+		for (int i = 0; i < transaction.getOperations().size(); i++) {
+			if (!Response.Status.Family.familyOf(results.get(i).getValue1().getStatus()).equals(Response.Status.Family.SUCCESSFUL)) {
+				final JsonArray vars = parser.parse(results.get(i).getValue1().getEntity().toString()).getAsJsonObject()
+						.getAsJsonObject("requestError")
+						.getAsJsonObject("serviceException")
+						.getAsJsonArray("variables");
+				StringBuilder sb = new StringBuilder();
+				for (int j = 2; j < vars.size() - 1; j++) {
+					if (j != 2) {
+						sb.append(": ");
+					}
+					sb.append(vars.get(j).getAsString());
+				}
+				final AAIException e = new AAIException("AAI_3000",
+						String.format(
+								failureInResponse,
+								i,
+								vars.get(0).getAsString(),
+								vars.get(1).getAsString(),
+								results.get(i).getValue1().getStatus(),
+								vars.get(vars.size()-1).getAsString(),
+								sb.toString()
+						));
+				ArrayList<String> templateVars = new ArrayList<>();
+				templateVars.add(action); //GET, PUT, etc
+				templateVars.add(info.getPath());
+				return Response
+						.status(results.get(i).getValue1().getStatus())
+						.entity(ErrorLogHelper.getRESTAPIErrorResponseWithLogging(headers.getAcceptableMediaTypes(), e, templateVars))
+						.build();
+			}
+		}
+		LOGGER.error("Transaction Process reported failure, none found.");
+		throw new AAIException("AAI_3000", "Transaction Process reported failure, none found.");
 	}
 
 
@@ -297,11 +340,9 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 		List<BulkOperation> bulkOperations = new ArrayList<>(transaction.getOperations().size());
 
 		BulkOperation bulkOperation;
-		for (int i = 0; i < transaction.getOperations().size(); i++) {
-			final Operation operation = transaction.getOperations().get(i);
+		for (Operation operation : transaction.getOperations()) {
 			bulkOperation = new BulkOperation();
-
-			UriComponents uriComponents = UriComponentsBuilder.fromUriString(operation.getUri()).build();
+			UriComponents uriComponents = UriComponentsBuilder.fromUriString(getUri(operation)).build();
 			bulkOperation.setUri(UriBuilder.fromPath(uriComponents.getPath()).build());
 			bulkOperation.addUriInfoQueryParams(uriComponents.getQueryParams());
 			bulkOperation.setHttpMethod(getHttpMethod(operation.getAction(), bulkOperation.getUri()));
@@ -311,6 +352,17 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
 		return bulkOperations;
 	}
+
+	private String getUri(Operation operation) {
+		String uri = operation.getUri();
+		if (uri == null || uri.isEmpty()) {
+			return uri;
+		} else if (uri.charAt(0) != '/') {
+			uri = '/' + uri;
+		}
+		return uri.replaceAll("^" + uriPrefix + "/v\\d+", "");
+	}
+
 
 	/**
 	 * Map action to httpmethod
@@ -384,21 +436,6 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 			throw new AAIException("AAI_6111", "input payload missing required properties. [" + String.join(", ", msgs) + "]");
 		}
 
-	}
-
-	/**
-	 * Initialize logging context
-	 * @param req requestContext
-	 * @param transId transaction id
-	 * @param sourceOfTruth application source
-	 */
-	private void initLogging(@Context HttpServletRequest req, String transId, String sourceOfTruth) {
-		String serviceName = req.getMethod() + " " + req.getRequestURI().toString();
-		LoggingContext.requestId(transId);
-		LoggingContext.partnerName(sourceOfTruth);
-		LoggingContext.serviceName(serviceName);
-		LoggingContext.targetEntity(TARGET_ENTITY);
-		LoggingContext.targetServiceName(serviceName);
 	}
 
 	protected boolean enableResourceVersion() {

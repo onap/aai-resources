@@ -24,17 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import org.onap.aai.restclient.PropertyPasswordConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphTransaction;
-import org.onap.aai.config.PropertyPasswordConfiguration;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.AAIGraph;
-import org.onap.aai.edges.EdgeIngestor;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
@@ -42,7 +41,6 @@ import org.onap.aai.introspection.LoaderFactory;
 import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.exceptions.AAIUnknownObjectException;
 import org.onap.aai.logging.ErrorLogHelper;
-import org.onap.aai.logging.LoggingContext;
 import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.util.AAISystemExitUtil;
 import org.onap.aai.util.PositiveNumValidator;
@@ -65,7 +63,7 @@ public class IncreaseNodesTool {
    protected TransactionalGraphEngine engine;
     Vertex parentVtx;
 
-    private static final EELFLogger LOGGER = EELFManager.getInstance().getLogger(IncreaseNodesTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncreaseNodesTool.class);
 
    public IncreaseNodesTool(LoaderFactory loaderFactory, SchemaVersions schemaVersions){
        this.loaderFactory = loaderFactory;
@@ -84,11 +82,14 @@ public class IncreaseNodesTool {
            );
            context.refresh();
        } catch (Exception e) {
-           AAIException aai = ResourcesApp.schemaServiceExceptionTranslator(e);
-           LOGGER.error("Problems running the tool "+aai.getMessage());
-           LoggingContext.statusCode(LoggingContext.StatusCode.ERROR);
-           LoggingContext.responseCode(LoggingContext.DATA_ERROR);
-           ErrorLogHelper.logError(aai.getCode(), e.getMessage() + ", resolve and retry");
+           AAIException aai = null;
+           if(e.getCause() instanceof AAIException){
+               aai = (AAIException)e.getCause();
+           } else {
+               aai = ResourcesApp.schemaServiceExceptionTranslator(e);
+           }
+           LOGGER.error("Problems starting the Increase Nodes Tool due to {}", aai.getMessage());
+           ErrorLogHelper.logException(aai);
            throw aai;
        }
 
@@ -141,7 +142,7 @@ public class IncreaseNodesTool {
                 GraphTraversalSource g = transaction.traversal();
                 for (long i = 1; i <= nodeCount; i++) {
                     String randomId = UUID.randomUUID().toString();
-                    Vertex v = g.addV().next();
+                    Vertex v = g.addV(nodeType).next();
                     
                     v.property("aai-node-type", nodeType);
                     v.property("source-of-truth", "IncreaseNodesTool");

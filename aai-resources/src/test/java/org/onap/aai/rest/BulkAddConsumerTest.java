@@ -29,11 +29,11 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
 
-    private static final EELFLogger logger = EELFManager.getInstance().getLogger(BulkAddConsumerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BulkAddConsumerTest.class.getName());
 
 
 	@Test

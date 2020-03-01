@@ -19,37 +19,31 @@
  */
 package org.onap.aai;
 
-import static org.junit.Assert.assertNotNull;
+import org.apache.commons.io.IOUtils;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.onap.aai.config.*;
+import org.onap.aai.edges.EdgeIngestor;
+import org.onap.aai.introspection.LoaderFactory;
+import org.onap.aai.introspection.MoxyLoader;
+import org.onap.aai.nodes.NodeIngestor;
+import org.onap.aai.rest.db.HttpEntry;
+import org.onap.aai.serialization.db.EdgeSerializer;
+import org.onap.aai.setup.AAIConfigTranslator;
+import org.onap.aai.setup.SchemaVersion;
+import org.onap.aai.setup.SchemaVersions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.BeforeClass;
-import org.onap.aai.config.ConfigConfiguration;
-import org.onap.aai.config.SpringContextAware;
-import org.onap.aai.config.IntrospectionConfig;
-import org.onap.aai.introspection.LoaderFactory;
-import org.onap.aai.logging.LoggingContext;
-import org.onap.aai.nodes.NodeIngestor;
-import org.onap.aai.config.RestBeanConfig;
-import org.onap.aai.rest.db.HttpEntry;
-import org.onap.aai.setup.SchemaLocationsBean;
-import org.onap.aai.setup.SchemaVersion;
-import org.onap.aai.setup.SchemaVersions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.onap.aai.introspection.MoxyLoader;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.onap.aai.edges.EdgeIngestor;
-import org.onap.aai.setup.AAIConfigTranslator;
-import org.onap.aai.serialization.db.EdgeSerializer;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import static org.junit.Assert.assertNotNull;
 
 @ContextConfiguration(classes = {
         ConfigConfiguration.class,
@@ -58,7 +52,8 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
         EdgeIngestor.class,
         EdgeSerializer.class,
         SpringContextAware.class,
-        IntrospectionConfig.class,  
+        IntrospectionConfig.class,
+        XmlFormatTransformerConfiguration.class,
         RestBeanConfig.class
 })
 @TestPropertySource(properties = {
@@ -95,7 +90,6 @@ public abstract class AAISetup {
     public static void setupBundleconfig() throws Exception {
         System.setProperty("AJSC_HOME", "./");
         System.setProperty("BUNDLECONFIG_DIR", "src/main/resources/");
-        LoggingContext.init();
     }
    
     public String getPayload(String filename) throws IOException {

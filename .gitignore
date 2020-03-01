@@ -12,3 +12,4 @@ test_csvWriter.csv
 **/.idea/
 */.idea
 *.iml
+aai-resources/debug-logs/EELF/

@@ -1,0 +1,63 @@
+{
+  "hostname": "SkeletonPserver.aic.att.com",
+  "pserver-id": "auto-generated-skeleton",
+  "in-maint": false,
+  "relationship-list": {
+    "relationship": [
+      {
+        "related-to": "vserver",
+        "relationship-data": [
+          {
+            "relationship-key": "cloud-region.cloud-owner",
+            "relationship-value": "Sample-att-aic"
+          },
+          {
+            "relationship-key": "cloud-region.cloud-region-id",
+            "relationship-value": "Sample-AAIAIC25"
+          },
+          {
+            "relationship-key": "tenant.tenant-id",
+            "relationship-value": "Sample-TenantId"
+          },
+          {
+            "relationship-key": "vserver.vserver-id",
+            "relationship-value": "Sample-VserverId"
+          }
+        ],
+        "related-to-property": [
+          {
+            "property-key": "vserver.vserver-name",
+            "property-value": "Sample-VserverName"
+          }
+        ]
+      },
+      {
+        "related-to": "cloud-region",
+        "relationship-data": [
+          {
+            "relationship-key": "cloud-region.cloud-owner",
+            "relationship-value": "Sample-att-aic"
+          },
+          {
+            "relationship-key": "cloud-region.cloud-region-id",
+            "relationship-value": "Sample-AAIAIC25"
+          }
+        ],
+        "related-to-property": [
+          {
+            "property-key": "cloud-region.owner-defined-type"
+          }
+        ]
+      },
+      {
+        "related-to": "complex",
+        "relationship-data": [
+          {
+            "relationship-key": "complex.physical-location-id",
+            "relationship-value": "complex1"
+          }
+        ]
+      }
+    ]
+  }
+}

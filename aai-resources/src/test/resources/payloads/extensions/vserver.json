@@ -1,0 +1,32 @@
+{
+  "vserver-id": "Sample-VserverId",
+  "vserver-name": "Sample-VserverName",
+  "vserver-selflink": "http://testvserverLink.com/Sample-VserverLink",
+  "in-maint": false,
+  "relationship-list": {
+    "relationship": [
+      {
+        "related-to": "vf-module",
+        "relationship-data": [
+          {
+            "relationship-key": "generic-vnf.vnf-id",
+            "relationship-value": "Sample-Vnf-Id"
+          },
+          {
+            "relationship-key": "vf-module.vf-module-id",
+            "relationship-value": "SampleVfModule1"
+          }
+        ]
+      },
+      {
+        "related-to": "pserver",
+        "relationship-data": [
+            {
+                "relationship-key": "pserver.hostname",
+                "relationship-value": "SkeletonPserver.aic.att.com"
+            }
+        ]
+      }
+    ]
+  }
+}

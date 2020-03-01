@@ -1,0 +1,7 @@
+{
+  "vnfc-name": "Sample-VserverName1",
+  "nfc-naming-code": "Sample-code",
+  "nfc-function": "Sample-function",
+  "vnfc-function-code": "Sample-code",
+  "vnfc-type": "Sample-function"
+}

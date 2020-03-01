@@ -30,7 +30,9 @@ public final class AAIHeaderProperties {
 	public static final String TRANSACTION_ID = "X-TransactionId";
 	
 	public static final String FROM_APP_ID = "X-FromAppId";
-	
+
+	public static final String SOURCE_OF_TRUTH = "X-SourceOfTruth";
+
 	public static final String AAI_TX_ID = "X-AAI-TXID";
 	
 	public static final String AAI_REQUEST = "X-REQUEST";

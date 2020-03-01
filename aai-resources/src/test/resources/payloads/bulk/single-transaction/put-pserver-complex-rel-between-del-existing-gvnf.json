@@ -2,7 +2,7 @@
   "operations": [
     {
       "action": "put",
-      "uri": "/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
+      "uri": "aai/v15/cloud-infrastructure/pservers/pserver/pserver-<methodName>",
       "body": {
         "hostname": "pserver-<methodName>",
         "fqdn": "pserver-<methodName>-fqdn"
@@ -10,7 +10,7 @@
     },
     {
       "action": "put",
-      "uri": "/cloud-infrastructure/complexes/complex/complex-<methodName>",
+      "uri": "/aai/v15/cloud-infrastructure/complexes/complex/complex-<methodName>",
       "body": {
         "physical-location-id": "complex-<methodName>",
         "data-center-code": "code",
@@ -27,7 +27,7 @@
     },
     {
       "action": "put",
-      "uri": "/cloud-infrastructure/complexes/complex/complex-<methodName>/relationship-list/relationship",
+      "uri": "/aai/v15/cloud-infrastructure/complexes/complex/complex-<methodName>/relationship-list/relationship",
       "body": {
         "related-to": "pserver",
         "related-link": "/aai/v13/cloud-infrastructure/pservers/pserver/pserver-<methodName>"
@@ -36,7 +36,7 @@
     },
     {
       "action": "delete",
-      "uri": "/network/generic-vnfs/generic-vnf/gvnf-<methodName>?resource-version=0",
+      "uri": "/aai/v15/network/generic-vnfs/generic-vnf/gvnf-<methodName>?resource-version=0",
       "body": {}
     }
   ]

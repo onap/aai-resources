@@ -60,16 +60,19 @@ execute_spring_jar(){
     JAVA_OPTS="$JAVA_OPTS -Dlogback.configurationFile=${logbackFile}";
 
     export SOURCE_NAME=$(grep '^schema.source.name=' ${PROJECT_HOME}/resources/application.properties | cut -d"=" -f2-);
-    # Needed for the schema ingest library beans
-    eval $(grep '^schema\.' ${PROJECT_HOME}/resources/application.properties | \
-     sed 's/^\(.*\)$/JAVA_OPTS="$JAVA_OPTS -D\1"/g' | \
-     sed 's/${server.local.startpath}/${PROJECT_HOME}\/resources/g'| \
-     sed 's/${schema.source.name}/'${SOURCE_NAME}'/g'\
-    )
+        # Needed for the schema ingest library beans
+        eval $(egrep '^(schema|server)\.' ${PROJECT_HOME}/resources/application.properties | \
+         sed 's/^\(.*\)$/JAVA_OPTS="$JAVA_OPTS -D\1"/g' | \
+         sed 's/${server.local.startpath}/${PROJECT_HOME}\/resources/g'| \
+         sed 's/${schema.source.name}/'${SOURCE_NAME}'/g'\
+        )
 
-    JAVA_OPTS="${JAVA_OPTS} ${JAVA_POST_OPTS}";
+        JAVA_OPTS="${JAVA_OPTS} ${JAVA_POST_OPTS}";
 
-    ${JAVA_HOME}/bin/java ${JVM_OPTS} ${JAVA_OPTS} -jar ${EXECUTABLE_JAR} "$@"
+        "${JAVA_HOME}/bin/java" ${JVM_OPTS} ${JAVA_OPTS} -jar ${EXECUTABLE_JAR} "$@" || {
+            echo "Failed to run the tool $0 successfully";
+            exit 1;
+        }
 }
 
 # Prints the start date and the script that the user called

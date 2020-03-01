@@ -1,0 +1,19 @@
+{
+  "cloud-owner": "test-aic",
+  "cloud-region-id": "testAIC03",
+  "tenants": {"tenant": [   {
+    "tenant-id": "tenant03",
+    "tenant-name": "tenant03",
+    "vservers": {"vserver": [      {
+      "vserver-id": "vserver03",
+      "vserver-name": "vserver03",
+      "vserver-selflink": "somelink",
+      "in-maint": false,
+      "is-closed-loop-disabled": false,
+      "relationship-list": {"relationship": [         {
+        "related-to": "pserver",
+        "related-link": "/aai/v15/cloud-infrastructure/pservers/pserver/pserver-hostname-test03"
+      }]}
+    }]}
+  }]}
+}
