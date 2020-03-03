@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.6.5-SNAPSHOT</version>
+        <version>1.6.8-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -41,7 +41,7 @@
         <docker.push.registry>localhost:5000</docker.push.registry>
         <aai.docker.version>1.0.0</aai.docker.version>
         <aai.base.image>alpine</aai.base.image>
-        <aai.base.image.version>1.6.0</aai.base.image.version>
+        <aai.base.image.version>1.6.2</aai.base.image.version>
 
         <!--
              Location where assembly of our scripts, resources and main jar will be held
