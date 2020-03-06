@@ -82,7 +82,7 @@ public class ResourcesTestConfiguration {
                     .build();
 
             restTemplate = builder
-                    .requestFactory(new HttpComponentsClientHttpRequestFactory(client))
+                    .requestFactory(() -> new HttpComponentsClientHttpRequestFactory(client))
                     .build();
         }else {
             restTemplate = builder.build();
