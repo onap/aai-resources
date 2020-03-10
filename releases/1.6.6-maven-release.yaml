@@ -1,0 +1,4 @@
+distribution_type: maven
+log_dir: aai-resources-maven-stage-master/258/
+project: resources
+version: 1.6.6
