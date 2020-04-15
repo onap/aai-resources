@@ -58,11 +58,11 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
     private void transLogging(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
         String logValue;
-        String getValue;
+        String isGetTransactionResponseLoggingEnabled;
 
         try {
             logValue = AAIConfig.get("aai.transaction.logging");
-            getValue = AAIConfig.get("aai.transaction.logging.get");
+            isGetTransactionResponseLoggingEnabled = AAIConfig.get("aai.transaction.logging.get");
         } catch (AAIException e) {
             return;
         }
@@ -70,10 +70,6 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
         String httpMethod = requestContext.getMethod();
 
         if(Boolean.parseBoolean(logValue)){
-
-            if(!Boolean.parseBoolean(getValue) && HttpMethod.GET.equals(httpMethod)){
-                return;
-            }
 
             String transId = requestContext.getHeaderString(AAIHeaderProperties.TRANSACTION_ID);
             String fromAppId = requestContext.getHeaderString(AAIHeaderProperties.FROM_APP_ID);
@@ -84,7 +80,10 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
             String status = Integer.toString(responseContext.getStatus());
 
             String request = (String) requestContext.getProperty(AAIHeaderProperties.AAI_REQUEST);
-            String response = this.getResponseString(responseContext);
+            String response = null;
+            if (!HttpMethod.GET.equals(httpMethod) || Boolean.parseBoolean(isGetTransactionResponseLoggingEnabled)) {
+                response = this.getResponseString(responseContext);
+            }
 
 
             JsonObject logEntry = new JsonObject();
@@ -96,7 +95,9 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
             logEntry.addProperty("resourceId", fullUri);
             logEntry.addProperty("resourceType", httpMethod);
             logEntry.addProperty("rqstBuf", Objects.toString(request, ""));
-            logEntry.addProperty("respBuf", Objects.toString(response, ""));
+            if (response != null ) {
+                logEntry.addProperty("respBuf", Objects.toString(response));
+            }
 
             try {
                 TRANSACTION_LOGGER.debug(logEntry.toString());
