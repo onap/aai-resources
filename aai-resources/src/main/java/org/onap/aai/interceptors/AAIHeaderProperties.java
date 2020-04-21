@@ -21,8 +21,6 @@ package org.onap.aai.interceptors;
 
 public final class AAIHeaderProperties {
 	
-	private AAIHeaderProperties(){}
-	
 	public static final String REQUEST_CONTEXT = "aai-request-context";
 	
 	public static final String HTTP_METHOD_OVERRIDE = "X-HTTP-Method-Override";
@@ -38,4 +36,6 @@ public final class AAIHeaderProperties {
 	public static final String AAI_REQUEST = "X-REQUEST";
 	
 	public static final String AAI_REQUEST_TS = "X-REQUEST-TS";
+
+	private AAIHeaderProperties(){}
 }

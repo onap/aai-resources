@@ -19,13 +19,10 @@
  */
 package org.onap.aai.interceptors.pre;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -33,7 +30,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.onap.aai.interceptors.AAIContainerFilter;
 import org.onap.aai.interceptors.AAIHeaderProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @PreMatching
 @Priority(AAIRequestFilterPriority.HEADER_MANIPULATION)

@@ -19,7 +19,6 @@
  */
 package org.onap.aai;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,14 +52,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class IncreaseNodesTool {
 
-   public static long nodeCount = 0;
+    public static final String RANDOM = "random-";
+    public static long nodeCount = 0;
    
-   @Autowired
-   protected static EdgeSerializer edgeSerializer;
+    @Autowired
+    protected static EdgeSerializer edgeSerializer;
    
-   private LoaderFactory loaderFactory;
-   private SchemaVersions schemaVersions;
-   protected TransactionalGraphEngine engine;
+    private LoaderFactory loaderFactory;
+    private SchemaVersions schemaVersions;
+    protected TransactionalGraphEngine engine;
     Vertex parentVtx;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IncreaseNodesTool.class);
@@ -70,7 +70,7 @@ public class IncreaseNodesTool {
        this.schemaVersions = schemaVersions;
    }
 
-   public static void main(String[] args) throws AAIUnknownObjectException, UnsupportedEncodingException, AAIException {
+   public static void main(String[] args) throws AAIException {
 
        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
        PropertyPasswordConfiguration initializer = new PropertyPasswordConfiguration();
@@ -99,7 +99,7 @@ public class IncreaseNodesTool {
        IncreaseNodesTool increaseNodesTool = new IncreaseNodesTool(loaderFactory, schemaVersions);
        JanusGraph janusGraph = AAIGraph.getInstance().getGraph();
        
-       ApplicationContext ctx = (ApplicationContext) SpringContextAware.getApplicationContext();
+       ApplicationContext ctx = SpringContextAware.getApplicationContext();
        edgeSerializer = ctx.getBean(EdgeSerializer.class);
        
        increaseNodesTool.run(janusGraph,args);
@@ -108,7 +108,7 @@ public class IncreaseNodesTool {
    }
 
 
-    public void run(JanusGraph janusGraph, String[] args) throws AAIUnknownObjectException, UnsupportedEncodingException {
+    public void run(JanusGraph janusGraph, String[] args) throws AAIUnknownObjectException {
         CommandLineArgs cArgs = new CommandLineArgs();
         JCommander jCommander = new JCommander(cArgs,args);
         jCommander.setProgramName(IncreaseNodesTool.class.getSimpleName());
@@ -116,7 +116,7 @@ public class IncreaseNodesTool {
         Loader loader = loaderFactory.createLoaderForVersion(ModelType.MOXY, schemaVersions.getDefaultVersion());
         Introspector obj = loader.introspectorFromName(cArgs.nodeType);
 
-        List<String> propList = new ArrayList<String>();
+        List<String> propList = new ArrayList<>();
         propList.addAll(obj.getRequiredProperties());
 
 
@@ -146,7 +146,7 @@ public class IncreaseNodesTool {
                     
                     v.property("aai-node-type", nodeType);
                     v.property("source-of-truth", "IncreaseNodesTool");
-                    v.property("aai-uri", cArgs.uri+"random-"+randomId);
+                    v.property("aai-uri", cArgs.uri+RANDOM+randomId);
 
 
                     for(String propName : propList){
@@ -154,28 +154,28 @@ public class IncreaseNodesTool {
                             v.property(propName,"false");
                             continue;
                         }
-                        v.property(propName, "random-" + randomId);
-                        System.out.println("node " + i + " added " + propList.get(0)+": " + "random-"+randomId);
+                        v.property(propName, RANDOM + randomId);
+                        LOGGER.info("node {} added {}: {}{}", i, propList.get(0), RANDOM, randomId);
                     }
                     
                     if(cArgs.child.equals("true")){
 
                         if(parentVtx == null){
                             String[] uriTokens = cArgs.uri.split("/");
-                            String ParentNodeType = uriTokens[uriTokens.length-4]; //parent node type
+                            String parentNodeType = uriTokens[uriTokens.length-4]; //parent node type
                             String keyVal = uriTokens[uriTokens.length-3]; // parent unique key
                             Loader loader = loaderFactory.createLoaderForVersion(ModelType.MOXY, schemaVersions.getDefaultVersion());
                             if (loader != null)
                             {
-	                            Introspector objParent = loader.introspectorFromName(ParentNodeType);
+	                            Introspector objParent = loader.introspectorFromName(parentNodeType);
 	                            if (objParent != null)
 	                            {
-		                            List<String> parentPropList = new ArrayList<String>();
+		                            List<String> parentPropList = new ArrayList<>();
 		                            parentPropList.addAll(objParent.getRequiredProperties());
-		                            if (parentPropList.size() > 0)
-		                            { 
-		                            	System.out.println("parent node (" + ParentNodeType + ") key (" + parentPropList.get(0)+" ) =" + keyVal);
-			                            parentVtx = g.V().has(parentPropList.get(0),keyVal).next();
+		                            if (!parentPropList.isEmpty())
+		                            {
+                                        LOGGER.info("parent node ({}) key ({} ) ={}", parentNodeType, parentPropList.get(0), keyVal);
+                                        parentVtx = g.V().has(parentPropList.get(0),keyVal).next();
 			                            edgeSerializer.addTreeEdgeIfPossible(g,parentVtx,v);
 		                            }
 	                            }
@@ -193,9 +193,9 @@ public class IncreaseNodesTool {
             } finally {
                 if (success) {
                     transaction.commit();
-                    System.out.println("Transaction Committed");
+                    LOGGER.info("Transaction Committed");
                     long endTime = System.currentTimeMillis();
-                    System.out.println("Total Time: "+ ((endTime - startTime)/ 1000.0) + "seconds");
+                    LOGGER.info("Total Time: {}seconds", ((endTime - startTime)/ 1000.0));
                 } else {
                     transaction.rollback();
                 }

@@ -100,7 +100,7 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
             }
 
             try {
-                TRANSACTION_LOGGER.debug(logEntry.toString());
+                TRANSACTION_LOGGER.debug("{}", logEntry);
             } catch (Exception e) {
                 ErrorLogHelper.logError("AAI_4000", "Exception writing transaction log.");
             }

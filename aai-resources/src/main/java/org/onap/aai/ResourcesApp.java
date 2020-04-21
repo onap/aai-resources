@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -71,6 +70,7 @@ public class ResourcesApp {
 	private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
 
 	private static final String APP_NAME = "aai-resources";
+	public static final String BUNDLECONFIG_DIR = "BUNDLECONFIG_DIR";
 	private static AaiDebugLog debugLog = new AaiDebugLog();
 	static {
 		debugLog.setupMDC();
@@ -90,7 +90,7 @@ public class ResourcesApp {
 	
 	
 	@PostConstruct
-	private void init() throws AAIException {
+	private void init() {
 		System.setProperty("org.onap.aai.serverStarted", "false");
 		setDefaultProps();
 		logger.info("AAI Server initialization started...");
@@ -117,7 +117,7 @@ public class ResourcesApp {
 
 	    setDefaultProps();
 	    
-		Environment env =null;
+		Environment env = null;
 		AAIConfig.init();
 		try {
 			SpringApplication app = new SpringApplication(ResourcesApp.class);
@@ -153,9 +153,6 @@ public class ResourcesApp {
 
 		logger.info("Resources MicroService Started");
 		logger.debug("Resources MicroService Started");
-
-		System.out.println("Resources Microservice Started");
-		
 	}
 
 	public static void setDefaultProps(){
@@ -172,12 +169,12 @@ public class ResourcesApp {
 		}
 
 		if(currentDirectory.contains(APP_NAME)){
-			if (System.getProperty("BUNDLECONFIG_DIR") == null) {
-				System.setProperty("BUNDLECONFIG_DIR", "src/main/resources");
+			if (System.getProperty(BUNDLECONFIG_DIR) == null) {
+				System.setProperty(BUNDLECONFIG_DIR, "src/main/resources");
 			}
 		} else {
-			if (System.getProperty("BUNDLECONFIG_DIR") == null) {
-				System.setProperty("BUNDLECONFIG_DIR", "aai-resources/src/main/resources");
+			if (System.getProperty(BUNDLECONFIG_DIR) == null) {
+				System.setProperty(BUNDLECONFIG_DIR, "aai-resources/src/main/resources");
 			}
 		}
 	}

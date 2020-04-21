@@ -34,6 +34,7 @@ import org.onap.aai.interceptors.AAIHeaderProperties;
 public class ResponseHeaderManipulation extends AAIContainerFilter implements ContainerResponseFilter {
 
 	private static final String DEFAULT_XML_TYPE = MediaType.APPLICATION_XML;
+	private static final String CONTENT_TYPE = "Content-Type";
 
 	@Override
 	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
@@ -48,15 +49,15 @@ public class ResponseHeaderManipulation extends AAIContainerFilter implements Co
 
 		responseContext.getHeaders().add(AAIHeaderProperties.AAI_TX_ID, requestContext.getProperty(AAIHeaderProperties.AAI_TX_ID));
 
-		String responseContentType = responseContext.getHeaderString("Content-Type");
+		String responseContentType = responseContext.getHeaderString(CONTENT_TYPE);
 
 		if(responseContentType == null){
 			String acceptType = requestContext.getHeaderString("Accept");
 
 			if(acceptType == null || "*/*".equals(acceptType)){
-				responseContext.getHeaders().putSingle("Content-Type", DEFAULT_XML_TYPE);
+				responseContext.getHeaders().putSingle(CONTENT_TYPE, DEFAULT_XML_TYPE);
 			} else {
-				responseContext.getHeaders().putSingle("Content-Type", acceptType);
+				responseContext.getHeaders().putSingle(CONTENT_TYPE, acceptType);
 			}
 		}
 
