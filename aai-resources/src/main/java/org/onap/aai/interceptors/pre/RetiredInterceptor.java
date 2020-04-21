@@ -96,17 +96,14 @@ public class RetiredInterceptor extends AAIContainerFilter implements ContainerR
                 }
 
                 ArrayList<String> templateVars = new ArrayList<>();
+                templateVars.add("PUT");
 
-                if (templateVars.isEmpty()) {
-                    templateVars.add("PUT");
-                    if(requestURI != null){
-                        requestURI = requestURI.replaceAll(basePath, "");
-                    }
-                    templateVars.add(requestURI);
-                    if(message == null){
-                        templateVars.add(version);
-                        templateVars.add(AAIConfig.get("aai.default.api.version", ""));
-                    }
+                requestURI = requestURI.replaceAll(basePath, "");
+                templateVars.add(requestURI);
+
+                if(message == null){
+                    templateVars.add(version);
+                    templateVars.add(AAIConfig.get("aai.default.api.version", ""));
                 }
 
                 Response response = Response

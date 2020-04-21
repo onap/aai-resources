@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 import java.security.SecureRandom;
@@ -44,6 +45,8 @@ import org.onap.aai.interceptors.AAIHeaderProperties;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
 import org.onap.aai.util.HbaseSaltPrefixer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.JsonObject;
@@ -55,6 +58,8 @@ public class RequestTransactionLogging extends AAIContainerFilter implements Con
 
 	@Autowired
 	private HttpServletRequest httpServletRequest;
+
+	private static final Logger TRANSACTION_LOGGER = LoggerFactory.getLogger(RequestTransactionLogging.class);
 
 	private static final String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON;
 	private static final String DEFAULT_RESPONSE_TYPE = MediaType.APPLICATION_XML;
@@ -114,6 +119,7 @@ public class RequestTransactionLogging extends AAIContainerFilter implements Con
 			txId = HbaseSaltPrefixer.getInstance().prependSalt(AAIConfig.get(AAIConstants.AAI_NODENAME) + "-"
 					+ currentTimeStamp + "-" + number ); //new Random(System.currentTimeMillis()).nextInt(99999)
 		} catch (AAIException e) {
+			TRANSACTION_LOGGER.info("{}", e.getMessage());
 		}
 
 		return txId;
@@ -134,7 +140,7 @@ public class RequestTransactionLogging extends AAIContainerFilter implements Con
 			if (in.available() > 0) {
 				ReaderWriter.writeTo(in, out);
 				byte[] requestEntity = out.toByteArray();
-				request.addProperty("Payload", new String(requestEntity, "UTF-8"));
+				request.addProperty("Payload", new String(requestEntity, StandardCharsets.UTF_8));
 				requestContext.setEntityStream(new ByteArrayInputStream(requestEntity));
 			}
 		} catch (IOException ex) {

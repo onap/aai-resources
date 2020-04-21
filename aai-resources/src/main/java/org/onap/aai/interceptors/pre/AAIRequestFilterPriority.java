@@ -21,8 +21,6 @@ package org.onap.aai.interceptors.pre;
 
 public final class AAIRequestFilterPriority {
 	
-	private AAIRequestFilterPriority() {}
-	
 	public static final int REQUEST_TRANS_LOGGING = 1000;
 	
 	public static final int HEADER_VALIDATION = 2000;
@@ -42,5 +40,7 @@ public final class AAIRequestFilterPriority {
 	public static final int HEADER_MANIPULATION = 6000;
 
 	public static final int REQUEST_MODIFICATION = 7000;
+
+	private AAIRequestFilterPriority() {}
 
 }

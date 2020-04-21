@@ -26,8 +26,6 @@ package org.onap.aai.interceptors.post;
  * and INVALID_RESPONSE_STATUS
  */
 public final class AAIResponseFilterPriority {
-	
-	private AAIResponseFilterPriority() {}
 
 	public static final int INVALID_RESPONSE_STATUS = 1000;
 
@@ -36,5 +34,7 @@ public final class AAIResponseFilterPriority {
 	public static final int RESPONSE_TRANS_LOGGING = 3000;
 
 	public static final int HEADER_MANIPULATION = 4000;
+
+	private AAIResponseFilterPriority() {}
 
 }

@@ -22,8 +22,12 @@ package org.onap.aai.interceptors;
 import java.util.UUID;
 
 import org.onap.aai.util.FormatDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class  AAIContainerFilter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AAIContainerFilter.class);
     
 	protected String genDate() {
 		FormatDate fd = new FormatDate("YYMMdd-HH:mm:ss:SSS");
@@ -34,6 +38,7 @@ public abstract class  AAIContainerFilter {
 		try {
 			UUID.fromString(transId);
 		} catch (IllegalArgumentException e) {
+			LOGGER.info("Given String is not valid UUID");
 			return false;
 		}
 		return true;

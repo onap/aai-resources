@@ -35,15 +35,15 @@ import java.io.IOException;
 @PreMatching
 @Priority(AAIRequestFilterPriority.HTTP_HEADER)
 public class HttpHeaderInterceptor extends AAIContainerFilter implements ContainerRequestFilter {
-	public static final String patchMethod = "PATCH";
+	public static final String PATCH_METHOD = "PATCH";
 	
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
     	String overrideMethod = containerRequestContext.getHeaderString(AAIHeaderProperties.HTTP_METHOD_OVERRIDE);
     	String httpMethod = containerRequestContext.getMethod();
     	
-		if (HttpMethod.POST.equalsIgnoreCase(httpMethod) && patchMethod.equalsIgnoreCase(overrideMethod)) {
-			containerRequestContext.setMethod(patchMethod);
+		if (HttpMethod.POST.equalsIgnoreCase(httpMethod) && PATCH_METHOD.equalsIgnoreCase(overrideMethod)) {
+			containerRequestContext.setMethod(PATCH_METHOD);
 		}
     }
     
