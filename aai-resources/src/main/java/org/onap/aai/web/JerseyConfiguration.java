@@ -22,18 +22,16 @@ package org.onap.aai.web;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Comparator.comparingInt;
 
+import com.google.common.collect.Sets;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.annotation.Priority;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
-import jersey.repackaged.com.google.common.collect.Sets;
-import org.glassfish.jersey.filter.LoggingFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.onap.aai.rest.BulkAddConsumer;
 import org.onap.aai.rest.BulkProcessConsumer;
@@ -124,7 +122,7 @@ public class JerseyConfiguration {
     }
 
     private void logRequests(ResourceConfig resourceConfig) {
-        resourceConfig.register(new LoggingFilter(log, ENABLE_RESPONSE_LOGGING));
+        resourceConfig.register(new LoggingFilter(log, ENABLE_RESPONSE_LOGGING ? null : 0));
     }
 
     private boolean isLoggingEnabled() {
