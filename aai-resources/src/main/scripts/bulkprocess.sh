@@ -29,12 +29,16 @@
 inputFolder=$1
 if [ -z "$1" ]; then
 	echo "Input folder string is empty."
-   exit 1
+    exit 1
 fi
 
-if [ ! -d "/opt/bulkprocess_load/$1" ]; then
-	echo "Input folder could not be found."
-   exit 1
+if [ ! -d "$inputFolder" ]; then 
+	if [ ! -d "/opt/bulkprocess_load/$1" ]; then
+		echo "Input folder could not be found."
+   		exit 1
+   	else
+   		inputFolder="/opt/bulkprocess_load/$1"	
+   	fi
 fi
 
 XFROMAPPID=$2
@@ -50,7 +54,7 @@ esac
 
 XTRANSID=$3
 
-for input_file in $(ls -v /opt/bulkprocess_load/${inputFolder}/*);
+for input_file in $(ls -v ${inputFolder}/*);
 do
     output_file=$(basename $input_file | sed 's/.json//g');
     /opt/app/aai-resources/scripts/putTool.sh /bulkprocess ${input_file} -display $XFROMAPPID  $XTRANSID > /tmp/${output_file}.$(date +"%Y%m%d%H%M%S").results.json;

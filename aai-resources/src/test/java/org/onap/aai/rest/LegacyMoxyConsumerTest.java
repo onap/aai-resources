@@ -43,14 +43,17 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.annotation.DirtiesContext;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+// TODO: Change the following test to use spring boot
 public class LegacyMoxyConsumerTest extends AAISetup {
 
     protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
@@ -594,7 +597,9 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
-        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
+        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+        when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + uri));
+
         Response response = legacyMoxyConsumer.getLegacy(
                 "",
                 null,
@@ -605,21 +610,20 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                mockReqGet
+                mockRequest
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals("Expected to not have the data already in memory",
                 Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
         response = legacyMoxyConsumer.update(
                 payload,
                 schemaVersions.getDefaultVersion().toString(),
                 uri,
                 httpHeaders,
                 uriInfo,
-                mockReq
+                mockRequest
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -641,7 +645,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "false",
                 httpHeaders,
                 uriInfo,
-                mockReqGet
+                mockRequest
         );
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -838,6 +842,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 "cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
         String getRelationshipUri = String.format(
                 "cloud-infrastructure/pservers/pserver/%s", hostname);
+        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+        when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + getRelationshipUri));
         response = legacyMoxyConsumer.getRelationshipList(
                 "1",
                 "1",
@@ -845,6 +851,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 getRelationshipUri,
                 "false",
                 httpHeaders,
+                mockRequest,
                 uriInfo
         );
 
@@ -902,6 +909,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         String getRelationshipUri = String.format(
                 "cloud-infrastructure/pservers/pserver/%s", hostname);
         queryParameters.add("format", "resource");
+        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+        when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + getRelationshipUri));
         response = legacyMoxyConsumer.getRelationshipList(
                 "1",
                 "1",
@@ -909,6 +918,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 getRelationshipUri,
                 "false",
                 httpHeaders,
+                mockRequest,
                 uriInfo
         );
         queryParameters.remove("format");
@@ -971,6 +981,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         String getRelationshipUri = String.format(
                 "cloud-infrastructure/pservers/pserver/%s", hostname);
         MockHttpServletRequest mockReq = new MockHttpServletRequest("GET_RELATIONSHIP", getRelationshipMockRequestUri);
+        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+        when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + getRelationshipUri));
         Response response = legacyMoxyConsumer.getRelationshipList(
                 "1",
                 "1",
@@ -978,6 +990,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 getRelationshipUri,
                 "false",
                 httpHeaders,
+                mockRequest,
                 uriInfo
         );
 

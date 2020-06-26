@@ -227,7 +227,8 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			SchemaVersion version = new SchemaVersion(versionParam);
 
 			final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version);
+			String serverBase = req.getRequestURL().toString().replaceAll("/(v[0-9]+|latest)/.*", "/");
+			traversalUriHttpEntry.setHttpEntryProperties(version, serverBase);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 			loader = traversalUriHttpEntry.getLoader();
 			MultivaluedMap<String, String> params = info.getQueryParameters();
@@ -438,7 +439,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Path("/{uri: .+}/relationship-list")
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Response getRelationshipList (@DefaultValue("-1") @QueryParam("resultIndex") String resultIndex, @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context UriInfo info) {
+	public Response getRelationshipList (@DefaultValue("-1") @QueryParam("resultIndex") String resultIndex, @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context HttpServletRequest req,@Context UriInfo info) {
 		return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED,
 				AAIConstants.AAI_CRUD_TIMEOUT_APP,
 				AAIConstants.AAI_CRUD_TIMEOUT_LIMIT,
@@ -448,7 +449,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				new AaiCallable<Response>() {
 					@Override
 					public Response process() {
-						return getRelationshipList(versionParam, uri, cleanUp, headers, info, resultIndex, resultSize);
+						return getRelationshipList(versionParam, req, uri, cleanUp, headers, info, resultIndex, resultSize);
 					}
 				}
 		);
@@ -463,7 +464,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 * @param info
 	 * @return
 	 */
-	public Response getRelationshipList(String versionParam, String uri, String cleanUp, HttpHeaders headers, UriInfo info, String resultIndex, String resultSize) {
+	public Response getRelationshipList(String versionParam, HttpServletRequest req, String uri, String cleanUp, HttpHeaders headers, UriInfo info, String resultIndex, String resultSize) {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		Response response = null;
@@ -475,7 +476,8 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			SchemaVersion version = new SchemaVersion(versionParam);
 
 			final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			traversalUriHttpEntry.setHttpEntryProperties(version);
+			String serverBase = req.getRequestURL().toString().replaceAll("/(v[0-9]+|latest)/.*", "/");
+			traversalUriHttpEntry.setHttpEntryProperties(version, serverBase);
 			dbEngine = traversalUriHttpEntry.getDbEngine();
 			loader = traversalUriHttpEntry.getLoader();
 			MultivaluedMap<String, String> params = info.getQueryParameters();

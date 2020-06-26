@@ -74,7 +74,8 @@ public class URLFromVertexIdConsumer extends RESTAPI {
 		TransactionalGraphEngine dbEngine = null;
 		try {
 			HttpEntry resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			resourceHttpEntry.setHttpEntryProperties(version);
+			String serverBase = req.getRequestURL().toString().replaceAll("/(v[0-9]+|latest)/.*", "/");
+			resourceHttpEntry.setHttpEntryProperties(version, serverBase);
 			dbEngine = resourceHttpEntry.getDbEngine();
 			
 			DBSerializer serializer = new DBSerializer(version, dbEngine, introspectorFactoryType, sourceOfTruth);
@@ -88,7 +89,7 @@ public class URLFromVertexIdConsumer extends RESTAPI {
 
 			result.append(uri.getRawPath());
 			result.insert(0, version);
-			result.insert(0, AAIConfig.get("aai.server.url.base"));
+			result.insert(0, serverBase);
 			response = Response.ok().entity(result.toString()).status(Status.OK).type(MediaType.TEXT_PLAIN).build();
 		} catch (AAIException e) {
 			//TODO check that the details here are sensible

@@ -354,8 +354,7 @@ public abstract class BulkConsumer extends RESTAPI {
 							throw new AAIException("AAI_6111", String.format("input payload does not follow %s interface", module));
 						} 
 					}
-					
-					Gson gson = new Gson();
+					Gson gson = new GsonBuilder().serializeNulls().create();
 					
 					String bodyStr = gson.toJson(bodyObj);
 					bulkOperation.setRawReq(bodyStr);

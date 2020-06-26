@@ -43,7 +43,6 @@ contains() {
     fi
 }
 
-. /etc/profile.d/aai.sh
 PROJECT_HOME=/opt/app/aai-resources
 
 PROGNAME=$(basename $0)

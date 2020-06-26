@@ -21,8 +21,7 @@
 ###
 
 #
-# vmUpdateExport.sh  -- This tool updates the files generated in A&AI to
-# match what is expected in narad
+# vmUpdateExport.sh  -- This tool updates the files generated in A&AI
 # The script takes no arguments
 
 addTemplates() {
@@ -33,7 +32,7 @@ addTemplates() {
 COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
 . ${COMMON_ENV_PATH}/common_functions.sh
 
-. /etc/profile.d/aai.sh
+
 
 PROJECT_HOME=/opt/app/aai-resources
 PROGNAME=$(basename $0)

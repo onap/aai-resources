@@ -70,8 +70,8 @@
         <schema.version.app.root.start>v11</schema.version.app.root.start>
         <schema.version.namespace.change.start>v12</schema.version.namespace.change.start>
         <schema.version.edge.label.start>v12</schema.version.edge.label.start>
-        <schema.version.api.default>v19</schema.version.api.default>
-        <schema.version.list>v10,v11,v12,v13,v14,v15,v16,v17,v18,v19</schema.version.list>
+        <schema.version.api.default>v20</schema.version.api.default>
+        <schema.version.list>v10,v11,v12,v13,v14,v15,v16,v17,v18,v19,v20</schema.version.list>
         <schema.uri.base.path>/aai</schema.uri.base.path>
         <!-- <schema.translator.list>config</schema.translator.list> -->
         <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>

@@ -337,7 +337,7 @@ addValidateVserver() {
 COMMON_ENV_PATH=$( cd "$(dirname "$0")" ; pwd -P )
 . ${COMMON_ENV_PATH}/common_functions.sh
 
-. /etc/profile.d/aai.sh
+
 
 PROJECT_HOME=/opt/app/aai-resources
 PROGNAME=$(basename $0)

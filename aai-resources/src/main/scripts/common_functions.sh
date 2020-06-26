@@ -36,7 +36,6 @@ check_user(){
 
 # Sources the profile and sets the project home
 source_profile(){
-    . /etc/profile.d/aai.sh
     PROJECT_HOME=/opt/app/aai-resources
 }
 
