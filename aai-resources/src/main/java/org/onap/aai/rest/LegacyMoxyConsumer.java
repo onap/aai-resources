@@ -1,4 +1,4 @@
-/**
+/*
  * ============LICENSE_START=======================================================
  * org.onap.aai
  * ================================================================================
@@ -20,9 +20,11 @@
 package org.onap.aai.rest;
 
 import io.swagger.jaxrs.PATCH;
+import io.vavr.control.Try;
 import org.javatuples.Pair;
 import org.onap.aai.concurrent.AaiCallable;
 import org.onap.aai.config.SpringContextAware;
+import org.onap.aai.dbmap.DBConnectionType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
@@ -35,6 +37,7 @@ import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersion;
+import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +58,7 @@ import java.util.stream.Collectors;
 @Path("{version: v[1-9][0-9]*|latest}")
 public class LegacyMoxyConsumer extends RESTAPI {
 
-	private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumer.class.getName());
+	private static final LockMap<String> lockMap = LockMap.make();
 
 	/**
 	 *
@@ -577,74 +580,80 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 * @param info the info
 	 * @return the response
 	 */
-	private Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam, String uri, HttpHeaders headers, UriInfo info) {
+	private Response handleWrites(final MediaType mediaType,
+								  final HttpMethod method,
+								  final String content,
+								  final String versionParam,
+								  final String uri,
+								  final HttpHeaders headers,
+								  final UriInfo info) {
 
-		Response response;
-		TransactionalGraphEngine dbEngine = null;
-		Loader loader;
-		SchemaVersion version;
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		boolean success = true;
 
-		try {
+		Try<Response> response2 = lockMap.withLock(uri, () -> {
 			validateRequest(info);
+			SchemaVersion version = new SchemaVersion(versionParam);
 
-			version = new SchemaVersion(versionParam);
-
-			HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+			HttpEntry traversalUriHttpEntry =
+					SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
 			traversalUriHttpEntry.setHttpEntryProperties(version);
-			loader = traversalUriHttpEntry.getLoader();
-			dbEngine = traversalUriHttpEntry.getDbEngine();
+			Loader loader = traversalUriHttpEntry.getLoader();
+			TransactionalGraphEngine dbEngine = traversalUriHttpEntry.getDbEngine();
+
 			URI uriObject = UriBuilder.fromPath(uri).build();
 			this.validateURI(uriObject);
 			QueryParser uriQuery = dbEngine.getQueryBuilder().createQueryFromURI(uriObject);
 			String objName = uriQuery.getResultType();
-			if (content.length() == 0) {
-				if (mediaType.toString().contains(MediaType.APPLICATION_JSON)) {
-					content = "{}";
-				} else {
-					content = "<empty/>";
-				}
-			}
-			Introspector obj = loader.unmarshal(objName, content, org.onap.aai.restcore.MediaType.getEnum(this.getInputMediaType(mediaType)));
+			String mediaContent = resolveContent(mediaType, content);
+			Introspector obj = loader.unmarshal(
+					objName, mediaContent,
+					org.onap.aai.restcore.MediaType.getEnum(this.getInputMediaType(mediaType))
+			);
 			if (obj == null) {
-				throw new AAIException("AAI_3000", "object could not be unmarshalled:" + content);
+				throw new AAIException("AAI_3000", "object could not be unmarshalled:" + mediaContent);
 			}
 
-			if (mediaType.toString().contains(MediaType.APPLICATION_XML) && !content.equals("<empty/>") && isEmptyObject(obj)) {
-				throw new AAIInvalidXMLNamespace(content);
+			if (mediaType.toString().contains(MediaType.APPLICATION_XML) &&
+					!mediaContent.equals("<empty/>") && isEmptyObject(obj)) {
+				throw new AAIInvalidXMLNamespace(mediaContent);
 			}
 
 			this.validateIntrospector(obj, loader, uriObject, method);
 
 			DBRequest request =
 					new DBRequest.Builder(method, uriObject, uriQuery, obj, headers, info, transId)
-							.rawRequestContent(content).build();
+							.rawRequestContent(mediaContent).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests,  sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple =
+					traversalUriHttpEntry.process(requests, sourceOfTruth);
 
-			response = responsesTuple.getValue1().get(0).getValue1();
-			success = responsesTuple.getValue0();
-		} catch (AAIException e) {
-			response = consumerExceptionResponseGenerator(headers, info, method, e);
-			success = false;
-		} catch (Exception e ) {
-			AAIException ex = new AAIException("AAI_4000", e);
-			response = consumerExceptionResponseGenerator(headers, info, method, ex);
-			success = false;
-		} finally {
-			if (dbEngine != null) {
-				if (success) {
-					dbEngine.commit();
-				} else {
-					dbEngine.rollback();
-				}
+			boolean success = responsesTuple.getValue0();
+			if (success) {
+				dbEngine.commit();
+			} else {
+				dbEngine.rollback();
+			}
+			return responsesTuple.getValue1().get(0).getValue1();
+		});
+
+		return response2
+				.recover(AAIException.class, e -> consumerExceptionResponseGenerator(headers, info, method, e))
+				.recover(Exception.class, e ->
+						consumerExceptionResponseGenerator(headers, info, method, new AAIException("AAI_4000", e)))
+				.get();
+	}
+
+	private String resolveContent(MediaType mediaType, String content) {
+		if (content.length() == 0) {
+			if (mediaType.toString().contains(MediaType.APPLICATION_JSON)) {
+				return "{}";
+			} else {
+				return "<empty/>";
 			}
 		}
-
-		return response;
+		return content;
 	}
 
 	private void validateURI(URI uri) throws AAIException {
