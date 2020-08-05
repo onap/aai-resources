@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bd77b99f_4b4cba63",
+        "filename": "aai-resources/src/main/java/org/onap/aai/ResourcesApp.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 75
+      },
+      "writtenOn": "2020-08-05T20:03:08Z",
+      "side": 0,
+      "message": "Please don\u0027t remove this print statement.",
+      "revId": "8cbe9c81a3924f295e7ffe2e0733524b73668505",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

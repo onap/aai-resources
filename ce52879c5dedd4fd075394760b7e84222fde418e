@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a630b7d1_c8b3310b",
+        "filename": "aai-resources/src/main/java/org/onap/aai/IncreaseNodesTool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 75
+      },
+      "writtenOn": "2020-08-05T20:03:08Z",
+      "side": 1,
+      "message": "Change {}seconds to {} seconds",
+      "revId": "ce52879c5dedd4fd075394760b7e84222fde418e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
