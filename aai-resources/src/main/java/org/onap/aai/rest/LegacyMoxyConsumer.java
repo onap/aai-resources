@@ -30,6 +30,7 @@ import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
 import org.onap.aai.rest.exceptions.AAIInvalidXMLNamespace;
+import org.onap.aai.rest.security.SecurityContextUtils;
 import org.onap.aai.rest.util.ValidateEncoding;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
@@ -39,6 +40,7 @@ import org.onap.aai.util.AAIConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -57,7 +59,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
 	private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumer.class.getName());
 
-	/**
+    private final SecurityContextUtils securityContextUtils = new SecurityContextUtils();
+
+    /**
 	 *
 	 * @param content
 	 * @param versionParam

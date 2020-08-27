@@ -77,6 +77,7 @@
         <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>
 
         <!-- End of Default ONAP Schema Properties -->
+        <keycloak.version>10.0.2</keycloak.version>
 
         <!-- Setting some default value to not complain by editor but it will be overridden by gmaven plugin -->
     </properties>
@@ -557,16 +558,26 @@
             sneaks backs in and causing issues with the two way ssl
         -->
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-rsa</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpkix-jdk15on</artifactId>
-                </exclusion>
-            </exclusions>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
+          <groupId>org.keycloak</groupId>
+          <artifactId>keycloak-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.vavr</groupId>
+          <artifactId>vavr</artifactId>
+          <version>0.10.3</version>
+        </dependency>
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <optional>true</optional>
+        </dependency>
+
+
+      <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
         </dependency>
@@ -608,6 +619,19 @@
             <artifactId>gremlin-groovy</artifactId>
         </dependency>
     </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.keycloak.bom</groupId>
+        <artifactId>keycloak-adapter-bom</artifactId>
+        <version>${keycloak.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
     <build>
         <resources>
             <resource>
@@ -779,10 +803,10 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>

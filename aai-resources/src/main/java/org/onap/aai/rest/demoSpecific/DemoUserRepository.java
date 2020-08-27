@@ -1,0 +1,59 @@
+/**
+ * ============LICENSE_START=======================================================
+ * org.onap.aai
+ * ================================================================================
+ * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
+ * ================================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ============LICENSE_END=========================================================
+ */
+package org.onap.aai.rest.demoSpecific;
+
+import org.onap.aai.rest.data.Permissions;
+import org.onap.aai.rest.data.Role;
+import org.onap.aai.rest.data.User;
+import org.onap.aai.rest.security.UserRepository;
+import org.onap.aai.rest.security.WebSecurityConfig;
+import io.vavr.Tuple;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
+import io.vavr.control.Option;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+public class DemoUserRepository implements UserRepository {
+
+    private static final Map<String, User> users = HashMap.ofAll(
+        Arrays.stream(Role.values()),
+        role -> {
+            String username = role.name();
+//            String password = WebSecurityConfig.encoder.encode(username);
+            String password = username;
+            Set<Role> userRoles = Collections.singleton(role);
+            User user = User.of(username, password, true, userRoles);
+
+            return Tuple.of(username, user);
+        }
+    );
+
+    @Override
+    public Option<User> getUserByUsername(String username) {
+        return users.get(username);
+    }
+
+    public List<Permissions> getPermissions() {
+        return DemoData.permissions;
+    }
+}
