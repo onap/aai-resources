@@ -77,7 +77,7 @@
         <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>
 
         <!-- End of Default ONAP Schema Properties -->
-
+        <keycloak.version>11.0.2</keycloak.version>
         <!-- Setting some default value to not complain by editor but it will be overridden by gmaven plugin -->
     </properties>
     <profiles>
@@ -607,7 +607,26 @@
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>gremlin-groovy</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.keycloak.bom</groupId>
+                <artifactId>keycloak-adapter-bom</artifactId>
+                <version>${keycloak.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <resources>
             <resource>
