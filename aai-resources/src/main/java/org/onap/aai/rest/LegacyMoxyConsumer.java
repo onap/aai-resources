@@ -20,7 +20,10 @@
 package org.onap.aai.rest;
 
 import io.swagger.jaxrs.PATCH;
+import java.security.Principal;
 import org.javatuples.Pair;
+import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.onap.aai.concurrent.AaiCallable;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.exceptions.AAIException;
@@ -72,8 +75,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response update (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-		MediaType mediaType = headers.getMediaType();
-		return this.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info);
+      Set<String> roles = getRoles(req.getUserPrincipal());
+      MediaType mediaType = headers.getMediaType();
+		return this.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info, roles);
 	}
 
 	/**
@@ -162,9 +166,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ "application/merge-patch+json" })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response patch (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-
+      Set<String> roles = getRoles(req.getUserPrincipal());
 		MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
-		return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info);
+		return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info, roles);
 
 	}
 
@@ -186,7 +190,9 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response getLegacy (String content, @DefaultValue("-1") @QueryParam("resultIndex") String resultIndex, @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("all") @QueryParam("depth") String depthParam, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-		return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED,
+      Set<String> roles = getRoles(req.getUserPrincipal());
+
+      return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED,
 				AAIConstants.AAI_CRUD_TIMEOUT_APP,
 				AAIConstants.AAI_CRUD_TIMEOUT_LIMIT,
 				headers,
@@ -195,13 +201,13 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				new AaiCallable<Response>() {
 					@Override
 					public Response process() {
-						return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>(), resultIndex, resultSize);
+						return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req, new HashSet<String>(), resultIndex, resultSize, roles);
 					}
 				}
 		);
 	}
 
-	/**
+    /**
 	 * This method exists as a workaround for filtering out undesired query params while routing between REST consumers
 	 *
 	 * @param content
@@ -215,7 +221,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 * @param removeQueryParams
 	 * @return
 	 */
-	public Response getLegacy(String content, String versionParam, String uri, String depthParam, String cleanUp,  HttpHeaders headers, UriInfo info, HttpServletRequest req, Set<String> removeQueryParams, String resultIndex, String resultSize) {
+	public Response getLegacy(String content, String versionParam, String uri, String depthParam, String cleanUp,  HttpHeaders headers, UriInfo info, HttpServletRequest req, Set<String> removeQueryParams, String resultIndex, String resultSize, Set<String> groups) {
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 		Response response;
@@ -256,7 +262,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 				traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
 				traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
 			}
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth, groups);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
 
@@ -577,7 +583,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	 * @param info the info
 	 * @return the response
 	 */
-	private Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam, String uri, HttpHeaders headers, UriInfo info) {
+	private Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam, String uri, HttpHeaders headers, UriInfo info, Set<String> roles) {
 
 		Response response;
 		TransactionalGraphEngine dbEngine = null;
@@ -623,7 +629,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 							.rawRequestContent(content).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests,  sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests, sourceOfTruth, roles);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
@@ -660,4 +666,17 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	protected boolean isEmptyObject(Introspector obj) {
 		return "{}".equals(obj.marshal(false));
 	}
+
+    private Set<String> getRoles(Principal userPrincipal) {
+        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) userPrincipal;
+        if (token == null) {
+            return Collections.EMPTY_SET;
+        }
+        SimpleKeycloakAccount account = (SimpleKeycloakAccount) token.getDetails();
+        if (account == null) {
+            return Collections.EMPTY_SET;
+        }
+        return account.getRoles();
+    }
 }
+
