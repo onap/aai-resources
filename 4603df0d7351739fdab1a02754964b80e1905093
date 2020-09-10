@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "84ffe30e_6cce53b0",
+        "filename": "aai-resources/src/main/resources/etc/appprops/error.properties",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 75
+      },
+      "writtenOn": "2020-09-10T20:15:46Z",
+      "side": 1,
+      "message": "I think it should :400 instead of :500",
+      "revId": "4603df0d7351739fdab1a02754964b80e1905093",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
