@@ -16,6 +16,24 @@
       "revId": "4603df0d7351739fdab1a02754964b80e1905093",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5aeccf8d_ab670701",
+        "filename": "aai-resources/src/main/resources/etc/appprops/error.properties",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 6617
+      },
+      "writtenOn": "2020-09-10T22:17:58Z",
+      "side": 1,
+      "message": "Ok, no prob. I\u0027m having a hard time figuring out what aaiElsErrorCode is used for.  Is there a list of codes and their meanings somewhere?",
+      "parentUuid": "84ffe30e_6cce53b0",
+      "revId": "4603df0d7351739fdab1a02754964b80e1905093",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }
