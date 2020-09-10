@@ -17,19 +17,19 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
-package org.onap.aai;
+package org.onap.aai.config.aaf;
 
-public final class Profiles {
+import org.springframework.core.Ordered;
 
-    public static final String DMAAP        = "dmaap";
-    public static final String DME2         = "dme2";
+public enum FilterPriority {
+    AAF_AUTHENTICATION(Ordered.HIGHEST_PRECEDENCE),
+    AAF_AUTHORIZATION(Ordered.HIGHEST_PRECEDENCE + 1); //higher number = lower priority
 
-    public static final String ONE_WAY_SSL  = "one-way-ssl";
-    // AAF Basic Auth
-    public static final String AAF_AUTHENTICATION  = "aaf-auth";
-    // AAF Auth with Client Certs
-    public static final String AAF_CERT_AUTHENTICATION  = "aaf-cert-auth";
-    public static final String TWO_WAY_SSL  = "two-way-ssl";
+    private final int priority;
 
-    private Profiles(){}
+    FilterPriority(final int p) {
+        priority = p;
+    }
+
+    public int getPriority() { return priority; }
 }

@@ -494,6 +494,10 @@
             <artifactId>aai-core</artifactId>
             <exclusions>
                 <exclusion>
+                    <groupId>org.onap.aai.aai-common</groupId>
+                    <artifactId>aai-aaf-auth</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-core</artifactId>
                 </exclusion>
@@ -518,6 +522,12 @@
         <dependency>
             <groupId>org.onap.aai.aai-common</groupId>
             <artifactId>aai-schema-ingest</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.onap.aai.aai-common</groupId>
+                    <artifactId>aai-aaf-auth</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
