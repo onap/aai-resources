@@ -321,7 +321,8 @@ public abstract class BulkConsumer extends RESTAPI {
 					}
 					
 					UriComponents uriComponents = UriComponentsBuilder.fromUriString(itemURIfield.getAsString()).build();
-					if (uriComponents.getPath().endsWith("/relationship-list/relationship")) {
+					if (uriComponents.getPath() != null &&
+							uriComponents.getPath().endsWith("/relationship-list/relationship")) {
 						if (method.equals(HttpMethod.PUT)) {
 							bulkOperation.setHttpMethod(HttpMethod.PUT_EDGE);
 						} else if (method.equals(HttpMethod.DELETE)) {

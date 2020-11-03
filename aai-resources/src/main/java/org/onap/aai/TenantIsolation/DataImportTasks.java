@@ -66,7 +66,7 @@ import org.apache.commons.io.filefilter.RegexFileFilter;
 public class DataImportTasks {
 
     private static final Logger LOGGER;
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private static final List<String> EXTS = Arrays.asList("tar.gz", "tgz");
 
