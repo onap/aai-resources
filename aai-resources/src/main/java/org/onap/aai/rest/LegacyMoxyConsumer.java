@@ -20,7 +20,7 @@
 package org.onap.aai.rest;
 
 import io.swagger.jaxrs.PATCH;
-import java.security.Principal;
+import org.apache.commons.lang3.ObjectUtils;
 import org.javatuples.Pair;
 import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -29,6 +29,7 @@ import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
+import org.onap.aai.introspection.sideeffect.OwnerCheck;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
@@ -48,6 +49,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,7 +77,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response update (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-      Set<String> roles = getRoles(req.getUserPrincipal());
+      Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
       MediaType mediaType = headers.getMediaType();
 		return this.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info, roles);
 	}
@@ -166,7 +168,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ "application/merge-patch+json" })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response patch (String content, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-      Set<String> roles = getRoles(req.getUserPrincipal());
+      Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
 		MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
 		return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info, roles);
 
@@ -190,7 +192,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response getLegacy (String content, @DefaultValue("-1") @QueryParam("resultIndex") String resultIndex, @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @DefaultValue("all") @QueryParam("depth") String depthParam, @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-      Set<String> roles = getRoles(req.getUserPrincipal());
+      Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
 
       return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED,
 				AAIConstants.AAI_CRUD_TIMEOUT_APP,
@@ -667,16 +669,31 @@ public class LegacyMoxyConsumer extends RESTAPI {
 		return "{}".equals(obj.marshal(false));
 	}
 
-    private Set<String> getRoles(Principal userPrincipal) {
+    private Set<String> getRoles(Principal userPrincipal, String method) {
         KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) userPrincipal;
-        if (token == null) {
+        if (ObjectUtils.isEmpty(token)) {
             return Collections.EMPTY_SET;
         }
         SimpleKeycloakAccount account = (SimpleKeycloakAccount) token.getDetails();
-        if (account == null) {
+        if (ObjectUtils.isEmpty(account)) {
             return Collections.EMPTY_SET;
         }
+        // When the request is not a GET, we need to exclude ReadOnly access roles
+        if (isNotGetRequest(method)) {
+			return getExcludedReadOnlyAccessRoles(account);
+		}
         return account.getRoles();
     }
+
+	private Set<String> getExcludedReadOnlyAccessRoles(SimpleKeycloakAccount account) {
+		return account.getRoles()
+				.stream()
+				.filter(role -> !role.endsWith(OwnerCheck.READ_ONLY_SUFFIX))
+				.collect(Collectors.toSet());
+	}
+
+	private boolean isNotGetRequest(String method) {
+		return !Action.GET.name().equalsIgnoreCase(method);
+	}
 }
 
