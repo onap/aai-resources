@@ -317,7 +317,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	public Response delete (@PathParam("version")String versionParam, @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info, @QueryParam("resource-version")String resourceVersion, @Context HttpServletRequest req) {
 
-
+		Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
 		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
 		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
 		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
@@ -346,7 +346,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
 			DBRequest request = new DBRequest.Builder(HttpMethod.DELETE, uriObject, uriQuery, obj, headers, info, transId).build();
 			List<DBRequest> requests = new ArrayList<>();
 			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = traversalUriHttpEntry.process(requests, sourceOfTruth);
+			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth, roles);
 
 			response = responsesTuple.getValue1().get(0).getValue1();
 			success = responsesTuple.getValue0();
