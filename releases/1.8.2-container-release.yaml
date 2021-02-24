@@ -1,0 +1,7 @@
+distribution_type: container
+container_release_tag: 1.8.2
+project: resources
+ref: 6e1fb3bf4383441055327ac621ae7745709b39b5
+containers:
+    - name: aai-resources
+      version: 1.8-STAGING-20210224T201441Z
