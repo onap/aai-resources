@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import io.micrometer.core.annotation.Timed;
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.exceptions.AAIException;
@@ -55,6 +56,7 @@ import java.net.URI;
 import java.util.*;
 
 @Path(value = "{version: v[1-9][0-9]*|latest}/bulk/single-transaction")
+@Timed
 public class BulkSingleTransactionConsumer extends RESTAPI {
 
 	private static final Set<String> validOperations = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("put", "patch", "delete")));
