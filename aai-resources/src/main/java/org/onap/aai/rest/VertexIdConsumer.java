@@ -19,6 +19,7 @@
  */
 package org.onap.aai.rest;
 
+import io.micrometer.core.annotation.Timed;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
@@ -48,6 +49,7 @@ import java.util.List;
  * The Class VertexIdConsumer.
  */
 @Path("{version: v[1-9][0-9]*|latest}/resources")
+@Timed
 public class VertexIdConsumer extends RESTAPI {
 
 	private ModelType introspectorFactoryType = ModelType.MOXY;

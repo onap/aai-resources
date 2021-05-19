@@ -21,9 +21,11 @@ package org.onap.aai.rest;
 
 import javax.ws.rs.Path;
 
+import io.micrometer.core.annotation.Timed;
 import org.onap.aai.restcore.HttpMethod;
 
 @Path("{version: v[1-9][0-9]*|latest}/bulkadd")
+@Timed
 public class BulkAddConsumer extends BulkConsumer {
 
 	@Override

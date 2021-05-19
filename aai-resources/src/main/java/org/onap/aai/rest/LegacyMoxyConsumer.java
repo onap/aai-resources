@@ -19,6 +19,7 @@
  */
 package org.onap.aai.rest;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.jaxrs.PATCH;
 import org.apache.commons.lang3.ObjectUtils;
 import org.javatuples.Pair;
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @Path("{version: v[1-9][0-9]*|latest}")
+@Timed
 public class LegacyMoxyConsumer extends RESTAPI {
 
 	private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumer.class.getName());
