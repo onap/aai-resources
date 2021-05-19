@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import io.micrometer.core.annotation.Timed;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
@@ -47,6 +48,7 @@ import org.onap.aai.restcore.RESTAPI;
  * The Class ExampleConsumer.
  */
 @Path("{version: v[1-9][0-9]*|latest}/examples")
+@Timed
 public class ExampleConsumer extends RESTAPI {
 
 	

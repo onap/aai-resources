@@ -27,6 +27,7 @@ import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.config.SpringContextAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test REST requests against configuration resource
@@ -58,10 +60,14 @@ public class ConfigurationTest extends AbstractSpringRestTest {
     @LocalServerPort
     int randomPort;
 
+    @Value("${local.management.port}")
+    private int mgtPort;
+
     private HttpEntity<String> httpEntity;
     private HttpEntity<String> httpEntityPut;
     private HttpEntity<String> httpEntityPatch;
     private String baseUrl;
+    private String actuatorurl;
     private HttpHeaders headers;
     @Before
     public void setup() throws UnsupportedEncodingException {
@@ -79,6 +85,7 @@ public class ConfigurationTest extends AbstractSpringRestTest {
 
         httpEntity = new HttpEntity<String>(headers);
         baseUrl = "http://localhost:" + randomPort;
+        actuatorurl = "http://localhost:" + mgtPort;
     }
 
     @Test
@@ -157,4 +164,32 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         
     }
     
+
+    @Test
+    public void TestManagementEndpointConfiguration() {
+        ResponseEntity responseEntity = null;
+        String responseBody = null;
+
+        //set Accept as text/plain in order to get access of endpoint "/actuator/prometheus"
+        headers.set("Accept", "text/plain");
+        httpEntity = new HttpEntity<String>(headers);
+        responseEntity = restTemplate.exchange(actuatorurl + "/actuator/prometheus", HttpMethod.GET, httpEntity, String.class);
+        responseBody = (String) responseEntity.getBody();
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertTrue(responseBody.contains("app_id"));
+        assertTrue(responseBody.contains("group_id"));
+
+        //Set Accept as MediaType.APPLICATION_JSON in order to get access of endpoint "/actuator/info" and "/actuator/health"
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        httpEntity = new HttpEntity<String>(headers);
+        responseEntity = restTemplate.exchange(actuatorurl + "/actuator/info", HttpMethod.GET, httpEntity, String.class);
+        responseBody = (String) responseEntity.getBody();
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertTrue(responseBody.contains("aai-resources"));
+
+        responseEntity = restTemplate.exchange(actuatorurl + "/actuator/health", HttpMethod.GET, httpEntity, String.class);
+        responseBody = (String) responseEntity.getBody();
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertTrue(responseBody.contains("UP"));
+    }
 }
