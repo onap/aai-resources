@@ -176,9 +176,9 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         responseEntity = restTemplate.exchange(actuatorurl + "/actuator/prometheus", HttpMethod.GET, httpEntity, String.class);
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertTrue(responseBody.contains("app_id"));
         assertTrue(responseBody.contains("group_id"));
-
+        assertTrue(responseBody.contains("aai_uri"));
+       
         //Set Accept as MediaType.APPLICATION_JSON in order to get access of endpoint "/actuator/info" and "/actuator/health"
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         httpEntity = new HttpEntity<String>(headers);

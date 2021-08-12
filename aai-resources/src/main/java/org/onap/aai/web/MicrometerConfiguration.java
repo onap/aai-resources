@@ -21,6 +21,7 @@ package org.onap.aai.web;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.jersey2.server.JerseyTags;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import io.micrometer.jersey2.server.JerseyTagsProvider;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
@@ -31,6 +32,9 @@ import org.springframework.context.annotation.Configuration;
  * Configuration Class to add customized tags to http metrics scraped in /actuator/prometheus endpoint
  */
 @Configuration
+@ConditionalOnProperty(
+        value="scrape.uri.metrics",
+        havingValue = "true")
 public class MicrometerConfiguration {
     private static final String TAG_AAI_URI = "aai_uri";
     private static final String NOT_AVAILABLE = "NOT AVAILABLE";
