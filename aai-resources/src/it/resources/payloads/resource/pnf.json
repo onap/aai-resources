@@ -1,9 +1,0 @@
-{
-  "frame-id": 999,
-  "in-maint": false,
-  "ipaddress-v4-oam": "1.1.1.1",
-  "pnf-name": "pnf-1",
-  "pnf-name-2": "pnf-test-1",
-  "data-owner": "operator",
-  "prov-status": "in_service"
-}
