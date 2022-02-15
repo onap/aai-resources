@@ -1,0 +1,7 @@
+distribution_type: container
+container_release_tag: 1.9.4
+project: resources
+ref: 15c9994211620f31c20f9018abb422911c786a6b
+containers:
+    - name: aai-resources
+      version: 1.9-STAGING-20220215T152911Z
