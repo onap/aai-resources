@@ -48,7 +48,7 @@
         <staging.path>/content/repositories/staging/</staging.path>
         <!-- GMaven plugin uses this property to figure out the name of the docker tag -->
         <aai.project.version>${project.version}</aai.project.version>
-        <aai.common.version>1.9.2</aai.common.version>
+        <aai.common.version>1.9.3</aai.common.version>
         <aai.schema.service.version>1.9.4</aai.schema.service.version>
     </properties>
     <build>
