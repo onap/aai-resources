@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.9.4-SNAPSHOT</version>
+        <version>1.9.5-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
