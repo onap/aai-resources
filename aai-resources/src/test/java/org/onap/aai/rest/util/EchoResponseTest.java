@@ -1,4 +1,4 @@
-/**
+/*
  * ============LICENSE_START=======================================================
  * org.onap.aai
  * ================================================================================
@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,61 +17,56 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest.util;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.onap.aai.AAISetup;
-
-import javax.ws.rs.core.*;
-import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import javax.ws.rs.core.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.onap.aai.AAISetup;
+import org.onap.aai.tasks.AaiGraphChecker;
+import org.onap.aai.tasks.AaiGraphChecker.CheckerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.context.ContextConfiguration;
+
+@ContextConfiguration(classes = {AaiGraphChecker.class})
 public class EchoResponseTest extends AAISetup {
 
+    private static final Logger logger = LoggerFactory.getLogger(EchoResponseTest.class);
     protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
+    private static final String CHECK_DB_ACTION = "checkDB";
+    private static final String CHECK_DB_STATUS_NOW_ACTION = "checkDBNow";
 
-    private static final Set<Integer> VALID_HTTP_STATUS_CODES = new HashSet<>();
-
-    static {
-        VALID_HTTP_STATUS_CODES.add(200);
-        VALID_HTTP_STATUS_CODES.add(201);
-        VALID_HTTP_STATUS_CODES.add(204);
-    }
-
-    private EchoResponse echoResponse;
+    private final EchoResponse echoResponse;
+    private final AaiGraphChecker aaiGraphCheckerMock = mock(AaiGraphChecker.class);
 
     private HttpHeaders httpHeaders;
-
-    private UriInfo uriInfo;
-
-    private MultivaluedMap<String, String> headersMultiMap;
-    private MultivaluedMap<String, String> queryParameters;
-
-    private List<String> aaiRequestContextList;
-
     private List<MediaType> outputMediaTypes;
 
-    private static final Logger logger = LoggerFactory.getLogger(EchoResponseTest.class.getName());
+    public EchoResponseTest() {
+        this.echoResponse = new EchoResponse(aaiGraphCheckerMock);
+    }
 
     @Before
-    public void setup(){
+    public void setup() {
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
-        echoResponse  = new EchoResponse();
-        httpHeaders         = mock(HttpHeaders.class);
-        uriInfo             = mock(UriInfo.class);
-
-        headersMultiMap     = new MultivaluedHashMap<>();
-        queryParameters     = Mockito.spy(new MultivaluedHashMap<>());
+        MultivaluedMap<String, String> headersMultiMap = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> queryParameters = Mockito.spy(new MultivaluedHashMap<>());
 
         headersMultiMap.add("X-FromAppId", "JUNIT");
         headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
@@ -82,28 +77,28 @@ public class EchoResponseTest extends AAISetup {
         outputMediaTypes = new ArrayList<>();
         outputMediaTypes.add(APPLICATION_JSON);
 
-        aaiRequestContextList = new ArrayList<>();
+        List<String> aaiRequestContextList = new ArrayList<>();
         aaiRequestContextList.add("");
 
+        httpHeaders = mock(HttpHeaders.class);
         when(httpHeaders.getAcceptableMediaTypes()).thenReturn(outputMediaTypes);
         when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
-        when(httpHeaders.getRequestHeader("X-FromAppId")).thenReturn(Arrays.asList("JUNIT"));
-        when(httpHeaders.getRequestHeader("X-TransactionId")).thenReturn(Arrays.asList("JUNIT"));
-
+        when(httpHeaders.getRequestHeader("X-FromAppId")).thenReturn(Collections.singletonList("JUNIT"));
+        when(httpHeaders.getRequestHeader("X-TransactionId")).thenReturn(Collections.singletonList("JUNIT"));
         when(httpHeaders.getRequestHeader("aai-request-context")).thenReturn(aaiRequestContextList);
+        when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
 
-
+        UriInfo uriInfo = mock(UriInfo.class);
         when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
         when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
 
         // TODO - Check if this is valid since RemoveDME2QueryParameters seems to be very unreasonable
         Mockito.doReturn(null).when(queryParameters).remove(anyObject());
 
-        when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
     }
 
     @Test
-    public void testEchoResultWhenValidHeaders() throws Exception {
+    public void testEchoResultWhenValidHeaders() {
 
         Response response = echoResponse.echoResult(httpHeaders, null, "");
 
@@ -112,7 +107,7 @@ public class EchoResponseTest extends AAISetup {
     }
 
     @Test
-    public void testEchoResultWhenInValidHeadersThrowsBadRequest() throws Exception {
+    public void testEchoResultWhenInValidHeadersThrowsBadRequest() {
 
         httpHeaders = mock(HttpHeaders.class);
         Response response = echoResponse.echoResult(httpHeaders, null, "");
@@ -122,14 +117,71 @@ public class EchoResponseTest extends AAISetup {
     }
 
     @Test
-    public void testEchoResultWhenValidHeadersButMediaTypeWrong() throws Exception {
+    public void testEchoResultWhenValidHeadersButMediaTypeWrong() {
 
-        when(httpHeaders.getAcceptableMediaTypes()).thenThrow(new IllegalStateException())
-        .thenReturn(outputMediaTypes);
+        when(httpHeaders.getAcceptableMediaTypes()).thenThrow(new IllegalStateException()).thenReturn(outputMediaTypes);
 
         Response response = echoResponse.echoResult(httpHeaders, null, "");
 
         assertNotNull(response);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     }
+
+    @Test
+    public void testCheckDbAction_CachedSuccess() {
+        // Prepare
+        when(aaiGraphCheckerMock.isAaiGraphDbAvailable(CheckerType.CACHED)).thenReturn(Boolean.TRUE);
+        // Run
+        Response response = echoResponse.echoResult(httpHeaders, null, CHECK_DB_ACTION);
+        // Verify
+        verify(aaiGraphCheckerMock, never()).isAaiGraphDbAvailable(CheckerType.ACTUAL);
+        assertNotNull(response);
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testCheckDbAction_CachedFailure() {
+        // Prepare
+        when(aaiGraphCheckerMock.isAaiGraphDbAvailable(CheckerType.CACHED)).thenReturn(Boolean.FALSE);
+        // Run
+        Response response = echoResponse.echoResult(httpHeaders, null, CHECK_DB_ACTION);
+        // Verify
+        verify(aaiGraphCheckerMock, never()).isAaiGraphDbAvailable(CheckerType.ACTUAL);
+        assertNotNull(response);
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testCheckDbNowAction_Success() {
+        // Prepare
+        when(aaiGraphCheckerMock.isAaiGraphDbAvailable(CheckerType.ACTUAL)).thenReturn(Boolean.TRUE);
+        // Run
+        Response response = echoResponse.echoResult(httpHeaders, null, CHECK_DB_STATUS_NOW_ACTION);
+        // Verify
+        assertNotNull(response);
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testCheckDbNowAction_Failure() {
+        // Prepare
+        when(aaiGraphCheckerMock.isAaiGraphDbAvailable(CheckerType.ACTUAL)).thenReturn(Boolean.FALSE);
+        // Run
+        Response response = echoResponse.echoResult(httpHeaders, null, CHECK_DB_STATUS_NOW_ACTION);
+        // Verify
+        assertNotNull(response);
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testCheckDbNowAction_Unknown() {
+        // Prepare
+        when(aaiGraphCheckerMock.isAaiGraphDbAvailable(CheckerType.ACTUAL)).thenReturn(null);
+        // Run
+        Response response = echoResponse.echoResult(httpHeaders, null, CHECK_DB_STATUS_NOW_ACTION);
+        // Verify
+        assertNotNull(response);
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
 }
