@@ -1,0 +1,4 @@
+distribution_type: maven
+log_dir: aai-resources-maven-stage-master/1189/
+project: resources
+version: 1.9.7
