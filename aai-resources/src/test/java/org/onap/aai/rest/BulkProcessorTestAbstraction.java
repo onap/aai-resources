@@ -19,9 +19,9 @@
  */
 package org.onap.aai.rest;
 
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.when;
-import org.springframework.mock.web.MockHttpServletRequest;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,9 +41,9 @@ import org.junit.BeforeClass;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 public abstract class BulkProcessorTestAbstraction extends AAISetup {
 

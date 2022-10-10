@@ -19,15 +19,32 @@
  */
 package org.onap.aai.rest;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 import org.json.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -36,22 +53,12 @@ import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
-
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.annotation.DirtiesContext;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.*;
-import java.io.IOException;
-import java.util.*;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 // TODO: Change the following test to use spring boot
 public class LegacyMoxyConsumerTest extends AAISetup {

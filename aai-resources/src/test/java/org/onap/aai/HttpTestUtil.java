@@ -19,6 +19,24 @@
  */
 package org.onap.aai;
 
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+
 import org.javatuples.Pair;
 import org.mockito.Mockito;
 import org.onap.aai.config.SpringContextAware;
@@ -36,17 +54,6 @@ import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.setup.SchemaVersions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.*;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 public class HttpTestUtil extends RESTAPI {
 
