@@ -30,7 +30,7 @@
     </parent>
     <groupId>org.onap.aai.resources</groupId>
     <artifactId>resources</artifactId>
-    <version>1.9.7-SNAPSHOT</version>
+    <version>1.11.0-SNAPSHOT</version>
     <name>aai-resources</name>
     <packaging>pom</packaging>
     <modules>
@@ -48,8 +48,8 @@
         <staging.path>/content/repositories/staging/</staging.path>
         <!-- GMaven plugin uses this property to figure out the name of the docker tag -->
         <aai.project.version>${project.version}</aai.project.version>
-        <aai.common.version>1.9.3</aai.common.version>
-        <aai.schema.service.version>1.9.7</aai.schema.service.version>
+        <aai.common.version>1.9.4</aai.common.version>
+        <aai.schema.service.version>1.11.0</aai.schema.service.version>
     </properties>
     <build>
         <pluginManagement>
