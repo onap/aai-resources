@@ -1,5 +1,5 @@
 distribution_type: container
-container_release_tag: 1.9.7
+container_release_tag: 1.11.0
 project: resources
 ref: 2b7b44a58d1e5da1bb02227bfd44ddee8419964e
 containers:
