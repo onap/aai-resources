@@ -29,18 +29,22 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.apache.commons.io.IOUtils;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.env.*;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 public class PropertyPasswordConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     private static final Pattern decodePasswordPattern = Pattern.compile("password\\((.*?)\\)");
     private PasswordDecoder passwordDecoder = new JettyPasswordDecoder();
-    private static final EELFLogger logger = EELFManager.getInstance().getLogger(PropertyPasswordConfiguration.class.getName());
+    private static final EELFLogger logger = EELFManager.getLogger(PropertyPasswordConfiguration.class.getName());
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
