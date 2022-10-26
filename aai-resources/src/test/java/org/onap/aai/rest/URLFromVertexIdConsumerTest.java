@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
 import static org.junit.Assert.assertEquals;
@@ -79,27 +80,28 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
 
     private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
     private boolean initialized = false;
+
     @BeforeClass
-    public static void setupRest(){
-       // AAIGraph.getInstance();
+    public static void setupRest() {
+        // AAIGraph.getInstance();
     }
 
     @Before
-    public void setup(){
-    	if(!initialized){
-    		initialized = true;
-    		AAIGraph.getInstance();
-    	}
+    public void setup() {
+        if (!initialized) {
+            initialized = true;
+            AAIGraph.getInstance();
+        }
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
         urlFromVertexIdConsumer = new URLFromVertexIdConsumer();
-        legacyMoxyConsumer      = new LegacyMoxyConsumer();
+        legacyMoxyConsumer = new LegacyMoxyConsumer();
 
-        httpHeaders         = Mockito.mock(HttpHeaders.class);
-        uriInfo             = Mockito.mock(UriInfo.class);
+        httpHeaders = Mockito.mock(HttpHeaders.class);
+        uriInfo = Mockito.mock(UriInfo.class);
 
-        headersMultiMap     = new MultivaluedHashMap<>();
-        queryParameters     = Mockito.spy(new MultivaluedHashMap<>());
+        headersMultiMap = new MultivaluedHashMap<>();
+        queryParameters = Mockito.spy(new MultivaluedHashMap<>());
 
         headersMultiMap.add("X-FromAppId", "JUNIT");
         headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
@@ -117,7 +119,6 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
 
         when(httpHeaders.getRequestHeader("aai-request-context")).thenReturn(aaiRequestContextList);
-
 
         when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
         when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
@@ -138,33 +139,17 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy(
-                "",
-                "-1",
-                "-1",
-                schemaVersions.getDefaultVersion().toString(),
-                uri,
-                "all",
-                "false",
-                httpHeaders,
-                uriInfo,
-                mockReqGet
-        );
+        Response response = legacyMoxyConsumer.getLegacy("", "-1", "-1", schemaVersions.getDefaultVersion().toString(),
+                uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        response = legacyMoxyConsumer.update(
-                payload,
-                schemaVersions.getDefaultVersion().toString(),
-                uri,
-                httpHeaders,
-                uriInfo,
-                mockReq
-        );
+        response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+                uriInfo, mockReq);
 
         int code = response.getStatus();
-        if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
+            System.out.println("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -175,14 +160,8 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         assertTrue("Response doesn't contain the key vertexId", responseHeaders.containsKey("vertex-id"));
 
         String vertexId = responseHeaders.get("vertex-id").get(0).toString();
-        response = urlFromVertexIdConsumer.generateUrlFromVertexId(
-                "",
-                schemaVersions.getDefaultVersion().toString(),
-                Long.valueOf(vertexId).longValue(),
-                httpHeaders,
-                uriInfo,
-                mockReqGet
-                );
+        response = urlFromVertexIdConsumer.generateUrlFromVertexId("", schemaVersions.getDefaultVersion().toString(),
+                Long.valueOf(vertexId).longValue(), httpHeaders, uriInfo, mockReqGet);
 
         assertNotNull(response);
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -198,14 +177,9 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
 
         String vertexId = "384584";
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = urlFromVertexIdConsumer.generateUrlFromVertexId(
-                "",
-                schemaVersions.getDefaultVersion().toString(),
-                Long.valueOf(vertexId).longValue(),
-                httpHeaders,
-                uriInfo,
-                mockReqGet
-        );
+        Response response =
+                urlFromVertexIdConsumer.generateUrlFromVertexId("", schemaVersions.getDefaultVersion().toString(),
+                        Long.valueOf(vertexId).longValue(), httpHeaders, uriInfo, mockReqGet);
 
         assertNotNull("Check if the response is not null", response);
 

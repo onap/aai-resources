@@ -17,18 +17,23 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sun.istack.SAXParseException2;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.onap.aai.AAISetup;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -36,15 +41,13 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.onap.aai.AAISetup;
 
 public class ExceptionHandlerTest extends AAISetup {
 
@@ -60,10 +63,10 @@ public class ExceptionHandlerTest extends AAISetup {
     private ExceptionHandler handler = new ExceptionHandler();
 
     @Before
-    public void setup(){
+    public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        MultivaluedHashMap headersMultiMap     = new MultivaluedHashMap<>();
+        MultivaluedHashMap headersMultiMap = new MultivaluedHashMap<>();
 
         headersMultiMap.add("X-FromAppId", "JUNIT");
         headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
@@ -85,7 +88,7 @@ public class ExceptionHandlerTest extends AAISetup {
 
         assertNotNull(response);
         assertNull(response.getEntity());
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),  response.getStatus());
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -97,7 +100,7 @@ public class ExceptionHandlerTest extends AAISetup {
 
         assertNotNull(response);
         assertNotNull(response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),  response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -109,7 +112,7 @@ public class ExceptionHandlerTest extends AAISetup {
 
         assertNotNull(response);
         assertNotNull(response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),  response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -121,7 +124,7 @@ public class ExceptionHandlerTest extends AAISetup {
 
         assertNotNull(response);
         assertNotNull(response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),  response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -134,8 +137,7 @@ public class ExceptionHandlerTest extends AAISetup {
 
         assertNotNull(response);
         assertNotNull(response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),  response.getStatus());
-
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     }
 
@@ -152,6 +154,6 @@ public class ExceptionHandlerTest extends AAISetup {
 
         assertNotNull(response);
         assertNotNull(response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),  response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 }

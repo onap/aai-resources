@@ -17,7 +17,19 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.onap.aai.PayloadUtil;
@@ -26,17 +38,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
 
 public class PserverRelationshipTest extends AbstractSpringRestTest {
 
@@ -55,7 +56,6 @@ public class PserverRelationshipTest extends AbstractSpringRestTest {
         httpMethodSet.add(HttpMethod.PUT);
         httpMethodSet.add(HttpMethod.DELETE);
         httpMethodSet.add(HttpMethod.OPTIONS);
-
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertThat(body, containsString("Unrecognized AAI function"));

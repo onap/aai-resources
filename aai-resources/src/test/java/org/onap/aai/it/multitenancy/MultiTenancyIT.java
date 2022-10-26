@@ -17,9 +17,16 @@
  * limitations under the License.
  * ============LICENSE_END====================================================
  */
+
 package org.onap.aai.it.multitenancy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+
+import java.util.Collections;
+
 import org.junit.Test;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -30,11 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
 import org.springframework.test.context.TestPropertySource;
-
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @Import(KeycloakTestConfiguration.class)
 @TestPropertySource(locations = "classpath:it/application-keycloak-test.properties")
@@ -61,14 +63,16 @@ public class MultiTenancyIT extends AbstractSpringRestTest {
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
         // get pnf with bob (operator_readOnly)
-        username = "bob"; password = "bob";
+        username = "bob";
+        password = "bob";
         headers = this.getHeaders(username, password);
         httpEntity = new HttpEntity("", headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         // get pnf with ted (selector)
-        username = "ted"; password = "ted";
+        username = "ted";
+        password = "ted";
         headers = this.getHeaders(username, password);
         httpEntity = new HttpEntity("", headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, httpEntity, String.class);
@@ -82,7 +86,8 @@ public class MultiTenancyIT extends AbstractSpringRestTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         // get pnf with ran
-        username = "ran"; password = "ran";
+        username = "ran";
+        password = "ran";
         headers = this.getHeaders(username, password);
         httpEntity = new HttpEntity("", headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, httpEntity, String.class);
@@ -103,14 +108,9 @@ public class MultiTenancyIT extends AbstractSpringRestTest {
     }
 
     private String getStringToken(String username, String password) {
-        Keycloak keycloakClient = KeycloakBuilder.builder()
-                .serverUrl(keycloakContainer.getAuthServerUrl())
-                .realm(properties.realm)
-                .clientId(properties.clientId)
-                .clientSecret(properties.clientSecret)
-                .username(username)
-                .password(password)
-                .build();
+        Keycloak keycloakClient = KeycloakBuilder.builder().serverUrl(keycloakContainer.getAuthServerUrl())
+                .realm(properties.realm).clientId(properties.clientId).clientSecret(properties.clientSecret)
+                .username(username).password(password).build();
 
         AccessTokenResponse tokenResponse = keycloakClient.tokenManager().getAccessToken();
         assertNotNull(tokenResponse);

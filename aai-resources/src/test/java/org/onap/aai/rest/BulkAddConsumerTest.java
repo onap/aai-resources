@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
 import static org.junit.Assert.assertEquals;
@@ -28,15 +29,14 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkAddConsumerTest.class.getName());
 
-
-	@Test
+    @Test
     public void validBulkAddTest() throws IOException {
 
         when(uriInfo.getPath()).thenReturn(uri);
@@ -46,10 +46,11 @@ public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
         Response response = executeRequest(payload);
 
         assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 3 {\"201\":null}", 3, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals("Contains 3 {\"201\":null}", 3,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
     }
-	
-	@Test
+
+    @Test
     public void bulkProcessPayloadInBulkAddTest() throws IOException {
 
         when(uriInfo.getPath()).thenReturn(uri);
@@ -59,12 +60,15 @@ public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
         Response response = executeRequest(payload);
 
         assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 1 {\"201\":null}", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
-        assertEquals("Contains 1 {\"400\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
-        assertEquals("Contains 1 ERR.5.4.6118", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
+        assertEquals("Contains 1 {\"201\":null}", 1,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals("Contains 1 {\"400\":\"{", 1,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
+        assertEquals("Contains 1 ERR.5.4.6118", 1,
+                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
     }
-	
-	@Test
+
+    @Test
     public void bulkAddInvalidMethodTest() throws IOException {
 
         when(uriInfo.getPath()).thenReturn(uri);
@@ -74,12 +78,14 @@ public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
         Response response = executeRequest(payload);
 
         assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 1 {\"400\":\"{", 1, StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
-        assertEquals("Contains 1 ERR.5.4.6118", 1, StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
+        assertEquals("Contains 1 {\"400\":\"{", 1,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
+        assertEquals("Contains 1 ERR.5.4.6118", 1,
+                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
     }
 
     @Test
-    public void bulkAddThrowExceptionWhenPayloadContainsNoTransactionsTest(){
+    public void bulkAddThrowExceptionWhenPayloadContainsNoTransactionsTest() {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
@@ -105,7 +111,7 @@ public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
     }
 
     @Test
-    public void bulkAddCheckMeetsLimit() throws IOException{
+    public void bulkAddCheckMeetsLimit() throws IOException {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
@@ -113,11 +119,12 @@ public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
         Response response = executeRequest(payload);
 
         assertEquals("Created", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 30 {\"201\":null}", 30, StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals("Contains 30 {\"201\":null}", 30,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
     }
 
     @Test
-    public void bulkAddCheckExceedsLimit() throws IOException{
+    public void bulkAddCheckExceedsLimit() throws IOException {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
@@ -127,14 +134,14 @@ public class BulkAddConsumerTest extends BulkProcessorTestAbstraction {
         assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6147"));
     }
-    
+
     @Override
-    protected BulkConsumer getConsumer(){
+    protected BulkConsumer getConsumer() {
         return new BulkAddConsumer();
     }
-  
+
     @Override
     protected String getUri() {
-		return "/aai/" + schemaVersions.getDefaultVersion().toString() + "/bulkadd";
-	}
+        return "/aai/" + schemaVersions.getDefaultVersion().toString() + "/bulkadd";
+    }
 }

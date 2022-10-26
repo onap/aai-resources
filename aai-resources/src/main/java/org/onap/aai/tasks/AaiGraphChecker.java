@@ -19,11 +19,14 @@
 package org.onap.aai.tasks;
 
 import com.google.common.collect.Iterators;
+
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.Validate;
 import org.janusgraph.core.JanusGraphException;
@@ -65,8 +68,7 @@ public class AaiGraphChecker extends TimerTask {
      * Enumeration of check type that can be made.
      */
     public enum CheckerType {
-        ACTUAL,
-        CACHED
+        ACTUAL, CACHED
     }
 
     private AaiGraphChecker() {
@@ -75,20 +77,13 @@ public class AaiGraphChecker extends TimerTask {
     @PostConstruct
     private void setupTimer() {
 
-        boolean scheduleEnabled =
-                Boolean.parseBoolean(
-                        getConfigurationValueOrDefault(
-                                "aai.graph.checker.task.enabled", DEFAULT_SCHEDULE_ENABLED_VALUE));
-        long scheduleDelay =
-                Long.parseLong(
-                        getConfigurationValueOrDefault(
-                                "aai.graph.checker.task.delay", DEFAULT_SCHEDULE_DELAY_VALUE));
-        long schedulePeriod =
-                Long.parseLong(
-                        getConfigurationValueOrDefault(
-                                "aai.graph.checker.task.period", DEFAULT_SCHEDULE_PERIOD_VALUE));
-        LOGGER.debug(
-                "Setting up AaiGraphChecker with scheduleEnabled={}, scheduleDelay={}, schedulePeriod={} ",
+        boolean scheduleEnabled = Boolean.parseBoolean(
+                getConfigurationValueOrDefault("aai.graph.checker.task.enabled", DEFAULT_SCHEDULE_ENABLED_VALUE));
+        long scheduleDelay = Long.parseLong(
+                getConfigurationValueOrDefault("aai.graph.checker.task.delay", DEFAULT_SCHEDULE_DELAY_VALUE));
+        long schedulePeriod = Long.parseLong(
+                getConfigurationValueOrDefault("aai.graph.checker.task.period", DEFAULT_SCHEDULE_PERIOD_VALUE));
+        LOGGER.debug("Setting up AaiGraphChecker with scheduleEnabled={}, scheduleDelay={}, schedulePeriod={} ",
                 scheduleEnabled, scheduleDelay, schedulePeriod);
 
         if (scheduleEnabled) {
@@ -120,11 +115,12 @@ public class AaiGraphChecker extends TimerTask {
 
     /**
      * Indicate if AAI Graph database is available either from actual db connection or from cached property state.
+     * 
      * @param checkerType the type of check to be made (actual or cached). Null is not supported.
      * @return
-     *      <li>true, if database is available</li>
-     *      <li>false, if database is NOT available</li>
-     *      <li>null, if database availability can not be determined</li>
+     *         <li>true, if database is available</li>
+     *         <li>false, if database is NOT available</li>
+     *         <li>null, if database availability can not be determined</li>
      */
     public Boolean isAaiGraphDbAvailable(CheckerType checkerType) {
         Validate.notNull(checkerType);
@@ -169,7 +165,7 @@ public class AaiGraphChecker extends TimerTask {
             dbAvailable = null;
         } finally {
             if (transaction != null && !transaction.isClosed()) {
-                //check if transaction is open then close instead of flag
+                // check if transaction is open then close instead of flag
                 try {
                     transaction.rollback();
                 } catch (Exception e) {
@@ -197,8 +193,7 @@ public class AaiGraphChecker extends TimerTask {
         try {
             result = AAIConfig.get(property);
         } catch (AAIException e) {
-            LOGGER.error(
-                    "Unable to get defined configuration value for '{}' property, then default '{}' value is used",
+            LOGGER.error("Unable to get defined configuration value for '{}' property, then default '{}' value is used",
                     property, defaultValue);
             result = defaultValue;
         }

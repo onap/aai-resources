@@ -17,21 +17,25 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.web;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Comparator.comparingInt;
 
 import com.google.common.collect.Sets;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
-import com.sun.jersey.api.client.filter.LoggingFilter;
+
 import org.glassfish.jersey.server.ResourceConfig;
 import org.onap.aai.rest.BulkAddConsumer;
 import org.onap.aai.rest.BulkProcessConsumer;
@@ -72,18 +76,12 @@ public class JerseyConfiguration {
     public ResourceConfig resourceConfig() {
         ResourceConfig resourceConfig = new ResourceConfig();
 
-        Set<Class<?>> classes = Sets.newHashSet(
-            EchoResponse.class,
-            VertexIdConsumer.class,
-            ExampleConsumer.class,
-            BulkAddConsumer.class,
-            BulkProcessConsumer.class,
-            BulkSingleTransactionConsumer.class,
-            LegacyMoxyConsumer.class,
-            URLFromVertexIdConsumer.class
-        );
+        Set<Class<?>> classes = Sets.newHashSet(EchoResponse.class, VertexIdConsumer.class, ExampleConsumer.class,
+                BulkAddConsumer.class, BulkProcessConsumer.class, BulkSingleTransactionConsumer.class,
+                LegacyMoxyConsumer.class, URLFromVertexIdConsumer.class);
         resourceConfig.registerClasses(classes);
-        registerFiltersForClasses(resourceConfig, ContainerRequestFilter.class, ContainerResponseFilter.class, AuditLogContainerFilter.class);
+        registerFiltersForClasses(resourceConfig, ContainerRequestFilter.class, ContainerResponseFilter.class,
+                AuditLogContainerFilter.class);
 
         if (isLoggingEnabled()) {
             logRequests(resourceConfig);
@@ -103,10 +101,8 @@ public class JerseyConfiguration {
         filters.addAll(reflections.getSubTypesOf(clazz));
         throwIfPriorityAnnotationAbsent(filters);
 
-        filters.stream()
-            .filter(this::isEnabledByActiveProfiles)
-            .sorted(priorityComparator())
-            .forEach(resourceConfig::register);
+        filters.stream().filter(this::isEnabledByActiveProfiles).sorted(priorityComparator())
+                .forEach(resourceConfig::register);
     }
 
     private <T> void throwIfPriorityAnnotationAbsent(Collection<Class<? extends T>> classes) {
@@ -130,8 +126,8 @@ public class JerseyConfiguration {
     }
 
     private boolean isEnabledByActiveProfiles(AnnotatedElement annotatedElement) {
-        return !annotatedElement.isAnnotationPresent(Profile.class) ||
-            environment.acceptsProfiles(annotatedElement.getAnnotation(Profile.class).value());
+        return !annotatedElement.isAnnotationPresent(Profile.class)
+                || environment.acceptsProfiles(annotatedElement.getAnnotation(Profile.class).value());
     }
 
     private class MissingFilterPriorityException extends RuntimeException {

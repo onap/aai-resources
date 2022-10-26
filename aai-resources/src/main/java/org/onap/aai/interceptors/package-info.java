@@ -26,11 +26,12 @@
  *
  * <pre>
  *     <code>
- *         @Priority(AAIRequestFilterPriority.YOUR_PRIORITY)
+ *         &#64;Priority(AAIRequestFilterPriority.YOUR_PRIORITY)
  *         public class YourInterceptor extends AAIContainerFilter implements ContainerRequestFilter {
  *
  *         }
  *     </code>
  * </pre>
  */
+
 package org.onap.aai.interceptors;

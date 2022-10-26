@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest.bulk.pojos;
 
 import com.google.gson.annotations.SerializedName;

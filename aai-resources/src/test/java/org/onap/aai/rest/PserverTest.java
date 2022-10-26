@@ -17,17 +17,19 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
+import static org.junit.Assert.assertEquals;
+
 import com.jayway.jsonpath.JsonPath;
+
+import java.util.UUID;
+
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * A sample junit test using spring boot that provides the ability to spin
@@ -56,7 +58,8 @@ public class PserverTest extends AbstractSpringRestTest {
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
         String vertexId = responseEntity.getHeaders().getFirst("vertex-id");
-        responseEntity = restTemplate.exchange(baseUrl + "/aai/v11/resources/id/" + vertexId, HttpMethod.GET, httpEntity, String.class);
+        responseEntity = restTemplate.exchange(baseUrl + "/aai/v11/resources/id/" + vertexId, HttpMethod.GET,
+                httpEntity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
@@ -65,7 +68,8 @@ public class PserverTest extends AbstractSpringRestTest {
         String body = responseEntity.getBody().toString();
         String resourceVersion = JsonPath.read(body, "$.resource-version");
 
-        responseEntity = restTemplate.exchange(baseUrl + endpoint+ "?resource-version=" + resourceVersion, HttpMethod.DELETE, httpEntity, String.class);
+        responseEntity = restTemplate.exchange(baseUrl + endpoint + "?resource-version=" + resourceVersion,
+                HttpMethod.DELETE, httpEntity, String.class);
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
     }
 }

@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
 import static org.junit.Assert.assertEquals;
@@ -74,21 +75,21 @@ public class ExampleConsumerTest extends AAISetup {
     private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
 
     @BeforeClass
-    public static void setupRest(){
+    public static void setupRest() {
         AAIGraph.getInstance();
-      
+
     }
 
     @Before
-    public void setup(){
+    public void setup() {
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
-        exampleConsumer  = new ExampleConsumer();
-        httpHeaders         = Mockito.mock(HttpHeaders.class);
-        uriInfo             = Mockito.mock(UriInfo.class);
+        exampleConsumer = new ExampleConsumer();
+        httpHeaders = Mockito.mock(HttpHeaders.class);
+        uriInfo = Mockito.mock(UriInfo.class);
 
-        headersMultiMap     = new MultivaluedHashMap<>();
-        queryParameters     = Mockito.spy(new MultivaluedHashMap<>());
+        headersMultiMap = new MultivaluedHashMap<>();
+        queryParameters = Mockito.spy(new MultivaluedHashMap<>());
 
         headersMultiMap.add("X-FromAppId", "JUNIT");
         headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
@@ -107,7 +108,6 @@ public class ExampleConsumerTest extends AAISetup {
 
         when(httpHeaders.getRequestHeader("aai-request-context")).thenReturn(aaiRequestContextList);
 
-
         when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
         when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
 
@@ -118,14 +118,10 @@ public class ExampleConsumerTest extends AAISetup {
     }
 
     @Test
-    public void testGetExampleRespondsWithOkStatusForValidObject(){
+    public void testGetExampleRespondsWithOkStatusForValidObject() {
 
-        Response response = exampleConsumer.getExample(
-                schemaVersions.getDefaultVersion().toString(),
-                "pserver",
-                httpHeaders,
-                uriInfo,
-                null);
+        Response response = exampleConsumer.getExample(schemaVersions.getDefaultVersion().toString(), "pserver",
+                httpHeaders, uriInfo, null);
 
         assertNotNull("Response from the example consumer returned null", response);
 
@@ -135,17 +131,13 @@ public class ExampleConsumerTest extends AAISetup {
     }
 
     @Test
-    public void testGetExampleFailureForInvalidObject(){
+    public void testGetExampleFailureForInvalidObject() {
 
         when(uriInfo.getPath()).thenReturn("examples/fakeObject");
         when(uriInfo.getPath(false)).thenReturn("examples/fakeObject");
 
-        Response response = exampleConsumer.getExample(
-                schemaVersions.getDefaultVersion().toString(),
-                "testRandomCrazyObject",
-                httpHeaders,
-                uriInfo,
-                null);
+        Response response = exampleConsumer.getExample(schemaVersions.getDefaultVersion().toString(),
+                "testRandomCrazyObject", httpHeaders, uriInfo, null);
 
         assertNotNull("Response from the example consumer returned null", response);
 

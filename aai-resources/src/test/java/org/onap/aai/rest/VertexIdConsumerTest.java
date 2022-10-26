@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
 import static org.junit.Assert.assertEquals;
@@ -50,6 +51,7 @@ import org.onap.aai.exceptions.AAIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
+
 public class VertexIdConsumerTest extends AAISetup {
 
     protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
@@ -78,28 +80,28 @@ public class VertexIdConsumerTest extends AAISetup {
 
     private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
     private boolean initialized = false;
-    
+
     @BeforeClass
-    public static void setupRest(){
-        //AAIGraph.getInstance();
+    public static void setupRest() {
+        // AAIGraph.getInstance();
     }
 
     @Before
-    public void setup(){
-    	if(!initialized){
-    		initialized = true;
-    		AAIGraph.getInstance();
-    	}
+    public void setup() {
+        if (!initialized) {
+            initialized = true;
+            AAIGraph.getInstance();
+        }
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
-        vertexIdConsumer    = new VertexIdConsumer();
-        legacyMoxyConsumer  = new LegacyMoxyConsumer();
+        vertexIdConsumer = new VertexIdConsumer();
+        legacyMoxyConsumer = new LegacyMoxyConsumer();
 
-        httpHeaders         = Mockito.mock(HttpHeaders.class);
-        uriInfo             = Mockito.mock(UriInfo.class);
+        httpHeaders = Mockito.mock(HttpHeaders.class);
+        uriInfo = Mockito.mock(UriInfo.class);
 
-        headersMultiMap     = new MultivaluedHashMap<>();
-        queryParameters     = Mockito.spy(new MultivaluedHashMap<>());
+        headersMultiMap = new MultivaluedHashMap<>();
+        queryParameters = Mockito.spy(new MultivaluedHashMap<>());
 
         headersMultiMap.add("X-FromAppId", "JUNIT");
         headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
@@ -118,7 +120,6 @@ public class VertexIdConsumerTest extends AAISetup {
 
         when(httpHeaders.getRequestHeader("aai-request-context")).thenReturn(aaiRequestContextList);
 
-
         when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
         when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
 
@@ -136,36 +137,20 @@ public class VertexIdConsumerTest extends AAISetup {
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
-        
+
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy(
-                "",
-                "-1",
-                "-1",
-                schemaVersions.getDefaultVersion().toString(),
-                uri,
-                "all",
-                "false",
-                httpHeaders,
-                uriInfo,
-                mockReqGet
-        );
+        Response response = legacyMoxyConsumer.getLegacy("", "-1", "-1", schemaVersions.getDefaultVersion().toString(),
+                uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        
-        response = legacyMoxyConsumer.update(
-                payload,
-                schemaVersions.getDefaultVersion().toString(),
-                uri,
-                httpHeaders,
-                uriInfo,
-                mockReq
-        );
+
+        response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+                uriInfo, mockReq);
 
         int code = response.getStatus();
-        if(!VALID_HTTP_STATUS_CODES.contains(code)){
-            System.out.println("Response Code: " + code + "\tEntity: " +  response.getEntity());
+        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
+            System.out.println("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -177,15 +162,8 @@ public class VertexIdConsumerTest extends AAISetup {
 
         String vertexId = responseHeaders.get("vertex-id").get(0).toString();
 
-        response = vertexIdConsumer.getByVertexId(
-                "",
-                schemaVersions.getDefaultVersion().toString(),
-                Long.valueOf(vertexId).longValue(),
-                "10000",
-                httpHeaders,
-                uriInfo,
-                mockReqGet
-        );
+        response = vertexIdConsumer.getByVertexId("", schemaVersions.getDefaultVersion().toString(),
+                Long.valueOf(vertexId).longValue(), "10000", httpHeaders, uriInfo, mockReqGet);
 
         assertNotNull(response);
         String pserverObject = response.getEntity().toString();

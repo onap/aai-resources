@@ -17,17 +17,9 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.eclipse.jetty.util.security.Password;
-import org.onap.aai.Profiles;
-import org.onap.aai.util.AAIConstants;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
@@ -36,6 +28,16 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import javax.annotation.PostConstruct;
+
+import org.eclipse.jetty.util.security.Password;
+import org.onap.aai.Profiles;
+import org.onap.aai.util.AAIConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 @Profile(Profiles.ONE_WAY_SSL)
 @Service
@@ -48,37 +50,38 @@ public class AuthorizationService {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @PostConstruct
-    public void init(){
+    public void init() {
 
         String basicAuthFile = getBasicAuthFilePath();
 
-        try(Stream<String> stream = Files.lines(Paths.get(basicAuthFile))){
+        try (Stream<String> stream = Files.lines(Paths.get(basicAuthFile))) {
             stream.filter(line -> !line.startsWith("#")).forEach(str -> {
-                byte [] bytes = null;
+                byte[] bytes = null;
 
                 String usernamePassword = null;
                 String accessType = null;
 
                 try {
-                    String [] userAccessType = str.split(",");
+                    String[] userAccessType = str.split(",");
 
-                    if(userAccessType == null || userAccessType.length != 2){
-                        throw new RuntimeException("Please check the realm.properties file as it is not conforming to the basic auth");
+                    if (userAccessType == null || userAccessType.length != 2) {
+                        throw new RuntimeException(
+                                "Please check the realm.properties file as it is not conforming to the basic auth");
                     }
 
                     usernamePassword = userAccessType[0];
-                    accessType       = userAccessType[1];
+                    accessType = userAccessType[1];
 
                     String[] usernamePasswordArray = usernamePassword.split(":");
 
-                    if(usernamePasswordArray == null || usernamePasswordArray.length != 3){
+                    if (usernamePasswordArray == null || usernamePasswordArray.length != 3) {
                         throw new RuntimeException("This username / pwd is not a valid entry in realm.properties");
                     }
 
                     String username = usernamePasswordArray[0];
                     String password = null;
 
-                    if(str.contains("OBF:")){
+                    if (str.contains("OBF:")) {
                         password = usernamePasswordArray[1] + ":" + usernamePasswordArray[2];
                         password = Password.deobfuscate(password);
                     }
@@ -87,8 +90,7 @@ public class AuthorizationService {
 
                     authorizedUsers.put(new String(bytes), accessType);
 
-                } catch (UnsupportedEncodingException e)
-                {
+                } catch (UnsupportedEncodingException e) {
                     logger.error("Unable to support the encoding of the file" + basicAuthFile);
                 }
 
@@ -99,11 +101,11 @@ public class AuthorizationService {
         }
     }
 
-    public boolean checkIfUserAuthorized(String authorization){
+    public boolean checkIfUserAuthorized(String authorization) {
         return authorizedUsers.containsKey(authorization) && "admin".equals(authorizedUsers.get(authorization));
     }
 
-    public String getBasicAuthFilePath(){
+    public String getBasicAuthFilePath() {
         return AAIConstants.AAI_HOME_ETC_AUTH + AAIConstants.AAI_FILESEP + "realm.properties";
     }
 }

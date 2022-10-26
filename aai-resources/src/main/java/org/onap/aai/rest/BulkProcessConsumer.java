@@ -17,32 +17,35 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import io.micrometer.core.annotation.Timed;
 
 import javax.ws.rs.Path;
 
-import io.micrometer.core.annotation.Timed;
 import org.onap.aai.restcore.HttpMethod;
 
 @Path("{version: v[1-9][0-9]*|latest}/bulkprocess")
 @Timed
 public class BulkProcessConsumer extends BulkConsumer {
 
-	@Override
-	protected boolean functionAllowed(HttpMethod method) {
-		
-		return method.equals(HttpMethod.PUT) || method.equals(HttpMethod.DELETE) || method.equals(HttpMethod.MERGE_PATCH);
-	}
+    @Override
+    protected boolean functionAllowed(HttpMethod method) {
 
-	@Override
-	protected String getModule(){
-		return "bulk process";
-	}
+        return method.equals(HttpMethod.PUT) || method.equals(HttpMethod.DELETE)
+                || method.equals(HttpMethod.MERGE_PATCH);
+    }
 
-	@Override
-	protected boolean enableResourceVersion() {
-		// TODO Auto-generated method stub
-		return true;
-	}
+    @Override
+    protected String getModule() {
+        return "bulk process";
+    }
+
+    @Override
+    protected boolean enableResourceVersion() {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
 }

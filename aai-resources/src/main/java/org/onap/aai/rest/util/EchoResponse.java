@@ -22,6 +22,7 @@ package org.onap.aai.rest.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -32,6 +33,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
@@ -66,16 +68,16 @@ public class EchoResponse extends RESTAPI {
      * data store.
      * If there is no query string, no transacction logging is done to hbase.
      *
-     * @param headers  the headers
-     * @param req      the req
+     * @param headers the headers
+     * @param req the req
      * @param myAction if exists will cause transaction to be logged to hbase
      * @return the response
      */
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/echo")
-    public Response echoResult(
-        @Context HttpHeaders headers, @Context HttpServletRequest req, @QueryParam("action") String myAction) {
+    public Response echoResult(@Context HttpHeaders headers, @Context HttpServletRequest req,
+            @QueryParam("action") String myAction) {
 
         String fromAppId;
         String transId;
@@ -95,8 +97,8 @@ public class EchoResponse extends RESTAPI {
         templateVars.add(transId);
 
         try {
-            if (CHECK_DB_STATUS_ACTION.equalsIgnoreCase(myAction) ||
-                CHECK_DB_STATUS_NOW_ACTION.equalsIgnoreCase(myAction)) {
+            if (CHECK_DB_STATUS_ACTION.equalsIgnoreCase(myAction)
+                    || CHECK_DB_STATUS_NOW_ACTION.equalsIgnoreCase(myAction)) {
                 validateDBStatus(myAction);
             }
             return generateSuccessResponse(headers, templateVars);
@@ -114,7 +116,7 @@ public class EchoResponse extends RESTAPI {
     /**
      * Validates if Janus Graph can process request using AAIGraphChecker.
      *
-     * @param action        expected input values 'checkDB' 'checkDBNow'
+     * @param action expected input values 'checkDB' 'checkDBNow'
      * @throws AAIException exception thrown if DB is not available
      */
     private void validateDBStatus(String action) throws AAIException {
@@ -138,17 +140,15 @@ public class EchoResponse extends RESTAPI {
         HashMap<AAIException, ArrayList<String>> exceptionList = new HashMap<>();
         exceptionList.put(new AAIException("AAI_0002", "OK"), templateVariables);
         return Response.status(Status.OK)
-            .entity(
-                ErrorLogHelper.getRESTAPIInfoResponse(headers.getAcceptableMediaTypes(), exceptionList)).build();
+                .entity(ErrorLogHelper.getRESTAPIInfoResponse(headers.getAcceptableMediaTypes(), exceptionList))
+                .build();
     }
 
     private Response generateFailureResponse(HttpHeaders headers, ArrayList<String> templateVariables,
-        AAIException aaiException) {
-        return Response.status(aaiException.getErrorObject().getHTTPResponseCode())
-            .entity(
-                ErrorLogHelper.getRESTAPIErrorResponseWithLogging(
-                    headers.getAcceptableMediaTypes(), aaiException, templateVariables))
-            .build();
+            AAIException aaiException) {
+        return Response.status(aaiException.getErrorObject().getHTTPResponseCode()).entity(ErrorLogHelper
+                .getRESTAPIErrorResponseWithLogging(headers.getAcceptableMediaTypes(), aaiException, templateVariables))
+                .build();
     }
 
 }

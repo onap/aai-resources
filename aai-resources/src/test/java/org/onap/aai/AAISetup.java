@@ -20,6 +20,12 @@
 
 package org.onap.aai;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -40,46 +46,32 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
-import static org.junit.Assert.assertNotNull;
-
-@ContextConfiguration(classes = {
-        ConfigConfiguration.class,
-        AAIConfigTranslator.class,
-        NodeIngestor.class,
-        EdgeIngestor.class,
-        EdgeSerializer.class,
-        SpringContextAware.class,
-        IntrospectionConfig.class,
-        XmlFormatTransformerConfiguration.class,
-        RestBeanConfig.class
-})
-@TestPropertySource(properties = {
-    "schema.uri.base.path = /aai" ,
-    "schema.ingest.file = src/test/resources/application-test.properties"
-})
+@ContextConfiguration(
+        classes = {ConfigConfiguration.class, AAIConfigTranslator.class, NodeIngestor.class, EdgeIngestor.class,
+                EdgeSerializer.class, SpringContextAware.class, IntrospectionConfig.class,
+                XmlFormatTransformerConfiguration.class, RestBeanConfig.class})
+@TestPropertySource(
+        properties = {"schema.uri.base.path = /aai",
+                "schema.ingest.file = src/test/resources/application-test.properties"})
 public abstract class AAISetup {
 
-	@Autowired
-	protected NodeIngestor nodeIngestor;
+    @Autowired
+    protected NodeIngestor nodeIngestor;
 
-	@Autowired
-	protected LoaderFactory loaderFactory;
-	
-	@Autowired
-	protected  Map<SchemaVersion, MoxyLoader>  moxyLoaderInstance;
-	
-	@Autowired
-	protected HttpEntry traversalHttpEntry;
-	
-	@Autowired
-	protected HttpEntry traversalUriHttpEntry;
+    @Autowired
+    protected LoaderFactory loaderFactory;
 
-	@Autowired
-	protected SchemaVersions schemaVersions;
+    @Autowired
+    protected Map<SchemaVersion, MoxyLoader> moxyLoaderInstance;
+
+    @Autowired
+    protected HttpEntry traversalHttpEntry;
+
+    @Autowired
+    protected HttpEntry traversalUriHttpEntry;
+
+    @Autowired
+    protected SchemaVersions schemaVersions;
 
     @ClassRule
     public static final SpringClassRule springClassRule = new SpringClassRule();
@@ -92,12 +84,10 @@ public abstract class AAISetup {
         System.setProperty("AJSC_HOME", "./");
         System.setProperty("BUNDLECONFIG_DIR", "src/main/resources/");
     }
-   
+
     public String getPayload(String filename) throws IOException {
 
-        InputStream inputStream = getClass()
-                .getClassLoader()
-                .getResourceAsStream(filename);
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename);
 
         String message = String.format("Unable to find the %s in src/test/resources", filename);
         assertNotNull(message, inputStream);

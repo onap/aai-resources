@@ -17,17 +17,19 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.pre;
-import org.onap.aai.interceptors.AAIContainerFilter;
-import org.onap.aai.interceptors.AAIHeaderProperties;
+
+import java.io.IOException;
 
 import javax.annotation.Priority;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.HttpMethod;
 
-import java.io.IOException;
+import org.onap.aai.interceptors.AAIContainerFilter;
+import org.onap.aai.interceptors.AAIHeaderProperties;
 
 /**
  * The Class HttpHeaderInterceptor
@@ -35,16 +37,16 @@ import java.io.IOException;
 @PreMatching
 @Priority(AAIRequestFilterPriority.HTTP_HEADER)
 public class HttpHeaderInterceptor extends AAIContainerFilter implements ContainerRequestFilter {
-	public static final String patchMethod = "PATCH";
-	
+    public static final String patchMethod = "PATCH";
+
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-    	String overrideMethod = containerRequestContext.getHeaderString(AAIHeaderProperties.HTTP_METHOD_OVERRIDE);
-    	String httpMethod = containerRequestContext.getMethod();
-    	
-		if (HttpMethod.POST.equalsIgnoreCase(httpMethod) && patchMethod.equalsIgnoreCase(overrideMethod)) {
-			containerRequestContext.setMethod(patchMethod);
-		}
+        String overrideMethod = containerRequestContext.getHeaderString(AAIHeaderProperties.HTTP_METHOD_OVERRIDE);
+        String httpMethod = containerRequestContext.getMethod();
+
+        if (HttpMethod.POST.equalsIgnoreCase(httpMethod) && patchMethod.equalsIgnoreCase(overrideMethod)) {
+            containerRequestContext.setMethod(patchMethod);
+        }
     }
-    
+
 }

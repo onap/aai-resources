@@ -17,24 +17,26 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
+
+import java.util.*;
 
 import org.junit.Test;
 import org.onap.aai.PayloadUtil;
 import org.springframework.http.*;
 
-import java.util.*;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
 public class PserverMissingTest extends AbstractSpringRestTest {
 
     @Test
     public void testWhenContentTypeMissingItWillFunctionalAndCreateObjectWithPayloadInJson() throws Exception {
 
         String id = "test-" + UUID.randomUUID().toString();
-        String endpoint = "/aai/v11/cloud-infrastructure/pservers/pserver/"+ id;
+        String endpoint = "/aai/v11/cloud-infrastructure/pservers/pserver/" + id;
         HttpHeaders headers = new HttpHeaders();
 
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -62,7 +64,7 @@ public class PserverMissingTest extends AbstractSpringRestTest {
     public void testWhenAcceptMissingItWillReturnThePayloadInXml() throws Exception {
 
         String id = "test-" + UUID.randomUUID().toString();
-        String endpoint = "/aai/v11/cloud-infrastructure/pservers/pserver/"+ id;
+        String endpoint = "/aai/v11/cloud-infrastructure/pservers/pserver/" + id;
         HttpHeaders headers = new HttpHeaders();
 
         headers.add("Real-Time", "true");

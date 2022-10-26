@@ -17,7 +17,21 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.pre;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.annotation.Priority;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Response;
 
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.interceptors.AAIContainerFilter;
@@ -25,18 +39,6 @@ import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.setup.SchemaVersions;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @PreMatching
 @Priority(AAIRequestFilterPriority.VERSION)
@@ -49,12 +51,10 @@ public class VersionInterceptor extends AAIContainerFilter implements ContainerR
     private final SchemaVersions schemaVersions;
 
     @Autowired
-    public VersionInterceptor(SchemaVersions schemaVersions){
+    public VersionInterceptor(SchemaVersions schemaVersions) {
         this.schemaVersions = schemaVersions;
-        allowedVersions  = schemaVersions.getVersions()
-            .stream()
-            .map(SchemaVersion::toString)
-            .collect(Collectors.toSet());
+        allowedVersions =
+                schemaVersions.getVersions().stream().map(SchemaVersion::toString).collect(Collectors.toSet());
 
     }
 
@@ -65,19 +65,19 @@ public class VersionInterceptor extends AAIContainerFilter implements ContainerR
 
         if (uri.startsWith("search") || uri.startsWith("util/echo") || uri.startsWith("tools")) {
             return;
-		}
+        }
 
         Matcher matcher = EXTRACT_VERSION_PATTERN.matcher(uri);
 
         String version = null;
-        if(matcher.matches()){
+        if (matcher.matches()) {
             version = matcher.group(1);
         } else {
             requestContext.abortWith(createInvalidVersionResponse("AAI_3017", requestContext, version));
             return;
         }
 
-        if(!allowedVersions.contains(version)){
+        if (!allowedVersions.contains(version)) {
             requestContext.abortWith(createInvalidVersionResponse("AAI_3016", requestContext, version));
         }
     }
@@ -94,9 +94,6 @@ public class VersionInterceptor extends AAIContainerFilter implements ContainerR
 
         String entity = ErrorLogHelper.getRESTAPIErrorResponse(context.getAcceptableMediaTypes(), e, templateVars);
 
-        return Response
-                .status(e.getErrorObject().getHTTPResponseCode())
-                .entity(entity)
-                .build();
+        return Response.status(e.getErrorObject().getHTTPResponseCode()).entity(entity).build();
     }
 }

@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.pre;
 
 import java.io.IOException;
@@ -45,111 +46,111 @@ import org.onap.logging.ref.slf4j.ONAPLogConstants;
 @Priority(AAIRequestFilterPriority.HEADER_VALIDATION)
 public class HeaderValidation extends AAIContainerFilter implements ContainerRequestFilter {
 
-	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
 
-		Optional<Response> oResp;
-		List<MediaType> acceptHeaderValues = requestContext.getAcceptableMediaTypes();
+        Optional<Response> oResp;
+        List<MediaType> acceptHeaderValues = requestContext.getAcceptableMediaTypes();
 
-		String fromAppId = getPartnerName(requestContext);
-		oResp = this.validateHeaderValuePresence(fromAppId, "AAI_4009", acceptHeaderValues);
-		if (oResp.isPresent()) {
-			requestContext.abortWith(oResp.get());
-			return;
-		}
+        String fromAppId = getPartnerName(requestContext);
+        oResp = this.validateHeaderValuePresence(fromAppId, "AAI_4009", acceptHeaderValues);
+        if (oResp.isPresent()) {
+            requestContext.abortWith(oResp.get());
+            return;
+        }
 
-		String transId = getRequestId(requestContext);
-		oResp = this.validateHeaderValuePresence(transId, "AAI_4010", acceptHeaderValues);
-		if (oResp.isPresent()) {
-			requestContext.abortWith(oResp.get());
-			return;
-		}
-	}
-	
-	private Optional<Response> validateHeaderValuePresence(String value, String errorCode,
-			List<MediaType> acceptHeaderValues) {
-		Response response = null;
-		AAIException aaie;
-		if (value == null || value.isEmpty()) {
-			aaie = new AAIException(errorCode);
-			return Optional.of(Response.status(aaie.getErrorObject().getHTTPResponseCode())
-					.entity(ErrorLogHelper.getRESTAPIErrorResponse(acceptHeaderValues, aaie, new ArrayList<>()))
-					.build());
-		}
+        String transId = getRequestId(requestContext);
+        oResp = this.validateHeaderValuePresence(transId, "AAI_4010", acceptHeaderValues);
+        if (oResp.isPresent()) {
+            requestContext.abortWith(oResp.get());
+            return;
+        }
+    }
 
-		return Optional.ofNullable(response);
-	}
-	public String getRequestId(ContainerRequestContext requestContext) {
-		String requestId = requestContext.getHeaderString(ONAPLogConstants.Headers.REQUEST_ID);
-		if (requestId == null || requestId.isEmpty()) {
-			requestId = requestContext.getHeaderString(Constants.HttpHeaders.HEADER_REQUEST_ID);
-			if (requestId == null || requestId.isEmpty()) {
-				requestId = requestContext.getHeaderString(Constants.HttpHeaders.TRANSACTION_ID);
-				if (requestId == null || requestId.isEmpty()) {
-					requestId = requestContext.getHeaderString(Constants.HttpHeaders.ECOMP_REQUEST_ID);
-					if (requestId == null || requestId.isEmpty()) {
-						return requestId;
-					}
-				}
-			}
-		}
-		if (requestContext.getHeaders().get(ONAPLogConstants.Headers.REQUEST_ID) != null) {
-			requestContext.getHeaders().get(ONAPLogConstants.Headers.REQUEST_ID).clear();
-		}
-		if (requestContext.getHeaders().get(Constants.HttpHeaders.TRANSACTION_ID) != null) {
-			requestContext.getHeaders().get(Constants.HttpHeaders.TRANSACTION_ID).clear();
-		}
-		if (requestContext.getHeaders().get(Constants.HttpHeaders.HEADER_REQUEST_ID) != null) {
-			requestContext.getHeaders().get(Constants.HttpHeaders.HEADER_REQUEST_ID).clear();
-		}
-		if (requestContext.getHeaders().get(Constants.HttpHeaders.ECOMP_REQUEST_ID) != null) {
-			requestContext.getHeaders().get(Constants.HttpHeaders.ECOMP_REQUEST_ID).clear();
-		}
-		requestContext.getHeaders().add(Constants.HttpHeaders.TRANSACTION_ID, requestId);
+    private Optional<Response> validateHeaderValuePresence(String value, String errorCode,
+            List<MediaType> acceptHeaderValues) {
+        Response response = null;
+        AAIException aaie;
+        if (value == null || value.isEmpty()) {
+            aaie = new AAIException(errorCode);
+            return Optional.of(Response.status(aaie.getErrorObject().getHTTPResponseCode())
+                    .entity(ErrorLogHelper.getRESTAPIErrorResponse(acceptHeaderValues, aaie, new ArrayList<>()))
+                    .build());
+        }
 
-		return requestId;
-	}
+        return Optional.ofNullable(response);
+    }
 
-	public String getPartnerName(ContainerRequestContext requestContext) {
+    public String getRequestId(ContainerRequestContext requestContext) {
+        String requestId = requestContext.getHeaderString(ONAPLogConstants.Headers.REQUEST_ID);
+        if (requestId == null || requestId.isEmpty()) {
+            requestId = requestContext.getHeaderString(Constants.HttpHeaders.HEADER_REQUEST_ID);
+            if (requestId == null || requestId.isEmpty()) {
+                requestId = requestContext.getHeaderString(Constants.HttpHeaders.TRANSACTION_ID);
+                if (requestId == null || requestId.isEmpty()) {
+                    requestId = requestContext.getHeaderString(Constants.HttpHeaders.ECOMP_REQUEST_ID);
+                    if (requestId == null || requestId.isEmpty()) {
+                        return requestId;
+                    }
+                }
+            }
+        }
+        if (requestContext.getHeaders().get(ONAPLogConstants.Headers.REQUEST_ID) != null) {
+            requestContext.getHeaders().get(ONAPLogConstants.Headers.REQUEST_ID).clear();
+        }
+        if (requestContext.getHeaders().get(Constants.HttpHeaders.TRANSACTION_ID) != null) {
+            requestContext.getHeaders().get(Constants.HttpHeaders.TRANSACTION_ID).clear();
+        }
+        if (requestContext.getHeaders().get(Constants.HttpHeaders.HEADER_REQUEST_ID) != null) {
+            requestContext.getHeaders().get(Constants.HttpHeaders.HEADER_REQUEST_ID).clear();
+        }
+        if (requestContext.getHeaders().get(Constants.HttpHeaders.ECOMP_REQUEST_ID) != null) {
+            requestContext.getHeaders().get(Constants.HttpHeaders.ECOMP_REQUEST_ID).clear();
+        }
+        requestContext.getHeaders().add(Constants.HttpHeaders.TRANSACTION_ID, requestId);
 
-		// CDM header overrides everything else for source of truth
-		String sourceOfTruth = requestContext.getHeaderString(AAIHeaderProperties.SOURCE_OF_TRUTH);
-		String partnerName = requestContext.getHeaderString(ONAPLogConstants.Headers.PARTNER_NAME);
-		if ( sourceOfTruth == null || sourceOfTruth.isEmpty()) {
+        return requestId;
+    }
 
-			if (partnerName != null && !(partnerName.isEmpty())) {
-				String components[] = partnerName.split("\\.");
-				if (components.length > 1) {
-					if (!(ONAPComponents.AAI.toString().equalsIgnoreCase(components[0]))) {
-						sourceOfTruth = components[0];
-					} else {
-						// request is coming internally from AAI, check X-FromAppId
-						partnerName = null;
-					}
-				}
-			}
-			if (sourceOfTruth == null || sourceOfTruth.isEmpty()) {
-				if (partnerName == null || (partnerName.isEmpty())) {
-					partnerName = requestContext.getHeaderString(AAIHeaderProperties.FROM_APP_ID);
-					if (partnerName == null || (partnerName.isEmpty())) {
-						return partnerName;
-					}
-				}
-			}
-		}
-		if (requestContext.getHeaders().get(ONAPLogConstants.Headers.PARTNER_NAME) != null) {
-			requestContext.getHeaders().get(ONAPLogConstants.Headers.PARTNER_NAME).clear();
-		}
-		if (requestContext.getHeaders().get(AAIHeaderProperties.FROM_APP_ID) != null) {
-			requestContext.getHeaders().get(AAIHeaderProperties.FROM_APP_ID).clear();
-		}
-		if ((sourceOfTruth != null) && !(sourceOfTruth.isEmpty())) {
-			requestContext.getHeaders().add(AAIHeaderProperties.FROM_APP_ID, sourceOfTruth);
-			partnerName = sourceOfTruth;
-		}
-		else {
-			requestContext.getHeaders().add(AAIHeaderProperties.FROM_APP_ID, partnerName);
-		}
-		return partnerName;
-	}
+    public String getPartnerName(ContainerRequestContext requestContext) {
+
+        // CDM header overrides everything else for source of truth
+        String sourceOfTruth = requestContext.getHeaderString(AAIHeaderProperties.SOURCE_OF_TRUTH);
+        String partnerName = requestContext.getHeaderString(ONAPLogConstants.Headers.PARTNER_NAME);
+        if (sourceOfTruth == null || sourceOfTruth.isEmpty()) {
+
+            if (partnerName != null && !(partnerName.isEmpty())) {
+                String components[] = partnerName.split("\\.");
+                if (components.length > 1) {
+                    if (!(ONAPComponents.AAI.toString().equalsIgnoreCase(components[0]))) {
+                        sourceOfTruth = components[0];
+                    } else {
+                        // request is coming internally from AAI, check X-FromAppId
+                        partnerName = null;
+                    }
+                }
+            }
+            if (sourceOfTruth == null || sourceOfTruth.isEmpty()) {
+                if (partnerName == null || (partnerName.isEmpty())) {
+                    partnerName = requestContext.getHeaderString(AAIHeaderProperties.FROM_APP_ID);
+                    if (partnerName == null || (partnerName.isEmpty())) {
+                        return partnerName;
+                    }
+                }
+            }
+        }
+        if (requestContext.getHeaders().get(ONAPLogConstants.Headers.PARTNER_NAME) != null) {
+            requestContext.getHeaders().get(ONAPLogConstants.Headers.PARTNER_NAME).clear();
+        }
+        if (requestContext.getHeaders().get(AAIHeaderProperties.FROM_APP_ID) != null) {
+            requestContext.getHeaders().get(AAIHeaderProperties.FROM_APP_ID).clear();
+        }
+        if ((sourceOfTruth != null) && !(sourceOfTruth.isEmpty())) {
+            requestContext.getHeaders().add(AAIHeaderProperties.FROM_APP_ID, sourceOfTruth);
+            partnerName = sourceOfTruth;
+        } else {
+            requestContext.getHeaders().add(AAIHeaderProperties.FROM_APP_ID, partnerName);
+        }
+        return partnerName;
+    }
 }

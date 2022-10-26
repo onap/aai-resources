@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.pre;
 
 import java.io.IOException;
@@ -39,38 +40,38 @@ import org.onap.aai.interceptors.AAIContainerFilter;
 @Priority(AAIRequestFilterPriority.REQUEST_MODIFICATION)
 public class RequestModification extends AAIContainerFilter implements ContainerRequestFilter {
 
-	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
 
-		this.cleanDME2QueryParams(requestContext);
+        this.cleanDME2QueryParams(requestContext);
 
-	}
-	
-	private void cleanDME2QueryParams(ContainerRequestContext request) {
-		UriBuilder builder = request.getUriInfo().getRequestUriBuilder();
-		MultivaluedMap<String, String> queries = request.getUriInfo().getQueryParameters();
+    }
 
-		String[] blacklist = { "version", "envContext", "routeOffer" };
-		Set<String> blacklistSet = Arrays.stream(blacklist).collect(Collectors.toSet());
+    private void cleanDME2QueryParams(ContainerRequestContext request) {
+        UriBuilder builder = request.getUriInfo().getRequestUriBuilder();
+        MultivaluedMap<String, String> queries = request.getUriInfo().getQueryParameters();
 
-		boolean remove = true;
+        String[] blacklist = {"version", "envContext", "routeOffer"};
+        Set<String> blacklistSet = Arrays.stream(blacklist).collect(Collectors.toSet());
 
-		for (String param : blacklistSet) {
-			if (!queries.containsKey(param)) {
-				remove = false;
-				break;
-			}
-		}
+        boolean remove = true;
 
-		if (remove) {
-			for (Map.Entry<String, List<String>> query : queries.entrySet()) {
-				String key = query.getKey();
-				if (blacklistSet.contains(key)) {
-					builder.replaceQueryParam(key);
-				}
-			}
-		}
-		request.setRequestUri(builder.build());
-	}
+        for (String param : blacklistSet) {
+            if (!queries.containsKey(param)) {
+                remove = false;
+                break;
+            }
+        }
+
+        if (remove) {
+            for (Map.Entry<String, List<String>> query : queries.entrySet()) {
+                String key = query.getKey();
+                if (blacklistSet.contains(key)) {
+                    builder.replaceQueryParam(key);
+                }
+            }
+        }
+        request.setRequestUri(builder.build());
+    }
 
 }

@@ -17,18 +17,19 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
-
-import org.junit.Test;
-import org.onap.aai.PayloadUtil;
-import org.springframework.http.*;
-
-import java.util.Base64;
-import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
+import java.util.Base64;
+import java.util.Collections;
+
+import org.junit.Test;
+import org.onap.aai.PayloadUtil;
+import org.springframework.http.*;
 
 public class CustomerFilterSearchTest extends AbstractSpringRestTest {
 
@@ -36,7 +37,7 @@ public class CustomerFilterSearchTest extends AbstractSpringRestTest {
     public void testWhenContentTypeMissingItWillFunctionalAndCreateObjectWithPayloadInJson() throws Exception {
 
         String id = "customer-987654321-91";
-        String endpoint = "/aai/v11/business/customers/customer/"+ id;
+        String endpoint = "/aai/v11/business/customers/customer/" + id;
         HttpHeaders headers = new HttpHeaders();
 
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

@@ -17,32 +17,34 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import io.micrometer.core.annotation.Timed;
 
 import javax.ws.rs.Path;
 
-import io.micrometer.core.annotation.Timed;
 import org.onap.aai.restcore.HttpMethod;
 
 @Path("{version: v[1-9][0-9]*|latest}/bulkadd")
 @Timed
 public class BulkAddConsumer extends BulkConsumer {
 
-	@Override
-	protected boolean functionAllowed(HttpMethod method) {
-		
-		return method.equals(HttpMethod.PUT);
+    @Override
+    protected boolean functionAllowed(HttpMethod method) {
 
-	}
+        return method.equals(HttpMethod.PUT);
 
-	@Override
-	protected String getModule(){
-		return "bulk add";
-	}
-	
-	@Override
-	protected boolean enableResourceVersion() {
-		return true;
-	}
+    }
+
+    @Override
+    protected String getModule() {
+        return "bulk add";
+    }
+
+    @Override
+    protected boolean enableResourceVersion() {
+        return true;
+    }
 
 }

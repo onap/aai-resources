@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.it.multitenancy;
 
 import org.springframework.beans.factory.annotation.Value;

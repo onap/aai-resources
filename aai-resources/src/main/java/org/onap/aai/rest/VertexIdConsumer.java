@@ -17,9 +17,20 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
 import io.micrometer.core.annotation.Timed;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
@@ -37,14 +48,6 @@ import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersion;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * The Class VertexIdConsumer.
  */
@@ -52,76 +55,80 @@ import java.util.List;
 @Timed
 public class VertexIdConsumer extends RESTAPI {
 
-	private ModelType introspectorFactoryType = ModelType.MOXY;
+    private ModelType introspectorFactoryType = ModelType.MOXY;
 
-	private final String ID_ENDPOINT = "/id/{vertexid: \\d+}";
-	
-	private HttpEntry resourceHttpEntry;
-	
-	/**
-	 * Gets the by vertex id.
-	 *
-	 * @param content the content
-	 * @param versionParam the version param
-	 * @param vertexid the vertexid
-	 * @param depthParam the depth param
-	 * @param headers the headers
-	 * @param info the info
-	 * @param req the req
-	 * @return the by vertex id
-	 */
-	@GET
-	@Path(ID_ENDPOINT)
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Response getByVertexId(String content, @PathParam("version")String versionParam, @PathParam("vertexid")long vertexid, @DefaultValue("all") @QueryParam("depth") String depthParam, @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
-				
-		String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
-		String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
-		String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-		SchemaVersion version = new SchemaVersion(versionParam);
-		Response response = null;
-		TransactionalGraphEngine dbEngine = null;
-		try {
-			resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
-			resourceHttpEntry.setHttpEntryProperties(version);
-		    dbEngine = resourceHttpEntry.getDbEngine();
-			Loader loader = resourceHttpEntry.getLoader();
+    private final String ID_ENDPOINT = "/id/{vertexid: \\d+}";
 
+    private HttpEntry resourceHttpEntry;
 
-			//get type of the object represented by the given id
-			Vertex thisVertex = null;
-			Iterator<Vertex> itr = dbEngine.asAdmin().getTraversalSource().V(vertexid);
-			
-			if (!itr.hasNext()) {
-				throw new AAIException("AAI_6114", "no node at that vertex id");
-			}
-			thisVertex = itr.next();
-			String objName = thisVertex.<String>property(AAIProperties.NODE_TYPE).orElse(null);
-			
-			QueryParser query = dbEngine.getQueryBuilder(thisVertex).createQueryFromObjectName(objName);
-			
-			Introspector obj = loader.introspectorFromName(query.getResultType());
-			
-			URI uriObject = UriBuilder.fromPath(info.getPath()).build();
+    /**
+     * Gets the by vertex id.
+     *
+     * @param content the content
+     * @param versionParam the version param
+     * @param vertexid the vertexid
+     * @param depthParam the depth param
+     * @param headers the headers
+     * @param info the info
+     * @param req the req
+     * @return the by vertex id
+     */
+    @GET
+    @Path(ID_ENDPOINT)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response getByVertexId(String content, @PathParam("version") String versionParam,
+            @PathParam("vertexid") long vertexid, @DefaultValue("all") @QueryParam("depth") String depthParam,
+            @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
 
-			DBRequest request = 
-					new DBRequest.Builder(HttpMethod.GET, uriObject, query, obj, headers, info, transId)
-					.customMarshaller(new MarshallerProperties.Builder(org.onap.aai.restcore.MediaType.getEnum(outputMediaType)).includeRoot(true).build()).build();
-			
-			List<DBRequest> requests = new ArrayList<>();
-			requests.add(request);
-			Pair<Boolean, List<Pair<URI, Response>>> responsesTuple  = resourceHttpEntry.process(requests, sourceOfTruth);
-			response = responsesTuple.getValue1().get(0).getValue1();
-		} catch (AAIException e){
-			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, e);
-		} catch (Exception e) {
-			AAIException ex = new AAIException("AAI_4000", e);
-			response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, ex);
-		} finally { //to close the janusgraph transaction (I think)
-			if (dbEngine != null) {
-				dbEngine.rollback();
-			}
-		}
-		return response;
-	}
+        String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
+        String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
+        String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
+        SchemaVersion version = new SchemaVersion(versionParam);
+        Response response = null;
+        TransactionalGraphEngine dbEngine = null;
+        try {
+            resourceHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
+            resourceHttpEntry.setHttpEntryProperties(version);
+            dbEngine = resourceHttpEntry.getDbEngine();
+            Loader loader = resourceHttpEntry.getLoader();
+
+            // get type of the object represented by the given id
+            Vertex thisVertex = null;
+            Iterator<Vertex> itr = dbEngine.asAdmin().getTraversalSource().V(vertexid);
+
+            if (!itr.hasNext()) {
+                throw new AAIException("AAI_6114", "no node at that vertex id");
+            }
+            thisVertex = itr.next();
+            String objName = thisVertex.<String>property(AAIProperties.NODE_TYPE).orElse(null);
+
+            QueryParser query = dbEngine.getQueryBuilder(thisVertex).createQueryFromObjectName(objName);
+
+            Introspector obj = loader.introspectorFromName(query.getResultType());
+
+            URI uriObject = UriBuilder.fromPath(info.getPath()).build();
+
+            DBRequest request =
+                    new DBRequest.Builder(HttpMethod.GET, uriObject, query, obj, headers, info, transId)
+                            .customMarshaller(new MarshallerProperties.Builder(
+                                    org.onap.aai.restcore.MediaType.getEnum(outputMediaType)).includeRoot(true).build())
+                            .build();
+
+            List<DBRequest> requests = new ArrayList<>();
+            requests.add(request);
+            Pair<Boolean, List<Pair<URI, Response>>> responsesTuple =
+                    resourceHttpEntry.process(requests, sourceOfTruth);
+            response = responsesTuple.getValue1().get(0).getValue1();
+        } catch (AAIException e) {
+            response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, e);
+        } catch (Exception e) {
+            AAIException ex = new AAIException("AAI_4000", e);
+            response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, ex);
+        } finally { // to close the janusgraph transaction (I think)
+            if (dbEngine != null) {
+                dbEngine.rollback();
+            }
+        }
+        return response;
+    }
 }

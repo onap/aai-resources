@@ -17,13 +17,22 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -35,13 +44,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
-
-import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore;
 
 @TestConfiguration
 public class ResourcesTestConfiguration {
@@ -58,9 +60,8 @@ public class ResourcesTestConfiguration {
     @Bean
     RestTemplate restTemplate(RestTemplateBuilder builder) throws Exception {
 
-
         RestTemplate restTemplate = null;
-        if(env.acceptsProfiles("one-way-ssl", "two-way-ssl")) {
+        if (env.acceptsProfiles("one-way-ssl", "two-way-ssl")) {
             char[] trustStorePassword = env.getProperty("server.ssl.trust-store-password").toCharArray();
             char[] keyStorePassword = env.getProperty("server.ssl.key-store-password").toCharArray();
 
@@ -69,22 +70,18 @@ public class ResourcesTestConfiguration {
             SSLContextBuilder sslContextBuilder = SSLContextBuilder.create();
 
             if (env.acceptsProfiles("two-way-ssl")) {
-                sslContextBuilder = sslContextBuilder.loadKeyMaterial(loadPfx(keyStore, keyStorePassword), keyStorePassword);
+                sslContextBuilder =
+                        sslContextBuilder.loadKeyMaterial(loadPfx(keyStore, keyStorePassword), keyStorePassword);
             }
 
-            SSLContext sslContext = sslContextBuilder
-                    .loadTrustMaterial(ResourceUtils.getFile(trustStore), trustStorePassword)
-                    .build();
+            SSLContext sslContext =
+                    sslContextBuilder.loadTrustMaterial(ResourceUtils.getFile(trustStore), trustStorePassword).build();
 
-            HttpClient client = HttpClients.custom()
-                    .setSSLContext(sslContext)
-                    .setSSLHostnameVerifier((s, sslSession) -> true)
-                    .build();
+            HttpClient client = HttpClients.custom().setSSLContext(sslContext)
+                    .setSSLHostnameVerifier((s, sslSession) -> true).build();
 
-            restTemplate = builder
-                    .requestFactory(() -> new HttpComponentsClientHttpRequestFactory(client))
-                    .build();
-        }else {
+            restTemplate = builder.requestFactory(() -> new HttpComponentsClientHttpRequestFactory(client)).build();
+        } else {
             restTemplate = builder.build();
         }
         restTemplate.setErrorHandler(new ResponseErrorHandler() {
@@ -99,7 +96,7 @@ public class ResourcesTestConfiguration {
                         return true;
                     }
 
-                    if(clientHttpResponse.getRawStatusCode() % 100 == 5){
+                    if (clientHttpResponse.getRawStatusCode() % 100 == 5) {
                         logger.debug("Call returned a error " + clientHttpResponse.getStatusText());
                         return true;
                     }

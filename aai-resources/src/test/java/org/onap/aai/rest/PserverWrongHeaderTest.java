@@ -17,20 +17,22 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
-
-import org.junit.Test;
-import org.springframework.http.*;
-
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-public class PserverWrongHeaderTest extends AbstractSpringRestTest{
+
+import java.util.UUID;
+
+import org.junit.Test;
+import org.springframework.http.*;
+
+public class PserverWrongHeaderTest extends AbstractSpringRestTest {
 
     @Test
-    public void testWhenNoHeadersItFailsWithBadRequestAndReturnsXml(){
+    public void testWhenNoHeadersItFailsWithBadRequestAndReturnsXml() {
 
         HttpHeaders httpHeaders = new HttpHeaders();
 

@@ -17,7 +17,14 @@
  * limitations under the License.
  * ============LICENSE_END====================================================
  */
+
 package org.onap.aai.rest;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 
 import org.junit.Test;
 import org.onap.aai.PayloadUtil;
@@ -25,12 +32,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.io.IOException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
 
 public class CloudRegionTest extends AbstractSpringRestTest {
 
@@ -49,7 +50,8 @@ public class CloudRegionTest extends AbstractSpringRestTest {
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
-        responseEntity = restTemplate.exchange(baseUrl + endpoint + "/tenants", HttpMethod.GET, httpEntity, String.class);
+        responseEntity =
+                restTemplate.exchange(baseUrl + endpoint + "/tenants", HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertThat(responseEntity.getBody().toString(), containsString("tenant-id"));
     }

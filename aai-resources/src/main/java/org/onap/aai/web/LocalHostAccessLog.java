@@ -17,9 +17,13 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.web;
 
 import ch.qos.logback.access.jetty.RequestLogImpl;
+
+import java.util.Arrays;
+
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -30,19 +34,16 @@ import org.springframework.boot.web.servlet.server.AbstractServletWebServerFacto
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Arrays;
-
 @Configuration
 public class LocalHostAccessLog {
 
-	@Bean
-	public AbstractServletWebServerFactory jettyConfigBean(
+    @Bean
+    public AbstractServletWebServerFactory jettyConfigBean(
             @Value("${jetty.threadPool.maxThreads:200}") final String maxThreads,
-            @Value("${jetty.threadPool.minThreads:8}") final String minThreads
-    ){
+            @Value("${jetty.threadPool.minThreads:8}") final String minThreads) {
 
-    JettyServletWebServerFactory jef = new JettyServletWebServerFactory();
-		jef.addServerCustomizers((JettyServerCustomizer) server -> {
+        JettyServletWebServerFactory jef = new JettyServletWebServerFactory();
+        jef.addServerCustomizers((JettyServerCustomizer) server -> {
 
             HandlerCollection handlers = new HandlerCollection();
 
@@ -63,6 +64,6 @@ public class LocalHostAccessLog {
             threadPool.setMaxThreads(Integer.valueOf(maxThreads));
             threadPool.setMinThreads(Integer.valueOf(minThreads));
         });
-		return jef;
-	}
+        return jef;
+    }
 }

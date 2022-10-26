@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
 import static org.mockito.ArgumentMatchers.anyObject;
@@ -69,33 +70,33 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
     protected List<String> aaiRequestContextList;
 
     protected List<MediaType> outputMediaTypes;
-    
+
     protected String uri;
 
     private boolean initialized = false;
     private static final Logger logger = LoggerFactory.getLogger(BulkProcessorTestAbstraction.class.getName());
 
     @BeforeClass
-    public static void setupRest(){
-       // AAIGraph.getInstance();
-        
+    public static void setupRest() {
+        // AAIGraph.getInstance();
+
     }
 
     @Before
-    public void setup(){
-    	if(!initialized){
-    		initialized = true;
-    		AAIGraph.getInstance();
-    	}
+    public void setup() {
+        if (!initialized) {
+            initialized = true;
+            AAIGraph.getInstance();
+        }
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
-        bulkConsumer     = getConsumer();
+        bulkConsumer = getConsumer();
         uri = getUri();
-        httpHeaders         = Mockito.mock(HttpHeaders.class);
-        uriInfo             = Mockito.mock(UriInfo.class);
+        httpHeaders = Mockito.mock(HttpHeaders.class);
+        uriInfo = Mockito.mock(UriInfo.class);
 
-        headersMultiMap     = new MultivaluedHashMap<>();
-        queryParameters     = Mockito.spy(new MultivaluedHashMap<>());
+        headersMultiMap = new MultivaluedHashMap<>();
+        queryParameters = Mockito.spy(new MultivaluedHashMap<>());
 
         headersMultiMap.add("X-FromAppId", "JUNIT");
         headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
@@ -114,7 +115,6 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
 
         when(httpHeaders.getRequestHeader("aai-request-context")).thenReturn(aaiRequestContextList);
 
-
         when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
         when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
 
@@ -123,24 +123,19 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
 
         when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
     }
-    
+
     protected Response executeRequest(String payload) {
-    	MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", "http://www.test.com");
-    	
-		return bulkConsumer.bulkProcessor(
-				payload.replaceAll("<UUID>", UUID.randomUUID().toString()),
-                schemaVersions.getDefaultVersion().toString(),
-                httpHeaders,
-                uriInfo,
-                mockReq
-        );
-	}
+        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", "http://www.test.com");
+
+        return bulkConsumer.bulkProcessor(payload.replaceAll("<UUID>", UUID.randomUUID().toString()),
+                schemaVersions.getDefaultVersion().toString(), httpHeaders, uriInfo, mockReq);
+    }
 
     protected String getBulkPayload(String bulkPayloadName) throws IOException {
         return getPayload("payloads/bulk/" + bulkPayloadName + ".json");
     }
-    
+
     protected abstract BulkConsumer getConsumer();
-  
+
     protected abstract String getUri();
 }

@@ -17,18 +17,19 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.it.multitenancy;
+
+import java.util.Collections;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 
-import java.util.Collections;
-
 class RoleHandler {
 
-     /**
-        Following roles should be the same as given roles in multi-tenancy-realm json file
-      */
+    /**
+     * Following roles should be the same as given roles in multi-tenancy-realm json file
+     */
     final static String OPERATOR = "operator";
     final static String OPERATOR_READ_ONLY = "operator_readOnly";
     private final Keycloak adminClient;
@@ -41,17 +42,13 @@ class RoleHandler {
 
     void addToUser(String role, String username) {
         RealmResource realm = adminClient.realm(properties.realm);
-        realm.users().get(username)
-                .roles()
-                .realmLevel()
+        realm.users().get(username).roles().realmLevel()
                 .add(Collections.singletonList(realm.roles().get(role).toRepresentation()));
     }
 
     void removeFromUser(String role, String username) {
         RealmResource realm = adminClient.realm(properties.realm);
-        realm.users().get(username)
-                .roles()
-                .realmLevel()
+        realm.users().get(username).roles().realmLevel()
                 .remove(Collections.singletonList(realm.roles().get(role).toRepresentation()));
     }
 }

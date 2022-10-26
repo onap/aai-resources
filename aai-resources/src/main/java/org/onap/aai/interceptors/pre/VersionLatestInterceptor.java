@@ -17,17 +17,19 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.pre;
 
-import org.onap.aai.interceptors.AAIContainerFilter;
-import org.onap.aai.setup.SchemaVersions;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.net.URI;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import java.net.URI;
+
+import org.onap.aai.interceptors.AAIContainerFilter;
+import org.onap.aai.setup.SchemaVersions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @PreMatching
 @Priority(AAIRequestFilterPriority.LATEST)
@@ -36,7 +38,7 @@ public class VersionLatestInterceptor extends AAIContainerFilter implements Cont
     private final SchemaVersions schemaVersions;
 
     @Autowired
-    public VersionLatestInterceptor(SchemaVersions schemaVersions){
+    public VersionLatestInterceptor(SchemaVersions schemaVersions) {
         this.schemaVersions = schemaVersions;
     }
 
@@ -45,8 +47,8 @@ public class VersionLatestInterceptor extends AAIContainerFilter implements Cont
 
         String uri = requestContext.getUriInfo().getPath();
 
-		if(uri.startsWith("latest")){
-		    String absolutePath = requestContext.getUriInfo().getAbsolutePath().toString();
+        if (uri.startsWith("latest")) {
+            String absolutePath = requestContext.getUriInfo().getAbsolutePath().toString();
             String latest = absolutePath.replaceFirst("latest", schemaVersions.getDefaultVersion().toString());
             requestContext.setRequestUri(URI.create(latest));
             return;

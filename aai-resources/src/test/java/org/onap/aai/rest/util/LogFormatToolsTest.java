@@ -17,16 +17,17 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest.util;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
 
 public class LogFormatToolsTest {
 
     @Test
-    public void testLogFormatTools(){
+    public void testLogFormatTools() {
 
         String dateTime = new LogFormatTools().getCurrentDateTime();
         assertNotNull(dateTime);

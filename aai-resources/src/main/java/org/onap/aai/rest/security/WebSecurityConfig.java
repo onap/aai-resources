@@ -21,6 +21,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest.security;
 
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
@@ -48,10 +49,8 @@ public class WebSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) {
-        KeycloakAuthenticationProvider keycloakAuthenticationProvider
-            = keycloakAuthenticationProvider();
-        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(
-            new SimpleAuthorityMapper());
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
+        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);
     }
 
@@ -63,22 +62,18 @@ public class WebSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new RegisterSessionAuthenticationStrategy(
-            new SessionRegistryImpl());
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.authorizeRequests()
-            .antMatchers("/**")
-            .permitAll().and().csrf().disable();
+        http.authorizeRequests().antMatchers("/**").permitAll().and().csrf().disable();
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().regexMatchers("^.*/util/echo$");
     }
-
 
 }

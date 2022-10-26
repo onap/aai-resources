@@ -17,7 +17,12 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
+import java.util.Collections;
 
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -26,14 +31,14 @@ import org.janusgraph.core.JanusGraphTransaction;
 import org.junit.*;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
-import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.nodes.NodeIngestor;
+import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.util.AAIConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -43,10 +48,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Base64;
-import java.util.Collections;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = ResourcesApp.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -65,14 +66,14 @@ public abstract class AbstractSpringRestTest {
 
     @Autowired
     protected NodeIngestor nodeIngestor;
-    
+
     @LocalServerPort
     protected int randomPort;
 
     protected HttpEntity httpEntity;
 
     protected String baseUrl;
-    protected HttpHeaders headers ;
+    protected HttpHeaders headers;
 
     @BeforeClass
     public static void setupConfig() throws AAIException {
@@ -102,7 +103,7 @@ public abstract class AbstractSpringRestTest {
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
 
         JanusGraph janusGraph = AAIGraph.getInstance().getGraph();
         JanusGraphTransaction transaction = janusGraph.newTransaction();
@@ -111,14 +112,12 @@ public abstract class AbstractSpringRestTest {
 
         try {
             GraphTraversalSource g = transaction.traversal();
-            g.V().has("source-of-truth", P.within("JUNIT", "AAI-EXTENSIONS"))
-                    .toList()
-                    .stream()
+            g.V().has("source-of-truth", P.within("JUNIT", "AAI-EXTENSIONS")).toList().stream()
                     .forEach(v -> v.remove());
-        } catch(Exception ex){
+        } catch (Exception ex) {
             success = false;
         } finally {
-            if(success){
+            if (success) {
                 transaction.commit();
             } else {
                 transaction.rollback();

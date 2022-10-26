@@ -17,25 +17,27 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors;
 
 public final class AAIHeaderProperties {
-	
-	private AAIHeaderProperties(){}
-	
-	public static final String REQUEST_CONTEXT = "aai-request-context";
-	
-	public static final String HTTP_METHOD_OVERRIDE = "X-HTTP-Method-Override";
-	
-	public static final String TRANSACTION_ID = "X-TransactionId";
-	
-	public static final String FROM_APP_ID = "X-FromAppId";
 
-	public static final String SOURCE_OF_TRUTH = "X-SourceOfTruth";
+    private AAIHeaderProperties() {
+    }
 
-	public static final String AAI_TX_ID = "X-AAI-TXID";
-	
-	public static final String AAI_REQUEST = "X-REQUEST";
-	
-	public static final String AAI_REQUEST_TS = "X-REQUEST-TS";
+    public static final String REQUEST_CONTEXT = "aai-request-context";
+
+    public static final String HTTP_METHOD_OVERRIDE = "X-HTTP-Method-Override";
+
+    public static final String TRANSACTION_ID = "X-TransactionId";
+
+    public static final String FROM_APP_ID = "X-FromAppId";
+
+    public static final String SOURCE_OF_TRUTH = "X-SourceOfTruth";
+
+    public static final String AAI_TX_ID = "X-AAI-TXID";
+
+    public static final String AAI_REQUEST = "X-REQUEST";
+
+    public static final String AAI_REQUEST_TS = "X-REQUEST-TS";
 }

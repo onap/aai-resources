@@ -17,23 +17,24 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest.exceptions;
 
 import org.onap.aai.exceptions.AAIException;
 
 public class AAIInvalidXMLNamespace extends AAIException {
-	
-	private static final long serialVersionUID = 7487333042291858169L;
 
-	public AAIInvalidXMLNamespace(String message) {
-		super("AAI_3011", message);
-	}
+    private static final long serialVersionUID = 7487333042291858169L;
 
-	public AAIInvalidXMLNamespace(Throwable cause) {
-		super("AAI_3011",cause);
-	}
+    public AAIInvalidXMLNamespace(String message) {
+        super("AAI_3011", message);
+    }
 
-	public AAIInvalidXMLNamespace(String message, Throwable cause) {
-		super("AAI_3011", cause, message);
-	}
+    public AAIInvalidXMLNamespace(Throwable cause) {
+        super("AAI_3011", cause);
+    }
+
+    public AAIInvalidXMLNamespace(String message, Throwable cause) {
+        super("AAI_3011", cause, message);
+    }
 }

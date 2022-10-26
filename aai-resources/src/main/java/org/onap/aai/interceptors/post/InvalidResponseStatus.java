@@ -17,49 +17,51 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.post;
 
-import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.interceptors.AAIContainerFilter;
-import org.onap.aai.logging.ErrorLogHelper;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.interceptors.AAIContainerFilter;
+import org.onap.aai.logging.ErrorLogHelper;
 
 @Priority(AAIResponseFilterPriority.INVALID_RESPONSE_STATUS)
 public class InvalidResponseStatus extends AAIContainerFilter implements ContainerResponseFilter {
 
-	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+            throws IOException {
 
-		if(responseContext.getStatus() == 405){
+        if (responseContext.getStatus() == 405) {
 
-		    responseContext.setStatus(400);
-			AAIException e = new AAIException("AAI_3012");
-			ArrayList<String> templateVars = new ArrayList<>();
+            responseContext.setStatus(400);
+            AAIException e = new AAIException("AAI_3012");
+            ArrayList<String> templateVars = new ArrayList<>();
 
-			List<MediaType> mediaTypeList = new ArrayList<>();
+            List<MediaType> mediaTypeList = new ArrayList<>();
 
-			String contentType = responseContext.getHeaderString("Content-Type");
+            String contentType = responseContext.getHeaderString("Content-Type");
 
-			if (contentType == null) {
-				mediaTypeList.add(MediaType.APPLICATION_XML_TYPE);
-			} else {
-				mediaTypeList.add(MediaType.valueOf(contentType));
-			}
+            if (contentType == null) {
+                mediaTypeList.add(MediaType.APPLICATION_XML_TYPE);
+            } else {
+                mediaTypeList.add(MediaType.valueOf(contentType));
+            }
 
-			String message = ErrorLogHelper.getRESTAPIErrorResponse(mediaTypeList, e, templateVars);
+            String message = ErrorLogHelper.getRESTAPIErrorResponse(mediaTypeList, e, templateVars);
 
-			responseContext.setEntity(message);
-		}
+            responseContext.setEntity(message);
+        }
 
-	}
+    }
 
 }

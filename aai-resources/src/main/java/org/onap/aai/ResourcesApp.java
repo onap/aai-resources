@@ -22,6 +22,7 @@ package org.onap.aai;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.onap.aai.aailog.logs.AaiDebugLog;
 import org.onap.aai.config.SpringContextAware;
@@ -43,159 +44,140 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
 @SpringBootApplication(
-	exclude = {
-		DataSourceAutoConfiguration.class,
-		DataSourceTransactionManagerAutoConfiguration.class,
-		HibernateJpaAutoConfiguration.class
-	}
-)
+        exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
+                HibernateJpaAutoConfiguration.class})
 // Component Scan provides a way to look for spring beans
 // It only searches beans in the following packages
 // Any method annotated with @Bean annotation or any class
 // with @Component, @Configuration, @Service will be picked up
-@ComponentScan(basePackages = {
-     "org.onap.aai.config",
-     "org.onap.aai.web",
-     "org.onap.aai.setup",
-     "org.onap.aai.tasks",
-     "org.onap.aai.service",
-     "org.onap.aai.rest",
-     "org.onap.aai.aaf",
-     "org.onap.aai.TenantIsolation",
-     "org.onap.aai.aailog",
-     "org.onap.aai.prevalidation"
-})
+@ComponentScan(
+        basePackages = {"org.onap.aai.config", "org.onap.aai.web", "org.onap.aai.setup", "org.onap.aai.tasks",
+                "org.onap.aai.service", "org.onap.aai.rest", "org.onap.aai.aaf", "org.onap.aai.TenantIsolation",
+                "org.onap.aai.aailog", "org.onap.aai.prevalidation"})
 public class ResourcesApp {
 
-	private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
 
-	private static final String APP_NAME = "aai-resources";
-	private static AaiDebugLog debugLog = new AaiDebugLog();
-	static {
-		debugLog.setupMDC();
-	}
+    private static final String APP_NAME = "aai-resources";
+    private static AaiDebugLog debugLog = new AaiDebugLog();
+    static {
+        debugLog.setupMDC();
+    }
 
-	@Autowired
-	private Environment env;
+    @Autowired
+    private Environment env;
 
-	@Autowired
-	private NodeIngestor nodeIngestor;
-	
-	@Autowired
-	private SpringContextAware context;
-	
-	@Autowired
-	private SpringContextAware loaderFactory;
+    @Autowired
+    private NodeIngestor nodeIngestor;
 
+    @Autowired
+    private SpringContextAware context;
 
-	@PostConstruct
-	private void init() throws AAIException {
-		System.setProperty("org.onap.aai.serverStarted", "false");
-		setDefaultProps();
-		logger.info("AAI Server initialization started...");
+    @Autowired
+    private SpringContextAware loaderFactory;
 
-		// Setting this property to allow for encoded slash (/) in the path parameter
-		// This is only needed for tomcat keeping this as temporary
-		System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
+    @PostConstruct
+    private void init() throws AAIException {
+        System.setProperty("org.onap.aai.serverStarted", "false");
+        setDefaultProps();
+        logger.info("AAI Server initialization started...");
 
-	    logger.info("Starting AAIGraph connections and the NodeInjestor");
+        // Setting this property to allow for encoded slash (/) in the path parameter
+        // This is only needed for tomcat keeping this as temporary
+        System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
 
-	    if(env.acceptsProfiles(Profiles.TWO_WAY_SSL) && env.acceptsProfiles(Profiles.ONE_WAY_SSL)){
-	        logger.warn("You have seriously misconfigured your application");
-	    }
+        logger.info("Starting AAIGraph connections and the NodeInjestor");
 
-	}
+        if (env.acceptsProfiles(Profiles.TWO_WAY_SSL) && env.acceptsProfiles(Profiles.ONE_WAY_SSL)) {
+            logger.warn("You have seriously misconfigured your application");
+        }
 
-	@PreDestroy
-	public void cleanup(){
-		logger.info("Shutting down both realtime and cached connections");
-		AAIGraph.getInstance().graphShutdown();
-	}
+    }
 
-	public static void main(String[] args) throws AAIException {
+    @PreDestroy
+    public void cleanup() {
+        logger.info("Shutting down both realtime and cached connections");
+        AAIGraph.getInstance().graphShutdown();
+    }
 
-	    setDefaultProps();
-	    
-		Environment env =null;
-		AAIConfig.init();
-		try {
-			SpringApplication app = new SpringApplication(ResourcesApp.class);
-			app.setLogStartupInfo(false);
-			app.setRegisterShutdownHook(true);
-			app.addInitializers(new PropertyPasswordConfiguration());
-			env = app.run(args).getEnvironment();
-		}
-		catch(Exception ex){
-		    AAIException aai = null;
-			if(ex.getCause() instanceof AAIException){
-				aai = (AAIException)ex.getCause();
-			} else {
-				aai = schemaServiceExceptionTranslator(ex);
-			}
-			logger.error("Problems starting the ResourcesApp due to {}", aai.getMessage());
-			ErrorLogHelper.logException(aai);
-			throw aai;
-		}
+    public static void main(String[] args) throws AAIException {
 
-		logger.info(
-			"Application '{}' is running on {}!" ,
-			env.getProperty("spring.application.name"),
-			env.getProperty("server.port")
-		);
+        setDefaultProps();
 
-		// The main reason this was moved from the constructor is due
-		// to the SchemaGenerator needs the bean and during the constructor
-		// the Spring Context is not yet initialized
+        Environment env = null;
+        AAIConfig.init();
+        try {
+            SpringApplication app = new SpringApplication(ResourcesApp.class);
+            app.setLogStartupInfo(false);
+            app.setRegisterShutdownHook(true);
+            app.addInitializers(new PropertyPasswordConfiguration());
+            env = app.run(args).getEnvironment();
+        } catch (Exception ex) {
+            AAIException aai = null;
+            if (ex.getCause() instanceof AAIException) {
+                aai = (AAIException) ex.getCause();
+            } else {
+                aai = schemaServiceExceptionTranslator(ex);
+            }
+            logger.error("Problems starting the ResourcesApp due to {}", aai.getMessage());
+            ErrorLogHelper.logException(aai);
+            throw aai;
+        }
 
-		AAIConfig.init();
-		AAIGraph.getInstance();
+        logger.info("Application '{}' is running on {}!", env.getProperty("spring.application.name"),
+                env.getProperty("server.port"));
 
-		logger.info("Resources MicroService Started");
-		logger.debug("Resources MicroService Started");
+        // The main reason this was moved from the constructor is due
+        // to the SchemaGenerator needs the bean and during the constructor
+        // the Spring Context is not yet initialized
 
-		System.out.println("Resources Microservice Started");
-		
-	}
+        AAIConfig.init();
+        AAIGraph.getInstance();
 
-	public static void setDefaultProps(){
+        logger.info("Resources MicroService Started");
+        logger.debug("Resources MicroService Started");
 
-		if (System.getProperty("file.separator") == null) {
-			System.setProperty("file.separator", "/");
-		}
+        System.out.println("Resources Microservice Started");
 
-		String currentDirectory = System.getProperty("user.dir");
-		System.setProperty("aai.service.name", ResourcesApp.class.getSimpleName());
+    }
 
-		if (System.getProperty("AJSC_HOME") == null) {
-			System.setProperty("AJSC_HOME", ".");
-		}
+    public static void setDefaultProps() {
 
-		if(currentDirectory.contains(APP_NAME)){
-			if (System.getProperty("BUNDLECONFIG_DIR") == null) {
-				System.setProperty("BUNDLECONFIG_DIR", "src/main/resources");
-			}
-		} else {
-			if (System.getProperty("BUNDLECONFIG_DIR") == null) {
-				System.setProperty("BUNDLECONFIG_DIR", "aai-resources/src/main/resources");
-			}
-		}
-	}
-	public static AAIException schemaServiceExceptionTranslator(Exception ex) {
-		AAIException aai = null;
-		String message = ExceptionUtils.getRootCause(ex).getMessage();
-		if(message.contains("NodeIngestor")){
-			aai = new  AAIException("AAI_3026","Error reading OXM from SchemaService - Investigate");
-		}
-		else if(message.contains("EdgeIngestor")){
-			aai = new  AAIException("AAI_3027","Error reading EdgeRules from SchemaService - Investigate");
-		}
-		else if(message.contains("Connection refused")){
-			aai = new  AAIException("AAI_3025","Error connecting to SchemaService - Investigate");
-		}
-		else {
-			aai = new  AAIException("AAI_3025","Unable to determine what the error is, please check external.log");
-		}
+        if (System.getProperty("file.separator") == null) {
+            System.setProperty("file.separator", "/");
+        }
 
-		return aai;
-	}
+        String currentDirectory = System.getProperty("user.dir");
+        System.setProperty("aai.service.name", ResourcesApp.class.getSimpleName());
+
+        if (System.getProperty("AJSC_HOME") == null) {
+            System.setProperty("AJSC_HOME", ".");
+        }
+
+        if (currentDirectory.contains(APP_NAME)) {
+            if (System.getProperty("BUNDLECONFIG_DIR") == null) {
+                System.setProperty("BUNDLECONFIG_DIR", "src/main/resources");
+            }
+        } else {
+            if (System.getProperty("BUNDLECONFIG_DIR") == null) {
+                System.setProperty("BUNDLECONFIG_DIR", "aai-resources/src/main/resources");
+            }
+        }
+    }
+
+    public static AAIException schemaServiceExceptionTranslator(Exception ex) {
+        AAIException aai = null;
+        String message = ExceptionUtils.getRootCause(ex).getMessage();
+        if (message.contains("NodeIngestor")) {
+            aai = new AAIException("AAI_3026", "Error reading OXM from SchemaService - Investigate");
+        } else if (message.contains("EdgeIngestor")) {
+            aai = new AAIException("AAI_3027", "Error reading EdgeRules from SchemaService - Investigate");
+        } else if (message.contains("Connection refused")) {
+            aai = new AAIException("AAI_3025", "Error connecting to SchemaService - Investigate");
+        } else {
+            aai = new AAIException("AAI_3025", "Unable to determine what the error is, please check external.log");
+        }
+
+        return aai;
+    }
 }

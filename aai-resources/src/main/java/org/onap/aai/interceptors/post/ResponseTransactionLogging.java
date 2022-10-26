@@ -17,17 +17,14 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.post;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.google.gson.JsonObject;
-import org.onap.aai.exceptions.AAIException;
-import org.onap.aai.interceptors.AAIContainerFilter;
-import org.onap.aai.interceptors.AAIHeaderProperties;
-import org.onap.aai.logging.ErrorLogHelper;
-import org.onap.aai.util.AAIConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletResponse;
@@ -35,9 +32,15 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
+
+import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.interceptors.AAIContainerFilter;
+import org.onap.aai.interceptors.AAIHeaderProperties;
+import org.onap.aai.logging.ErrorLogHelper;
+import org.onap.aai.util.AAIConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Priority(AAIResponseFilterPriority.RESPONSE_TRANS_LOGGING)
 public class ResponseTransactionLogging extends AAIContainerFilter implements ContainerResponseFilter {
@@ -49,7 +52,7 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-        throws IOException {
+            throws IOException {
 
         this.transLogging(requestContext, responseContext);
 
@@ -69,13 +72,12 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
 
         String httpMethod = requestContext.getMethod();
 
-        if(Boolean.parseBoolean(logValue)){
+        if (Boolean.parseBoolean(logValue)) {
 
             String transId = requestContext.getHeaderString(AAIHeaderProperties.TRANSACTION_ID);
             String fromAppId = requestContext.getHeaderString(AAIHeaderProperties.FROM_APP_ID);
             String fullUri = requestContext.getUriInfo().getRequestUri().toString();
             String requestTs = (String) requestContext.getProperty(AAIHeaderProperties.AAI_REQUEST_TS);
-
 
             String status = Integer.toString(responseContext.getStatus());
 
@@ -84,7 +86,6 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
             if (!HttpMethod.GET.equals(httpMethod) || Boolean.parseBoolean(isGetTransactionResponseLoggingEnabled)) {
                 response = this.getResponseString(responseContext);
             }
-
 
             JsonObject logEntry = new JsonObject();
             logEntry.addProperty("transactionId", transId);
@@ -95,7 +96,7 @@ public class ResponseTransactionLogging extends AAIContainerFilter implements Co
             logEntry.addProperty("resourceId", fullUri);
             logEntry.addProperty("resourceType", httpMethod);
             logEntry.addProperty("rqstBuf", Objects.toString(request, ""));
-            if (response != null ) {
+            if (response != null) {
                 logEntry.addProperty("respBuf", Objects.toString(response));
             }
 

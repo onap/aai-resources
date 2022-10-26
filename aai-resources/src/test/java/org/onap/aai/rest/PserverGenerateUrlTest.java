@@ -17,20 +17,23 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+
 import com.jayway.jsonpath.JsonPath;
-import org.junit.Test;
-import org.springframework.http.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.springframework.http.*;
+
 public class PserverGenerateUrlTest extends AbstractSpringRestTest {
 
     @Test
@@ -47,7 +50,8 @@ public class PserverGenerateUrlTest extends AbstractSpringRestTest {
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
         String vertexId = responseEntity.getHeaders().getFirst("vertex-id");
-        responseEntity = restTemplate.exchange(baseUrl + "/aai/v11/generateurl/id/" + vertexId, HttpMethod.GET, plainHttpEntity(), String.class);
+        responseEntity = restTemplate.exchange(baseUrl + "/aai/v11/generateurl/id/" + vertexId, HttpMethod.GET,
+                plainHttpEntity(), String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertThat(responseEntity.getBody().toString(), containsString(endpoint));
 
@@ -57,7 +61,8 @@ public class PserverGenerateUrlTest extends AbstractSpringRestTest {
         String body = responseEntity.getBody().toString();
         String resourceVersion = JsonPath.read(body, "$.resource-version");
 
-        responseEntity = restTemplate.exchange(baseUrl + endpoint+ "?resource-version=" + resourceVersion, HttpMethod.DELETE, httpEntity, String.class);
+        responseEntity = restTemplate.exchange(baseUrl + endpoint + "?resource-version=" + resourceVersion,
+                HttpMethod.DELETE, httpEntity, String.class);
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
     }
 

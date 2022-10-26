@@ -17,96 +17,98 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest.util;
 
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.junit.Assert.assertEquals;
+
+import java.io.UnsupportedEncodingException;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
-import java.io.UnsupportedEncodingException;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class ValidateEncodingTest {
 
-	
-	@Test
-	public void badPath() throws UnsupportedEncodingException {
-		String badPath = "/aai/v6/network/vces/vce/blahh::blach/others/other/jklfea{}";
-		UriInfo mockUriInfo = getMockUriInfo(badPath, new MultivaluedHashMap<String, String>());
-		ValidateEncoding validator = ValidateEncoding.getInstance();
-		
-		assertEquals(false, validator.validate(mockUriInfo));
-	}
-	
-	@Test
-	public void goodPath() throws UnsupportedEncodingException {
-		String goodPath = "/aai/v6/network/vces/vce/blahh%3A%3Ablach/others/other/jklfea%7B%7D";
-		UriInfo mockUriInfo = getMockUriInfo(goodPath, new MultivaluedHashMap<String, String>());
-		ValidateEncoding validator = ValidateEncoding.getInstance();
-		
-		assertEquals(true, validator.validate(mockUriInfo));	
-	}
-	
-	@Test
-	public void badQueryParamsKey() throws UnsupportedEncodingException {
-		MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
-		map.putSingle("blahblah", "test");
-		map.putSingle("blahblah", "test2");
-		map.putSingle("bad::bad", "test3");
-		UriInfo mockUriInfo = getMockUriInfo("", map);
+    @Test
+    public void badPath() throws UnsupportedEncodingException {
+        String badPath = "/aai/v6/network/vces/vce/blahh::blach/others/other/jklfea{}";
+        UriInfo mockUriInfo = getMockUriInfo(badPath, new MultivaluedHashMap<String, String>());
+        ValidateEncoding validator = ValidateEncoding.getInstance();
 
-		ValidateEncoding validator = ValidateEncoding.getInstance();
-		
-		assertEquals(false, validator.validate(mockUriInfo));
-		
-	}
-	@Test
-	public void badQueryParamsValue() throws UnsupportedEncodingException {
-		MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
-		map.putSingle("blahblah", "test");
-		map.putSingle("blahblah", "test//:2");
-		map.putSingle("badbad", "test3");
-		UriInfo mockUriInfo = getMockUriInfo("", map);
+        assertEquals(false, validator.validate(mockUriInfo));
+    }
 
-		ValidateEncoding validator = ValidateEncoding.getInstance();
-		
-		assertEquals(false, validator.validate(mockUriInfo));
-	}
+    @Test
+    public void goodPath() throws UnsupportedEncodingException {
+        String goodPath = "/aai/v6/network/vces/vce/blahh%3A%3Ablach/others/other/jklfea%7B%7D";
+        UriInfo mockUriInfo = getMockUriInfo(goodPath, new MultivaluedHashMap<String, String>());
+        ValidateEncoding validator = ValidateEncoding.getInstance();
 
-	@Test
-	public void goodQueryParams() throws UnsupportedEncodingException {
-		MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
-		map.putSingle("blahblah", "test");
-		map.putSingle("blahblah", "test2");
-		map.putSingle("badbad", "~test%2F%2F%3A3");
-		UriInfo mockUriInfo = getMockUriInfo("", map);
+        assertEquals(true, validator.validate(mockUriInfo));
+    }
 
-		ValidateEncoding validator = ValidateEncoding.getInstance();
-		
-		assertEquals(true, validator.validate(mockUriInfo));
-	}
+    @Test
+    public void badQueryParamsKey() throws UnsupportedEncodingException {
+        MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
+        map.putSingle("blahblah", "test");
+        map.putSingle("blahblah", "test2");
+        map.putSingle("bad::bad", "test3");
+        UriInfo mockUriInfo = getMockUriInfo("", map);
 
-	@Test
-	public void testWhenQueryParameterHasPlusSignItShouldPass() throws UnsupportedEncodingException {
+        ValidateEncoding validator = ValidateEncoding.getInstance();
 
-		MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
-		map.putSingle("some-key", "test+one+two+three");
-		UriInfo mockUriInfo = getMockUriInfo("", map);
+        assertEquals(false, validator.validate(mockUriInfo));
 
-		ValidateEncoding validator = ValidateEncoding.getInstance();
+    }
 
-		assertEquals(true, validator.validate(mockUriInfo));
-	}
-	
-	private UriInfo getMockUriInfo(String path, MultivaluedMap<String, String> map) {
-		UriInfo mockUriInfo = Mockito.mock(UriInfo.class);
-		Mockito.when(mockUriInfo.getPath(false)).thenReturn(path);
-		Mockito.when(mockUriInfo.getQueryParameters(false)).thenReturn(map);
-		
-		return mockUriInfo;
-	}
-	
+    @Test
+    public void badQueryParamsValue() throws UnsupportedEncodingException {
+        MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
+        map.putSingle("blahblah", "test");
+        map.putSingle("blahblah", "test//:2");
+        map.putSingle("badbad", "test3");
+        UriInfo mockUriInfo = getMockUriInfo("", map);
+
+        ValidateEncoding validator = ValidateEncoding.getInstance();
+
+        assertEquals(false, validator.validate(mockUriInfo));
+    }
+
+    @Test
+    public void goodQueryParams() throws UnsupportedEncodingException {
+        MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
+        map.putSingle("blahblah", "test");
+        map.putSingle("blahblah", "test2");
+        map.putSingle("badbad", "~test%2F%2F%3A3");
+        UriInfo mockUriInfo = getMockUriInfo("", map);
+
+        ValidateEncoding validator = ValidateEncoding.getInstance();
+
+        assertEquals(true, validator.validate(mockUriInfo));
+    }
+
+    @Test
+    public void testWhenQueryParameterHasPlusSignItShouldPass() throws UnsupportedEncodingException {
+
+        MultivaluedHashMap<String, String> map = new MultivaluedHashMap<String, String>();
+        map.putSingle("some-key", "test+one+two+three");
+        UriInfo mockUriInfo = getMockUriInfo("", map);
+
+        ValidateEncoding validator = ValidateEncoding.getInstance();
+
+        assertEquals(true, validator.validate(mockUriInfo));
+    }
+
+    private UriInfo getMockUriInfo(String path, MultivaluedMap<String, String> map) {
+        UriInfo mockUriInfo = Mockito.mock(UriInfo.class);
+        Mockito.when(mockUriInfo.getPath(false)).thenReturn(path);
+        Mockito.when(mockUriInfo.getQueryParameters(false)).thenReturn(map);
+
+        return mockUriInfo;
+    }
+
 }

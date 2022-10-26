@@ -17,21 +17,22 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-
 public class InvalidURITest extends AbstractSpringRestTest {
 
     @Test
-    public void testWhenUriNotStartsWithAAIItReturnsProperNotFound(){
+    public void testWhenUriNotStartsWithAAIItReturnsProperNotFound() {
 
         String endpoint = "/aai1/v11/cloud-infrastructure/pservers/pserver/test";
 

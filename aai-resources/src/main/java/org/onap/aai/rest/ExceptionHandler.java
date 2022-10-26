@@ -17,7 +17,12 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.sun.istack.SAXParseException2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +38,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.sun.istack.SAXParseException2;
 
 /**
  * The Class ExceptionHandler.
@@ -45,84 +47,80 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 
     @Context
     private HttpServletRequest request;
-    
+
     @Context
     private HttpHeaders headers;
-    
+
     /**
-	 * @{inheritDoc}
-	 */
+     * @{inheritDoc}
+     */
     @Override
     public Response toResponse(Exception exception) {
 
-    	Response response = null;
-    	ArrayList<String> templateVars = new ArrayList<String>();
+        Response response = null;
+        ArrayList<String> templateVars = new ArrayList<String>();
 
-    	//the general case is that cxf will give us a WebApplicationException
-    	//with a linked exception
-    	if (exception instanceof WebApplicationException) { 
-    		WebApplicationException e = (WebApplicationException) exception;
-    		if (e.getCause() != null) {
-    			if (e.getCause() instanceof SAXParseException2) {
-    				templateVars.add("UnmarshalException");
-    				AAIException ex = new AAIException("AAI_4007", exception);
-    				response = Response
-    						.status(400)
-    						.entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
-    						.build();
-    			}
-    		}
-    	} else if (exception instanceof JsonParseException) {
-    		//jackson does it differently so we get the direct JsonParseException
-    		templateVars.add("JsonParseException");
-    		AAIException ex = new AAIException("AAI_4007", exception);
-    		response = Response
-    				.status(400)
-    				.entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
-    				.build();
+        // the general case is that cxf will give us a WebApplicationException
+        // with a linked exception
+        if (exception instanceof WebApplicationException) {
+            WebApplicationException e = (WebApplicationException) exception;
+            if (e.getCause() != null) {
+                if (e.getCause() instanceof SAXParseException2) {
+                    templateVars.add("UnmarshalException");
+                    AAIException ex = new AAIException("AAI_4007", exception);
+                    response = Response
+                            .status(400).entity(ErrorLogHelper
+                                    .getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
+                            .build();
+                }
+            }
+        } else if (exception instanceof JsonParseException) {
+            // jackson does it differently so we get the direct JsonParseException
+            templateVars.add("JsonParseException");
+            AAIException ex = new AAIException("AAI_4007", exception);
+            response = Response.status(400)
+                    .entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
+                    .build();
         } else if (exception instanceof JsonMappingException) {
-    		//jackson does it differently so we get the direct JsonParseException
-    		templateVars.add("JsonMappingException");
-    		AAIException ex = new AAIException("AAI_4007", exception);
-    		response = Response
-    				.status(400)
-    				.entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
-    				.build();
-        } 
-    	
-    	// it didn't get set above, we wrap a general fault here
-    	if (response == null) { 
-    		
-    		Exception actual_e = exception;
-    		if (exception instanceof WebApplicationException) { 
-    			WebApplicationException e = (WebApplicationException) exception;
-    			response = e.getResponse();
-    		} else { 
-    			templateVars.add(request.getMethod());
-    			templateVars.add("unknown");
-    			AAIException ex = new AAIException("AAI_4000", actual_e);
-    			List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
-    			int setError = 0;
+            // jackson does it differently so we get the direct JsonParseException
+            templateVars.add("JsonMappingException");
+            AAIException ex = new AAIException("AAI_4007", exception);
+            response = Response.status(400)
+                    .entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
+                    .build();
+        }
 
-    			for (MediaType mediaType : mediaTypes) { 
-    				if (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)) {
-    					response = Response
-    							.status(400)
-    							.type(MediaType.APPLICATION_XML_TYPE)
-    							.entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
-    							.build();	
-    					setError = 1;
-    				} 
-    			}
-    			if (setError == 0) { 
-    				response = Response
-    						.status(400)
-    						.type(MediaType.APPLICATION_JSON_TYPE)
-    						.entity(ErrorLogHelper.getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
-    						.build();	
-    			}
-    		}
-    	}		
-    	return response;
+        // it didn't get set above, we wrap a general fault here
+        if (response == null) {
+
+            Exception actual_e = exception;
+            if (exception instanceof WebApplicationException) {
+                WebApplicationException e = (WebApplicationException) exception;
+                response = e.getResponse();
+            } else {
+                templateVars.add(request.getMethod());
+                templateVars.add("unknown");
+                AAIException ex = new AAIException("AAI_4000", actual_e);
+                List<MediaType> mediaTypes = headers.getAcceptableMediaTypes();
+                int setError = 0;
+
+                for (MediaType mediaType : mediaTypes) {
+                    if (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)) {
+                        response = Response
+                                .status(400).type(MediaType.APPLICATION_XML_TYPE).entity(ErrorLogHelper
+                                        .getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
+                                .build();
+                        setError = 1;
+                    }
+                }
+                if (setError == 0) {
+                    response = Response
+                            .status(400).type(MediaType.APPLICATION_JSON_TYPE).entity(ErrorLogHelper
+                                    .getRESTAPIErrorResponse(headers.getAcceptableMediaTypes(), ex, templateVars))
+                            .build();
+                }
+            }
+        }
+        return response;
     }
 }

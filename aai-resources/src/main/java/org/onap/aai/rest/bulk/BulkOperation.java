@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.rest.bulk;
 
 import java.net.URI;
@@ -32,70 +33,70 @@ import org.springframework.util.MultiValueMap;
 
 public class BulkOperation {
 
-	private URI uri = null;
-	private QueryParser uriQuery = null;
-	private Introspector introspector = null;
-	private HttpMethod httpMethod = null;
-	private String rawReq = "";
-	private UriInfo uriInfo = new BulkUriInfo();
+    private URI uri = null;
+    private QueryParser uriQuery = null;
+    private Introspector introspector = null;
+    private HttpMethod httpMethod = null;
+    private String rawReq = "";
+    private UriInfo uriInfo = new BulkUriInfo();
 
-	public UriInfo getUriInfo() {
-		return uriInfo;
-	}
+    public UriInfo getUriInfo() {
+        return uriInfo;
+    }
 
-	public String getRawReq() {
-		return rawReq;
-	}
+    public String getRawReq() {
+        return rawReq;
+    }
 
-	public void setRawReq(String rawReq) {
-		this.rawReq = rawReq;
-	}
+    public void setRawReq(String rawReq) {
+        this.rawReq = rawReq;
+    }
 
-	public URI getUri() {
-		return uri;
-	}
+    public URI getUri() {
+        return uri;
+    }
 
-	public void setUri(URI uri) {
-		this.uri = uri;
-	}
+    public void setUri(URI uri) {
+        this.uri = uri;
+    }
 
-	public QueryParser getUriQuery() {
-		return uriQuery;
-	}
+    public QueryParser getUriQuery() {
+        return uriQuery;
+    }
 
-	public void setUriQuery(QueryParser uriQuery) {
-		this.uriQuery = uriQuery;
-	}
+    public void setUriQuery(QueryParser uriQuery) {
+        this.uriQuery = uriQuery;
+    }
 
-	public Introspector getIntrospector() {
-		return introspector;
-	}
+    public Introspector getIntrospector() {
+        return introspector;
+    }
 
-	public void setIntrospector(Introspector introspector) {
-		this.introspector = introspector;
-	}
+    public void setIntrospector(Introspector introspector) {
+        this.introspector = introspector;
+    }
 
-	public HttpMethod getHttpMethod() {
-		return httpMethod;
-	}
+    public HttpMethod getHttpMethod() {
+        return httpMethod;
+    }
 
-	public void setHttpMethod(HttpMethod httpMethod) {
-		this.httpMethod = httpMethod;
-	}
+    public void setHttpMethod(HttpMethod httpMethod) {
+        this.httpMethod = httpMethod;
+    }
 
-	public void addUriInfoQueryParams(MultiValueMap<String, String> queryParams) {
-		
-		BulkUriInfo bui = new BulkUriInfo();
-		
-		for (Entry<String, List<String>> entry : queryParams.entrySet()) {
-			bui.addParams(entry.getKey(), entry.getValue());
-		}
-		
-		this.uriInfo = bui;
-	}
+    public void addUriInfoQueryParams(MultiValueMap<String, String> queryParams) {
 
-	public void addUriInfo(UriInfo uriInfo){
-		this.uriInfo = uriInfo;
-	}
+        BulkUriInfo bui = new BulkUriInfo();
+
+        for (Entry<String, List<String>> entry : queryParams.entrySet()) {
+            bui.addParams(entry.getKey(), entry.getValue());
+        }
+
+        this.uriInfo = bui;
+    }
+
+    public void addUriInfo(UriInfo uriInfo) {
+        this.uriInfo = uriInfo;
+    }
 
 }

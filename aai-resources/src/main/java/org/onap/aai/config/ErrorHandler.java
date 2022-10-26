@@ -17,7 +17,18 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.config;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
@@ -25,15 +36,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Responsible for dealing with uri that doesn't start with basePath
@@ -46,15 +48,16 @@ public class ErrorHandler extends OncePerRequestFilter {
 
     private String basePath;
 
-    public ErrorHandler(@Value("${schema.uri.base.path}") String basePath){
+    public ErrorHandler(@Value("${schema.uri.base.path}") String basePath) {
         this.basePath = basePath;
-        if(!basePath.endsWith("/")){
+        if (!basePath.endsWith("/")) {
             this.basePath = basePath + "/";
         }
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+            FilterChain filterChain) throws ServletException, IOException {
 
         String uri = httpServletRequest.getRequestURI();
 

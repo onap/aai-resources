@@ -17,7 +17,11 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -30,9 +34,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 
 public class IncreaseNodesToolTest extends AAISetup {
 
@@ -54,10 +55,11 @@ public class IncreaseNodesToolTest extends AAISetup {
     @Mock
     GraphTraversal<org.apache.tinkerpop.gremlin.structure.Vertex, org.apache.tinkerpop.gremlin.structure.Vertex> graphTraversalVertex;
     private IncreaseNodesTool increaseNodesTool;
-    String [] args = {"-numberOfNodes", "5" ,"-nodeType", "pserver", "-uri", "/cloud-infrastructure/pservers/pserver/", "-child", "false"};
+    String[] args = {"-numberOfNodes", "5", "-nodeType", "pserver", "-uri", "/cloud-infrastructure/pservers/pserver/",
+            "-child", "false"};
 
     @Before
-    public void setup(){
+    public void setup() {
         increaseNodesTool = new IncreaseNodesTool(loaderFactory, schemaVersions);
     }
 
@@ -68,11 +70,11 @@ public class IncreaseNodesToolTest extends AAISetup {
         when(janusGraphtransaction.traversal()).thenReturn(graphTraversalSource);
         when(graphTraversalSource.addV(nodeTypeCapture.capture())).thenReturn(graphTraversalVertex);
         when(graphTraversalVertex.next()).thenReturn(mockVertex);
-        increaseNodesTool.run(janusGraph,args);
+        increaseNodesTool.run(janusGraph, args);
 
         Mockito.verify(janusGraph).newTransaction();
 
-        Mockito.verify(graphTraversalSource,times(5)).addV(nodeTypeCapture.capture());
+        Mockito.verify(graphTraversalSource, times(5)).addV(nodeTypeCapture.capture());
     }
 
     @Test
@@ -81,10 +83,9 @@ public class IncreaseNodesToolTest extends AAISetup {
         when(janusGraph.newTransaction()).thenReturn(janusGraphtransaction);
         when(janusGraphtransaction.traversal()).thenThrow(new RuntimeException());
 
-        increaseNodesTool.run(janusGraph,args);
+        increaseNodesTool.run(janusGraph, args);
 
         Mockito.verify(janusGraphtransaction).rollback();
     }
 
 }
-

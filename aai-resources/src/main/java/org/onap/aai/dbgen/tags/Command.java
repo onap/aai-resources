@@ -17,9 +17,10 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.dbgen.tags;
 
 @FunctionalInterface
 interface Command {
-	public abstract void execute() throws Exception;
+    public abstract void execute() throws Exception;
 }

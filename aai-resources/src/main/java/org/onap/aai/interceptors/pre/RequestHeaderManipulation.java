@@ -17,6 +17,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.interceptors.pre;
 
 import java.io.IOException;
@@ -39,27 +40,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Priority(AAIRequestFilterPriority.HEADER_MANIPULATION)
 public class RequestHeaderManipulation extends AAIContainerFilter implements ContainerRequestFilter {
 
-	@Override
-	public void filter(ContainerRequestContext requestContext) {
+    @Override
+    public void filter(ContainerRequestContext requestContext) {
 
-		String uri = requestContext.getUriInfo().getPath();
-		this.addRequestContext(uri, requestContext.getHeaders());
+        String uri = requestContext.getUriInfo().getPath();
+        this.addRequestContext(uri, requestContext.getHeaders());
 
-	}
-	
-	private void addRequestContext(String uri, MultivaluedMap<String, String> requestHeaders) {
+    }
 
-		String rc = "";
+    private void addRequestContext(String uri, MultivaluedMap<String, String> requestHeaders) {
+
+        String rc = "";
 
         Matcher match = VersionInterceptor.EXTRACT_VERSION_PATTERN.matcher(uri);
         if (match.find()) {
             rc = match.group(1);
         }
 
-		if (requestHeaders.containsKey(AAIHeaderProperties.REQUEST_CONTEXT)) {
-			requestHeaders.remove(AAIHeaderProperties.REQUEST_CONTEXT);
-		}
-		requestHeaders.put(AAIHeaderProperties.REQUEST_CONTEXT, Collections.singletonList(rc));
-	}
+        if (requestHeaders.containsKey(AAIHeaderProperties.REQUEST_CONTEXT)) {
+            requestHeaders.remove(AAIHeaderProperties.REQUEST_CONTEXT);
+        }
+        requestHeaders.put(AAIHeaderProperties.REQUEST_CONTEXT, Collections.singletonList(rc));
+    }
 
 }

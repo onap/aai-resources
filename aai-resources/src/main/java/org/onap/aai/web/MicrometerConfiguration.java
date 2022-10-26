@@ -17,14 +17,17 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.aai.web;
+
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.jersey2.server.JerseyTags;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import io.micrometer.jersey2.server.JerseyTagsProvider;
+
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,9 +35,7 @@ import org.springframework.context.annotation.Configuration;
  * Configuration Class to add customized tags to http metrics scraped in /actuator/prometheus endpoint
  */
 @Configuration
-@ConditionalOnProperty(
-        value="scrape.uri.metrics",
-        havingValue = "true")
+@ConditionalOnProperty(value = "scrape.uri.metrics", havingValue = "true")
 public class MicrometerConfiguration {
     private static final String TAG_AAI_URI = "aai_uri";
     private static final String NOT_AVAILABLE = "NOT AVAILABLE";
@@ -45,9 +46,10 @@ public class MicrometerConfiguration {
             @Override
             public Iterable httpRequestTags(RequestEvent event) {
                 ContainerResponse response = event.getContainerResponse();
-                return Tags.of(JerseyTags.method(event.getContainerRequest()),
-                        JerseyTags.exception(event), JerseyTags.status(response), JerseyTags.outcome(response), getAaiUriTag(event));
+                return Tags.of(JerseyTags.method(event.getContainerRequest()), JerseyTags.exception(event),
+                        JerseyTags.status(response), JerseyTags.outcome(response), getAaiUriTag(event));
             }
+
             private Tag getAaiUriTag(RequestEvent event) {
                 String aai_uri = event.getUriInfo().getRequestUri().toString();
                 if (aai_uri == null) {
@@ -55,6 +57,7 @@ public class MicrometerConfiguration {
                 }
                 return Tag.of(TAG_AAI_URI, aai_uri);
             }
+
             @Override
             public Iterable<Tag> httpLongRequestTags(RequestEvent event) {
                 return Tags.of(JerseyTags.method(event.getContainerRequest()), JerseyTags.uri(event));
