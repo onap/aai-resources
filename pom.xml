@@ -21,7 +21,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.onap.aai.aai-common</groupId>
@@ -62,28 +62,28 @@
                 mvn formatter:format spotless:apply process-sources
                 -->
                 <plugin>
-                     <groupId>net.revelc.code.formatter</groupId>
-                     <artifactId>formatter-maven-plugin</artifactId>
-                     <version>2.8.1</version>
-                     <configuration>
+                    <groupId>net.revelc.code.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>2.8.1</version>
+                    <configuration>
                         <configFile>${project.parent.basedir}/onap-java-formatter.xml</configFile>
-                     </configuration>
-                     <!-- https://code.revelc.net/formatter-maven-plugin/
+                    </configuration>
+                    <!-- https://code.revelc.net/formatter-maven-plugin/
                           use mvn formatter:format to rewrite source files
                           use mvn formatter:validate to validate source files -->
-                 </plugin>
+                </plugin>
                 <plugin>
-                  <groupId>com.diffplug.spotless</groupId>
-                  <artifactId>spotless-maven-plugin</artifactId>
-                  <version>1.18.0</version>
-                  <configuration>
-                    <java>
-                     <importOrder>
-                       <order>com,java,javax,org</order>
-                     </importOrder>
-                    </java>
-                  </configuration>
-                <!-- https://github.com/diffplug/spotless/tree/master/plugin-maven
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>1.18.0</version>
+                    <configuration>
+                        <java>
+                            <importOrder>
+                                <order>com,java,javax,org</order>
+                            </importOrder>
+                        </java>
+                    </configuration>
+                    <!-- https://github.com/diffplug/spotless/tree/master/plugin-maven
                      use mvn spotless:apply to rewrite source files
                      use mvn spotless:check to validate source files -->
                 </plugin>
@@ -98,30 +98,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.6</version>
-                <configuration>
-                    <reportPlugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <version>2.4</version>
-                            <configuration>
-                                <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                            </configuration>
-                            <reports>
-                                <report>dependencies</report>
-                            </reports>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>2.8</version>
-                            <configuration>
-                                <additionalparam>-Xdoclint:none</additionalparam>
-                            </configuration>
-                        </plugin>
-                    </reportPlugins>
-                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.wagon</groupId>
@@ -148,6 +124,23 @@
                     </docletArtifact>
                     <additionalparam>-views</additionalparam>
                     <useStandardDocletOptions>true</useStandardDocletOptions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
         </plugins>
@@ -183,17 +176,17 @@
         <repository>
             <id>ecomp-releases</id>
             <name>ECOMP Release Repository</name>
-	    <url>${nexusproxy}${release.path}</url>
+            <url>${nexusproxy}${release.path}</url>
         </repository>
         <repository>
             <id>ecomp-staging</id>
             <name>ECOMP Staging Repository</name>
-	    <url>${nexusproxy}${staging.path}</url>
+            <url>${nexusproxy}${staging.path}</url>
         </repository>
         <repository>
             <id>ecomp-snapshots</id>
             <name>ECOMP Snapshot Repository</name>
-	    <url>${nexusproxy}${snapshot.path}</url>
+            <url>${nexusproxy}${snapshot.path}</url>
         </repository>
     </repositories>
 </project>
