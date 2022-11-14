@@ -20,7 +20,6 @@
 
 package org.onap.aai.interceptors.pre;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.regex.Matcher;
