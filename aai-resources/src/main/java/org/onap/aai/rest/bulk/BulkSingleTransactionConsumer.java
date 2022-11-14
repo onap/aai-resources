@@ -29,11 +29,24 @@ import io.micrometer.core.annotation.Timed;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
@@ -65,7 +78,6 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
     private static final Set<String> validOperations =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList("put", "patch", "delete")));
-    private static final JsonParser parser = new JsonParser();
     private int allowedOperationCount = 30;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkSingleTransactionConsumer.class);
@@ -172,8 +184,8 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
         for (int i = 0; i < transaction.getOperations().size(); i++) {
             if (!Response.Status.Family.familyOf(results.get(i).getValue1().getStatus())
                     .equals(Response.Status.Family.SUCCESSFUL)) {
-                final JsonArray vars = parser.parse(results.get(i).getValue1().getEntity().toString()).getAsJsonObject()
-                        .getAsJsonObject("requestError").getAsJsonObject("serviceException")
+                final JsonArray vars = JsonParser.parseString(results.get(i).getValue1().getEntity().toString())
+                        .getAsJsonObject().getAsJsonObject("requestError").getAsJsonObject("serviceException")
                         .getAsJsonArray("variables");
                 StringBuilder sb = new StringBuilder();
                 for (int j = 2; j < vars.size() - 1; j++) {

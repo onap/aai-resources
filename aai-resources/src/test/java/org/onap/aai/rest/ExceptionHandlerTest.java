@@ -26,9 +26,10 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.JsonParser;
 import com.sun.istack.SAXParseException2;
 
 import java.util.ArrayList;
@@ -106,8 +107,8 @@ public class ExceptionHandlerTest extends AAISetup {
     @Test
     public void testConversionWhenJsonParseExceptionResultBadRequest() throws Exception {
 
-        JsonLocation jsonLocation = mock(JsonLocation.class);
-        Exception exception = new JsonParseException("", jsonLocation);
+        JsonParser parser = new JsonFactory().createParser("");
+        Exception exception = new JsonParseException(parser, "");
         Response response = handler.toResponse(exception);
 
         assertNotNull(response);
@@ -119,7 +120,9 @@ public class ExceptionHandlerTest extends AAISetup {
     public void testConversionWhenJsonMappingExceptionResultBadRequest() throws Exception {
 
         JsonLocation jsonLocation = mock(JsonLocation.class);
-        Exception exception = new JsonMappingException("", jsonLocation);
+        // Exception exception = new JsonMappingException("", jsonLocation);
+        JsonParser parser = new JsonFactory().createParser("");
+        Exception exception = new JsonParseException(parser, "");
         Response response = handler.toResponse(exception);
 
         assertNotNull(response);

@@ -92,6 +92,10 @@
 
         <!-- Integration tests will be skipped by default. Could be enabled here or by -DskipITs=false-->
         <skipITs>true</skipITs>
+
+        <!-- <swagger.version>1.5.24</swagger.version> -->
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-core -->
+        <swagger.version>1.6.8</swagger.version>
     </properties>
     <profiles>
         <!-- Docker profile to be used for building docker image and pushing to nexus -->
@@ -352,6 +356,7 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-core</artifactId>
+            <version>${swagger.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.ws.rs</groupId>
@@ -362,6 +367,7 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -371,6 +377,7 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jersey-jaxrs</artifactId>
+            <version>${swagger.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.glassfish.jersey.media</groupId>

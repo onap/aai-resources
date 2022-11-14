@@ -20,7 +20,7 @@
 
 package org.onap.aai;
 
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -102,7 +102,7 @@ public class HttpTestUtil extends RESTAPI {
         when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
         when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
 
-        doReturn(null).when(queryParameters).remove(anyObject());
+        doReturn(null).when(queryParameters).remove(any());
         when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
         schemaVersions = SpringContextAware.getBean(SchemaVersions.class);
     }

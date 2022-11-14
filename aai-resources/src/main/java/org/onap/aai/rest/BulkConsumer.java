@@ -20,12 +20,22 @@
 
 package org.onap.aai.rest;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,8 +43,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
@@ -237,9 +252,8 @@ public abstract class BulkConsumer extends RESTAPI {
      *         bodies to be processed.
      */
     private JsonArray getTransactions(String content, HttpHeaders headers) throws AAIException, JsonSyntaxException {
-        JsonParser parser = new JsonParser();
 
-        JsonObject input = parser.parse(content).getAsJsonObject();
+        JsonObject input = JsonParser.parseString(content).getAsJsonObject();
         String module = getModule();
 
         if (!(input.has("transactions"))) {

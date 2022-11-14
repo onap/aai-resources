@@ -71,7 +71,7 @@ public class OperationResponse {
         if (s == null) {
             this.body = null;
         } else {
-            this.body = new JsonParser().parse(s.toString()).getAsJsonObject();
+            this.body = JsonParser.parseString(s.toString()).getAsJsonObject();
         }
     }
 }

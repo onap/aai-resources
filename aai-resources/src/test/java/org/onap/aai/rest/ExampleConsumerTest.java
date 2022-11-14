@@ -22,7 +22,7 @@ package org.onap.aai.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -112,7 +112,7 @@ public class ExampleConsumerTest extends AAISetup {
         when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
 
         // TODO - Check if this is valid since RemoveDME2QueryParameters seems to be very unreasonable
-        Mockito.doReturn(null).when(queryParameters).remove(anyObject());
+        Mockito.doReturn(null).when(queryParameters).remove(any());
 
         when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
     }

@@ -110,7 +110,8 @@ public class IncreaseNodesTool {
     public void run(JanusGraph janusGraph, String[] args)
             throws AAIUnknownObjectException, UnsupportedEncodingException {
         CommandLineArgs cArgs = new CommandLineArgs();
-        JCommander jCommander = new JCommander(cArgs, args);
+        JCommander jCommander = new JCommander(cArgs);
+        jCommander.parse(args);
         jCommander.setProgramName(IncreaseNodesTool.class.getSimpleName());
 
         Loader loader = loaderFactory.createLoaderForVersion(ModelType.MOXY, schemaVersions.getDefaultVersion());

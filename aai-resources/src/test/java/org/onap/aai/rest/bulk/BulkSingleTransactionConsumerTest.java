@@ -321,8 +321,8 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
     @Test
     public void deleteChildRecreateChildTest() throws IOException {
         JsonArray requests =
-                new JsonParser()
-                        .parse(getBulkPayload("single-transaction/delete-child-recreate-child")
+                JsonParser
+                        .parseString(getBulkPayload("single-transaction/delete-child-recreate-child")
                                 .replaceAll("<methodName>", name.getMethodName()))
                         .getAsJsonObject().getAsJsonArray("array");
         String payload = requests.get(0).toString();
@@ -338,8 +338,11 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
 
     @Test
     public void deleteNodeRecreateNodeTest() throws IOException {
-        JsonArray requests = new JsonParser().parse(getBulkPayload("single-transaction/delete-node-recreate-node")
-                .replaceAll("<methodName>", name.getMethodName())).getAsJsonObject().getAsJsonArray("array");
+        JsonArray requests =
+                JsonParser
+                        .parseString(getBulkPayload("single-transaction/delete-node-recreate-node")
+                                .replaceAll("<methodName>", name.getMethodName()))
+                        .getAsJsonObject().getAsJsonArray("array");
         String payload = requests.get(0).toString();
         Response response = executeRequest(payload);
         System.out.println(response.getEntity().toString());
