@@ -43,7 +43,6 @@ import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.serialization.db.DBSerializer;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersion;
-import org.onap.aai.util.AAIConfig;
 
 /**
  * The Class URLFromVertexIdConsumer.

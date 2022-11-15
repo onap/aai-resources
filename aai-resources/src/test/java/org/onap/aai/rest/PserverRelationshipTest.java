@@ -33,7 +33,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.onap.aai.PayloadUtil;
-import org.onap.aai.util.MapperUtil;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;

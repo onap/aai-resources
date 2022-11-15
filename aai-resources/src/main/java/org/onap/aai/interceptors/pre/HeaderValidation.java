@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -39,7 +38,6 @@ import org.onap.aai.interceptors.AAIHeaderProperties;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.logging.filter.base.Constants;
 import org.onap.logging.filter.base.ONAPComponents;
-import org.onap.logging.filter.base.SimpleMap;
 import org.onap.logging.ref.slf4j.ONAPLogConstants;
 
 @PreMatching
