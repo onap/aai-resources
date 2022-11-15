@@ -118,7 +118,7 @@ public class RetiredConsumerSpringTest extends AbstractSpringRestTest {
 
     protected void executeRestCalls() {
         httpStatusMap.forEach((url, status) -> {
-            ResponseEntity responseEntity;
+            ResponseEntity<String> responseEntity;
             responseEntity = restTemplate.exchange(baseUrl + url, HttpMethod.GET, httpEntity, String.class);
             LOGGER.debug("For url {} expected status {} actual status {} and body {}", url, status,
                     responseEntity.getStatusCodeValue(), responseEntity.getBody());

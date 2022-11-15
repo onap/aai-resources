@@ -44,7 +44,7 @@ public class MicrometerConfiguration {
     public JerseyTagsProvider jerseyTagsProvider() {
         return new JerseyTagsProvider() {
             @Override
-            public Iterable httpRequestTags(RequestEvent event) {
+            public Iterable<Tag> httpRequestTags(RequestEvent event) {
                 ContainerResponse response = event.getContainerResponse();
                 return Tags.of(JerseyTags.method(event.getContainerRequest()), JerseyTags.exception(event),
                         JerseyTags.status(response), JerseyTags.outcome(response), getAaiUriTag(event));

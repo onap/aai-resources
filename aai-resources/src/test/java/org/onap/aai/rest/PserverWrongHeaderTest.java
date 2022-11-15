@@ -27,7 +27,11 @@ import static org.junit.Assert.assertThat;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class PserverWrongHeaderTest extends AbstractSpringRestTest {
 
@@ -36,11 +40,11 @@ public class PserverWrongHeaderTest extends AbstractSpringRestTest {
 
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        httpEntity = new HttpEntity(httpHeaders);
+        httpEntity = new HttpEntity<String>(httpHeaders);
 
         String endpoint = "/aai/v11/cloud-infrastructure/pservers/pserver/test" + UUID.randomUUID().toString();
 
-        ResponseEntity responseEntity;
+        ResponseEntity<String> responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
 
         String body = responseEntity.getBody().toString();

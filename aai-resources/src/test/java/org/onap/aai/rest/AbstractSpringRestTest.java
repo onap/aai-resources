@@ -28,7 +28,11 @@ import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphTransaction;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.dbmap.AAIGraph;
@@ -70,7 +74,7 @@ public abstract class AbstractSpringRestTest {
     @LocalServerPort
     protected int randomPort;
 
-    protected HttpEntity httpEntity;
+    protected HttpEntity<String> httpEntity;
 
     protected String baseUrl;
     protected HttpHeaders headers;
@@ -98,7 +102,7 @@ public abstract class AbstractSpringRestTest {
         headers.add("X-TransactionId", "JUNIT");
 
         headers.add("Authorization", "Basic " + authorization);
-        httpEntity = new HttpEntity(headers);
+        httpEntity = new HttpEntity<String>(headers);
         baseUrl = "http://localhost:" + randomPort;
     }
 

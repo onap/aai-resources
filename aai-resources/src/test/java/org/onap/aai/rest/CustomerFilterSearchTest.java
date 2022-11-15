@@ -29,7 +29,12 @@ import java.util.Collections;
 
 import org.junit.Test;
 import org.onap.aai.PayloadUtil;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 public class CustomerFilterSearchTest extends AbstractSpringRestTest {
 
@@ -49,16 +54,16 @@ public class CustomerFilterSearchTest extends AbstractSpringRestTest {
         headers.add("Authorization", "Basic " + authorization);
         String body = PayloadUtil.getResourcePayload("customer.json");
 
-        httpEntity = new HttpEntity(body, headers);
+        httpEntity = new HttpEntity<String>(body, headers);
         baseUrl = "http://localhost:" + randomPort;
 
-        ResponseEntity responseEntity;
+        ResponseEntity<String> responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
         String searchUrl = baseUrl + "/aai/v11/business/customers?subscriber-name=subscriber-name-987654321-91&depth=0";
-        httpEntity = new HttpEntity(headers);
+        httpEntity = new HttpEntity<String>(headers);
         responseEntity = restTemplate.exchange(searchUrl, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertThat(responseEntity.getBody().toString(), containsString("global-customer-id"));

@@ -32,7 +32,12 @@ import java.util.Collections;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 public class PserverGenerateUrlTest extends AbstractSpringRestTest {
 
@@ -41,7 +46,7 @@ public class PserverGenerateUrlTest extends AbstractSpringRestTest {
 
         String endpoint = "/aai/v11/cloud-infrastructure/pservers/pserver/test" + UUID.randomUUID().toString();
 
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -66,7 +71,7 @@ public class PserverGenerateUrlTest extends AbstractSpringRestTest {
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
     }
 
-    private HttpEntity plainHttpEntity() throws UnsupportedEncodingException {
+    private HttpEntity<String> plainHttpEntity() throws UnsupportedEncodingException {
 
         HttpHeaders headers = new HttpHeaders();
 
@@ -77,6 +82,6 @@ public class PserverGenerateUrlTest extends AbstractSpringRestTest {
 
         String authorization = Base64.getEncoder().encodeToString("AAI:AAI".getBytes("UTF-8"));
         headers.add("Authorization", "Basic " + authorization);
-        return new HttpEntity(headers);
+        return new HttpEntity<String>(headers);
     }
 }
