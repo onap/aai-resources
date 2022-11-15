@@ -35,7 +35,12 @@ import org.onap.aai.PayloadUtil;
 import org.onap.aai.rest.AbstractSpringRestTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 @Import(KeycloakTestConfiguration.class)
@@ -53,12 +58,12 @@ public class MultiTenancyIT extends AbstractSpringRestTest {
     public void testCreateAndGetPnf() throws Exception {
         baseUrl = "http://localhost:" + randomPort;
         String endpoint = baseUrl + "/aai/v23/network/pnfs/pnf/pnf-1";
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
 
         // create pnf with ran (operator)
         String username = "ran", password = "ran";
         headers = this.getHeaders(username, password);
-        httpEntity = new HttpEntity(PayloadUtil.getResourcePayload("pnf.json"), headers);
+        httpEntity = new HttpEntity<String>(PayloadUtil.getResourcePayload("pnf.json"), headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.PUT, httpEntity, String.class);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
@@ -66,7 +71,7 @@ public class MultiTenancyIT extends AbstractSpringRestTest {
         username = "bob";
         password = "bob";
         headers = this.getHeaders(username, password);
-        httpEntity = new HttpEntity("", headers);
+        httpEntity = new HttpEntity<String>("", headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
@@ -74,14 +79,14 @@ public class MultiTenancyIT extends AbstractSpringRestTest {
         username = "ted";
         password = "ted";
         headers = this.getHeaders(username, password);
-        httpEntity = new HttpEntity("", headers);
+        httpEntity = new HttpEntity<String>("", headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
 
         // add role to ted and try to get pnf again
         roleHandler.addToUser(RoleHandler.OPERATOR_READ_ONLY, username);
         headers = this.getHeaders(username, password);
-        httpEntity = new HttpEntity("", headers);
+        httpEntity = new HttpEntity<String>("", headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
@@ -89,7 +94,7 @@ public class MultiTenancyIT extends AbstractSpringRestTest {
         username = "ran";
         password = "ran";
         headers = this.getHeaders(username, password);
-        httpEntity = new HttpEntity("", headers);
+        httpEntity = new HttpEntity<String>("", headers);
         responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }

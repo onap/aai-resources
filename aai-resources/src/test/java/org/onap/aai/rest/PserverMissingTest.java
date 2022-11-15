@@ -24,11 +24,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Test;
 import org.onap.aai.PayloadUtil;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 public class PserverMissingTest extends AbstractSpringRestTest {
 
@@ -51,10 +60,10 @@ public class PserverMissingTest extends AbstractSpringRestTest {
         templateMap.put("hostname", id);
         String body = PayloadUtil.getTemplatePayload("pserver.json", templateMap);
 
-        httpEntity = new HttpEntity(body, headers);
+        httpEntity = new HttpEntity<String>(body, headers);
         baseUrl = "http://localhost:" + randomPort;
 
-        ResponseEntity responseEntity;
+        ResponseEntity<String> responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -73,10 +82,10 @@ public class PserverMissingTest extends AbstractSpringRestTest {
         String authorization = Base64.getEncoder().encodeToString("AAI:AAI".getBytes("UTF-8"));
         headers.add("Authorization", "Basic " + authorization);
 
-        httpEntity = new HttpEntity(headers);
+        httpEntity = new HttpEntity<String>(headers);
         baseUrl = "http://localhost:" + randomPort;
 
-        ResponseEntity responseEntity;
+        ResponseEntity<String> responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
 
         String body = responseEntity.getBody().toString();

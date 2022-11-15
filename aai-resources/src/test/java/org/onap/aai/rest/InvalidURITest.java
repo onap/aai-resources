@@ -36,7 +36,7 @@ public class InvalidURITest extends AbstractSpringRestTest {
 
         String endpoint = "/aai1/v11/cloud-infrastructure/pservers/pserver/test";
 
-        ResponseEntity responseEntity;
+        ResponseEntity<String> responseEntity;
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
 
         String body = responseEntity.getBody().toString();

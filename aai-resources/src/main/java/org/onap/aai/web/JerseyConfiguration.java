@@ -106,7 +106,7 @@ public class JerseyConfiguration {
     }
 
     private <T> void throwIfPriorityAnnotationAbsent(Collection<Class<? extends T>> classes) {
-        for (Class clazz : classes) {
+        for (Class<? extends T> clazz : classes) {
             if (!clazz.isAnnotationPresent(Priority.class)) {
                 throw new MissingFilterPriorityException(clazz);
             }
