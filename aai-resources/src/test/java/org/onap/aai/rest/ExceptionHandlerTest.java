@@ -66,7 +66,7 @@ public class ExceptionHandlerTest extends AAISetup {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        MultivaluedHashMap headersMultiMap = new MultivaluedHashMap<>();
+        MultivaluedHashMap<String, String> headersMultiMap = new MultivaluedHashMap<>();
 
         headersMultiMap.add("X-FromAppId", "JUNIT");
         headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());

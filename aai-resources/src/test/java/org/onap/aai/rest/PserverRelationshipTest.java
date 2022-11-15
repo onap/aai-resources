@@ -33,7 +33,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.onap.aai.PayloadUtil;
-import org.onap.aai.util.MapperUtil;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -46,7 +45,7 @@ public class PserverRelationshipTest extends AbstractSpringRestTest {
 
         String endpoint = "/aai/v12/cloud-infrastructure/pservers/pserver/test/relationship-list/relationship";
 
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
         String body = responseEntity.getBody().toString();
@@ -68,7 +67,7 @@ public class PserverRelationshipTest extends AbstractSpringRestTest {
         String hostname = "test-pserver1";
         String endpoint = "/aai/v12/cloud-infrastructure/pservers/pserver/" + hostname;
 
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
 
         restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
 
@@ -82,10 +81,10 @@ public class PserverRelationshipTest extends AbstractSpringRestTest {
         map.put("cloud-owner", cloudOwnerId);
 
         String payload = PayloadUtil.getTemplatePayload("pserver-to-cloud-region.json", map);
-        httpEntity = new HttpEntity(payload, headers);
+        httpEntity = new HttpEntity<String>(payload, headers);
         restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
 
-        httpEntity = new HttpEntity(headers);
+        httpEntity = new HttpEntity<String>(headers);
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
         assertThat(responseEntity.getBody().toString(), containsString("relationship-label"));
 

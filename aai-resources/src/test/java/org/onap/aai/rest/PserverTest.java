@@ -49,7 +49,7 @@ public class PserverTest extends AbstractSpringRestTest {
 
         String endpoint = "/aai/v11/cloud-infrastructure/pservers/pserver/test" + UUID.randomUUID().toString();
 
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());

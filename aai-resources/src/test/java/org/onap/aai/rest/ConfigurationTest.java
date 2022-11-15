@@ -42,7 +42,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
@@ -98,7 +103,7 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         String cid = "configtest" + UUID.randomUUID().toString();
         String endpoint = "/aai/v12/network/configurations/configuration/" + cid;
 
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -159,7 +164,7 @@ public class ConfigurationTest extends AbstractSpringRestTest {
 
     @Test
     public void TestManagementEndpointConfiguration() {
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
         String responseBody = null;
 
         // set Accept as text/plain in order to get access of endpoint "/actuator/prometheus"

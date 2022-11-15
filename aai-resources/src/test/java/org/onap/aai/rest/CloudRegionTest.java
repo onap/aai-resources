@@ -40,13 +40,13 @@ public class CloudRegionTest extends AbstractSpringRestTest {
 
         String endpoint = "/aai/v11/cloud-infrastructure/cloud-regions/cloud-region/testOwner/testRegionOne";
 
-        ResponseEntity responseEntity = null;
+        ResponseEntity<String> responseEntity = null;
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
         String payload = PayloadUtil.getResourcePayload("cloud-region.json");
-        httpEntity = new HttpEntity(payload, headers);
+        httpEntity = new HttpEntity<String>(payload, headers);
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntity, String.class);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
