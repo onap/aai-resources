@@ -1,6 +1,9 @@
+# FROM onap/aai-common-alpine:1.9.6
 FROM @aai.docker.namespace@/aai-common-@aai.base.image@:@aai.base.image.version@
 
+USER root
 RUN  mkdir -p /opt/aaihome/aaiadmin /opt/aai/logroot/AAI-RES /opt/bulkprocess_load
+RUN chown -R aaiadmin:aaiadmin /opt/aaihome /opt/aai/logroot/AAI-RES /opt/bulkprocess_load
 
 
 VOLUME /tmp
@@ -14,10 +17,6 @@ ENV AAI_BUILD_VERSION @aai.docker.version@
 # Expose the ports for outside linux to use
 # 8447 is the important one to be used
 EXPOSE 8447
-
-RUN groupadd aaiadmin -g 1000
-
-RUN adduser -u 1000 -h /opt/aaihome/aaiadmin -S -D -G aaiadmin -s /bin/bash aaiadmin
 
 # Add the proper files into the docker image from your build
 WORKDIR /opt/app/aai-resources
