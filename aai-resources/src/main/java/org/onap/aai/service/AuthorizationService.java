@@ -32,14 +32,14 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.jetty.util.security.Password;
-import org.onap.aai.Profiles;
+import org.onap.aai.ResourcesProfiles;
 import org.onap.aai.util.AAIConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Profile(Profiles.ONE_WAY_SSL)
+@Profile(ResourcesProfiles.ONE_WAY_SSL)
 @Service
 public class AuthorizationService {
 

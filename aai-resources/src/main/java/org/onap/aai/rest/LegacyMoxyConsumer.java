@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.javatuples.Pair;
@@ -186,6 +187,22 @@ public class LegacyMoxyConsumer extends RESTAPI {
         MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
         return this.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info, roles);
 
+    }
+
+    /**
+     * Only PUT, DELETE and OPTIONS methods are allowed for /relationship-list/relationship endpoints
+     * This prevents the GET Path matching for "/{uri: .+}" to match for paths ending with /relationship-list/relationship
+     * The METHOD_NOT_ALLOWED code will be mapped to a BadRequest in the InvalidResponseStatus interceptor
+     */
+    @GET
+    @Path("/{uri: .+}/relationship-list/relationship")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response disallowGetOnRelationshipListRelationship() {
+        return Response
+            .status(Status.METHOD_NOT_ALLOWED)
+            .allow("PUT","DELETE","OPTIONS")
+            .build();
     }
 
     /**

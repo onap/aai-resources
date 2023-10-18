@@ -42,6 +42,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
@@ -88,7 +89,8 @@ public class ResourcesApp {
 
         logger.info("Starting AAIGraph connections and the NodeInjestor");
 
-        if (env.acceptsProfiles(Profiles.TWO_WAY_SSL) && env.acceptsProfiles(Profiles.ONE_WAY_SSL)) {
+        // if (env.acceptsProfiles(Profiles.TWO_WAY_SSL) && env.acceptsProfiles(Profiles.ONE_WAY_SSL)) {
+        if (env.acceptsProfiles(Profiles.of(ResourcesProfiles.TWO_WAY_SSL, ResourcesProfiles.ONE_WAY_SSL))) {
             logger.warn("You have seriously misconfigured your application");
         }
 

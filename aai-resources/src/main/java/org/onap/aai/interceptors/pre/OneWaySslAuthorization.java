@@ -32,7 +32,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.onap.aai.Profiles;
+import org.onap.aai.ResourcesProfiles;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.interceptors.AAIContainerFilter;
 import org.onap.aai.logging.ErrorLogHelper;
@@ -40,7 +40,7 @@ import org.onap.aai.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 
-@Profile(Profiles.ONE_WAY_SSL)
+@Profile(ResourcesProfiles.ONE_WAY_SSL)
 @PreMatching
 @Priority(AAIRequestFilterPriority.AUTHORIZATION)
 public class OneWaySslAuthorization extends AAIContainerFilter implements ContainerRequestFilter {

@@ -13,3 +13,4 @@ test_csvWriter.csv
 */.idea
 *.iml
 aai-resources/debug-logs/EELF/
+.vscode

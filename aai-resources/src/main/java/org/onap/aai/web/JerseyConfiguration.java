@@ -52,6 +52,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 @Configuration
 public class JerseyConfiguration {
@@ -67,7 +68,6 @@ public class JerseyConfiguration {
     private final Reflections loggingReflections = new Reflections(LOGGING_INTERCEPTOR_PACKAGE);
     private final Environment environment;
 
-    @Autowired
     public JerseyConfiguration(Environment environment) {
         this.environment = environment;
     }
@@ -127,7 +127,7 @@ public class JerseyConfiguration {
 
     private boolean isEnabledByActiveProfiles(AnnotatedElement annotatedElement) {
         return !annotatedElement.isAnnotationPresent(Profile.class)
-                || environment.acceptsProfiles(annotatedElement.getAnnotation(Profile.class).value());
+                || environment.acceptsProfiles(Profiles.of(annotatedElement.getAnnotation(Profile.class).value()));
     }
 
     private class MissingFilterPriorityException extends RuntimeException {

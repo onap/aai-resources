@@ -32,6 +32,10 @@
     </parent>
     <properties>
         <java.version>1.8</java.version>
+        <spring.boot.version>2.2.13.RELEASE</spring.boot.version>
+        <spring.version>5.2.12.RELEASE</spring.version>
+        <spring.jms.version>${spring.version}</spring.jms.version>
+        <spring.test.version>${spring.version}</spring.test.version>
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
         <!-- Default docker registry that maven fabric plugin will try to pull from -->
@@ -93,7 +97,6 @@
         <!-- Integration tests will be skipped by default. Could be enabled here or by -DskipITs=false-->
         <skipITs>true</skipITs>
 
-        <!-- <swagger.version>1.5.24</swagger.version> -->
         <!-- https://mvnrepository.com/artifact/io.swagger/swagger-core -->
         <swagger.version>1.6.8</swagger.version>
     </properties>
