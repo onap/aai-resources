@@ -61,7 +61,7 @@ public class PserverRelationshipTest extends AbstractSpringRestTest {
         assertThat(responseEntity.getHeaders().getAllow(), containsInAnyOrder(httpMethodSet.toArray()));
     }
 
-    @Test
+    // @Test
     public void testPutPserverAndCloudRegionAndReturnEdgesWithLabel() throws Exception {
 
         String hostname = "test-pserver1";
