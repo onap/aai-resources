@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.interceptors.AAIContainerFilter;
 import org.onap.aai.logging.ErrorLogHelper;
+import org.springframework.http.HttpStatus;
 
 @Priority(AAIResponseFilterPriority.INVALID_RESPONSE_STATUS)
 public class InvalidResponseStatus extends AAIContainerFilter implements ContainerResponseFilter {
@@ -41,9 +42,9 @@ public class InvalidResponseStatus extends AAIContainerFilter implements Contain
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
 
-        if (responseContext.getStatus() == 405) {
+        if (responseContext.getStatus() == HttpStatus.METHOD_NOT_ALLOWED.value()) {
 
-            responseContext.setStatus(400);
+            responseContext.setStatus(HttpStatus.BAD_REQUEST.value());
             AAIException e = new AAIException("AAI_3012");
             ArrayList<String> templateVars = new ArrayList<>();
 

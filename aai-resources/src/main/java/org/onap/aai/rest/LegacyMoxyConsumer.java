@@ -21,7 +21,6 @@
 package org.onap.aai.rest;
 
 import io.micrometer.core.annotation.Timed;
-import io.swagger.jaxrs.PATCH;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;

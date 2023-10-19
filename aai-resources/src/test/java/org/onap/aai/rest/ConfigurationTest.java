@@ -27,7 +27,6 @@ import com.jayway.jsonpath.JsonPath;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -72,28 +71,29 @@ public class ConfigurationTest extends AbstractSpringRestTest {
     @Value("${local.management.port}")
     private int mgtPort;
 
-    private HttpEntity<String> httpEntity;
+    private HttpEntity<String> httpEntityGet;
     private HttpEntity<String> httpEntityPut;
     private HttpEntity<String> httpEntityPatch;
     private String baseUrl;
     private String actuatorurl;
-    private HttpHeaders headers;
+    private HttpHeaders headersGet;
+    private HttpHeaders headersPutPatch;
 
     @Before
     public void setup() throws UnsupportedEncodingException {
 
-        headers = new HttpHeaders();
+        headersGet = new HttpHeaders();
+        headersGet.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headersGet.add("Real-Time", "true");
+        headersGet.add("X-FromAppId", "JUNIT");
+        headersGet.add("X-TransactionId", "JUNIT");
 
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Real-Time", "true");
-        headers.add("X-FromAppId", "JUNIT");
-        headers.add("X-TransactionId", "JUNIT");
+        headersGet.setBasicAuth("AAI","AAI");
 
-        String authorization = Base64.getEncoder().encodeToString("AAI:AAI".getBytes("UTF-8"));
-        headers.add("Authorization", "Basic " + authorization);
-
-        httpEntity = new HttpEntity<String>(headers);
+        headersPutPatch = new HttpHeaders();
+        headersPutPatch.putAll(headersGet);
+        headersPutPatch.setContentType(MediaType.APPLICATION_JSON);
+        httpEntityGet = new HttpEntity<String>(headersGet);
         baseUrl = "http://localhost:" + randomPort;
         actuatorurl = "http://localhost:" + mgtPort;
     }
@@ -105,7 +105,7 @@ public class ConfigurationTest extends AbstractSpringRestTest {
 
         ResponseEntity<String> responseEntity = null;
 
-        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
+        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntityGet, String.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
         // String putBody = " configuration-id, configuration-type configuration-sub-type";
@@ -113,31 +113,31 @@ public class ConfigurationTest extends AbstractSpringRestTest {
                 + "\"configuration-sub-type\": \"subtype1\", " + "\"operational-status\": \"example1\", "
                 + "\"orchestration-status\": \"example1\", " + "\"configuration-selflink\": \"example1\", "
                 + "\"model-customization-id\": \"example1\" " + "}";
-        httpEntityPut = new HttpEntity<String>(putBody, headers);
+        httpEntityPut = new HttpEntity<String>(putBody, headersPutPatch);
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PUT, httpEntityPut, String.class);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
         String vertexId = responseEntity.getHeaders().getFirst("vertex-id");
         responseEntity = restTemplate.exchange(baseUrl + "/aai/v12/resources/id/" + vertexId, HttpMethod.GET,
-                httpEntity, String.class);
+                httpEntityGet, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
+        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntityGet, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         String patchBody = "{" + "\"configuration-id\": \"" + cid + "\"," + "\"configuration-type\": \"type2\","
                 + "\"configuration-sub-type\": \"subtype2\", " + "\"operational-status\": \"example1\", "
                 + "\"orchestration-status\": \"example1\", " + "\"configuration-selflink\": \"example1\", "
                 + "\"model-customization-id\": \"example1\" " + "}";
-        headers.put("Content-Type", Arrays.asList("application/merge-patch+json"));
-        headers.add("X-HTTP-Method-Override", "PATCH");
+        headersPutPatch.put("Content-Type", Arrays.asList("application/merge-patch+json"));
+        headersPutPatch.add("X-HTTP-Method-Override", "PATCH");
 
-        httpEntityPatch = new HttpEntity<String>(patchBody, headers);
+        httpEntityPatch = new HttpEntity<String>(patchBody, headersPutPatch);
 
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.POST, httpEntityPatch, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
+        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntityGet, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         String body = responseEntity.getBody().toString();
@@ -148,11 +148,11 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         patchBody = "{" + "\"configuration-id\": \"" + cid + "\"," + "\"configuration-type\": \"type3\","
                 + "\"configuration-sub-type\": \"subtype3\" " + "}";
 
-        httpEntityPatch = new HttpEntity<String>(patchBody, headers);
+        httpEntityPatch = new HttpEntity<String>(patchBody, headersPutPatch);
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.PATCH, httpEntityPatch, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntity, String.class);
+        responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntityGet, String.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         body = responseEntity.getBody().toString();
@@ -163,15 +163,16 @@ public class ConfigurationTest extends AbstractSpringRestTest {
     }
 
     @Test
-    public void TestManagementEndpointConfiguration() {
+    public void testManagementEndpointConfiguration() {
         ResponseEntity<String> responseEntity = null;
         String responseBody = null;
 
         // set Accept as text/plain in order to get access of endpoint "/actuator/prometheus"
-        headers.set("Accept", "text/plain");
-        httpEntity = new HttpEntity<String>(headers);
+        headersGet.set("Accept", "text/plain");
+        headersGet.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
+        httpEntityGet = new HttpEntity<String>(headersGet);
         responseEntity =
-                restTemplate.exchange(actuatorurl + "/actuator/prometheus", HttpMethod.GET, httpEntity, String.class);
+                restTemplate.exchange(actuatorurl + "/actuator/prometheus", HttpMethod.GET, httpEntityGet, String.class);
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseBody.contains("group_id"));
@@ -179,16 +180,16 @@ public class ConfigurationTest extends AbstractSpringRestTest {
 
         // Set Accept as MediaType.APPLICATION_JSON in order to get access of endpoint "/actuator/info" and
         // "/actuator/health"
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        httpEntity = new HttpEntity<String>(headers);
+        headersGet.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        httpEntityGet = new HttpEntity<String>(headersGet);
         responseEntity =
-                restTemplate.exchange(actuatorurl + "/actuator/info", HttpMethod.GET, httpEntity, String.class);
+                restTemplate.exchange(actuatorurl + "/actuator/info", HttpMethod.GET, httpEntityGet, String.class);
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseBody.contains("aai-resources"));
 
         responseEntity =
-                restTemplate.exchange(actuatorurl + "/actuator/health", HttpMethod.GET, httpEntity, String.class);
+                restTemplate.exchange(actuatorurl + "/actuator/health", HttpMethod.GET, httpEntityGet, String.class);
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseBody.contains("UP"));

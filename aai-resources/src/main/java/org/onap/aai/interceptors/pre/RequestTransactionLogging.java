@@ -91,7 +91,7 @@ public class RequestTransactionLogging extends AAIContainerFilter implements Con
             requestContext.getHeaders().putSingle(CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
         }
 
-        if (WILDCARD.equals(acceptType) || StringUtils.isEmpty(acceptType) || acceptType.contains(TEXT_PLAIN)) {
+        if (WILDCARD.equals(acceptType) || acceptType.isEmpty() || !StringUtils.hasLength(acceptType) || acceptType.contains(TEXT_PLAIN)) {
             UriInfo uriInfo = requestContext.getUriInfo();
             if (uriInfo != null) {
                 MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
