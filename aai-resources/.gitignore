@@ -14,3 +14,5 @@ bundleconfig-local/etc/logback.xml
 *.iml
 **/dbedgerules/**
 **/oxm/**
+**/.classpath
+.classpath
