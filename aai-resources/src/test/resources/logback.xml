@@ -26,18 +26,15 @@
 
 	<property resource="application.properties" />
 
+	<property name="maxHistory" value='7' />
+	<property name="totalSizeCap" value='1GB' />
+	<property name="queueSize" value='1000'/>
+
 	<property name="namespace" value="aai-resources"/>
 
 	<property name="AJSC_HOME" value="${AJSC_HOME:-.}" />
 	<jmxConfigurator />
 	<property name="logDirectory" value="${AJSC_HOME}/logs" />
-	<!-- Old patterns
-	<property name="eelfLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
-	<property name="eelfAuditLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n|\r\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
-	<property name="eelfMetricLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%X{targetEntity}|%X{targetServiceName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{targetVirtualEntity}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
-	<property name="eelfErrorLogPattern" value="%ecompStartTime|%X{requestId}|%-10t|%ecompServiceName|%X{partnerName}|%X{targetEntity}|%X{targetServiceName}|%ecompErrorCategory|%ecompResponseCode|%ecompResponseDescription|co=%X{component}:%replace(%replace(%m){'\\|', '!'}){'\r|\n', '^'}%n"/>
-    <property name="eelfTransLogPattern" value="%ecompStartTime|%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ, UTC}|%X{requestId}|%X{serviceInstanceId}|%-10t|%X{serverName}|%ecompServiceName|%X{partnerName}|%ecompStatusCode|%X{responseCode}|%replace(%replace(%X{responseDescription}){'\\|', '!'}){'\r|\n', '^'}|%X{instanceUUID}|%level|%X{severity}|%X{serverIpAddress}|%ecompElapsedTime|%X{server}|%X{clientIpAddress}|%eelfClassOfCaller|%X{unused}|%X{processKey}|%X{customField1}|%X{customField2}|%X{customField3}|%X{customField4}|co=%X{partnerName}:%m%n"/>
-    -->
 	<property name="p_tim" value="%d{&quot;yyyy-MM-dd'T'HH:mm:ss.SSSXXX&quot;, UTC}"/>
 	<property name="p_lvl" value="%level"/>
 	<property name="p_log" value="%logger"/>
@@ -65,11 +62,7 @@
 		</encoder>
 	</appender>
 
-	<appender name="SANE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${logDirectory}/rest/sane.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/sane.log.%d{yyyy-MM-dd}</fileNamePattern>
-		</rollingPolicy>
+	<appender name="SANE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{1024} - %msg%n
 			</pattern>
@@ -77,56 +70,41 @@
 	</appender>
 
 	<appender name="asyncSANE" class="ch.qos.logback.classic.AsyncAppender">
-		<queueSize>1000</queueSize>
+		<queueSize>${queueSize}</queueSize>
 		<includeCallerData>true</includeCallerData>
 		<appender-ref ref="SANE" />
 	</appender>
-	<appender name="METRIC" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${logDirectory}/rest/metrics.log</file>
-		<rollingPolicy
-				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/metrics.log.%d{yyyy-MM-dd}</fileNamePattern>
-		</rollingPolicy>
+	<appender name="METRIC" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>${metricPattern}</pattern>
 		</encoder>
 	</appender>
 
 	<appender name="asyncMETRIC" class="ch.qos.logback.classic.AsyncAppender">
-		<queueSize>1000</queueSize>
+		<queueSize>${queueSize}</queueSize>
 		<includeCallerData>true</includeCallerData>
 		<appender-ref ref="METRIC"/>
 	</appender>
 
 	<appender name="DEBUG"
-			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+			  class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<file>${logDirectory}/rest/debug.log</file>
-		<rollingPolicy
-				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/debug.log.%d{yyyy-MM-dd}</fileNamePattern>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${debugPattern}</pattern>
 		</encoder>
 	</appender>
 
 	<appender name="asyncDEBUG" class="ch.qos.logback.classic.AsyncAppender">
-		<queueSize>1000</queueSize>
+		<queueSize>${queueSize}</queueSize>
 		<appender-ref ref="DEBUG" />
 		<includeCallerData>true</includeCallerData>
 	</appender>
 	<appender name="ERROR"
-			  class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${logDirectory}/rest/error.log</file>
-		<rollingPolicy
-				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/error.log.%d{yyyy-MM-dd}</fileNamePattern>
-		</rollingPolicy>
+			  class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
 		</filter>
@@ -136,61 +114,46 @@
 	</appender>
 
 	<appender name="asyncERROR" class="ch.qos.logback.classic.AsyncAppender">
-		<queueSize>1000</queueSize>
+		<queueSize>${queueSize}</queueSize>
 		<appender-ref ref="ERROR"/>
 	</appender>
 
 	<appender name="AUDIT"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${logDirectory}/rest/audit.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/audit.log.%d{yyyy-MM-dd}
-			</fileNamePattern>
-		</rollingPolicy>
+		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>${auditPattern}</pattern>
 		</encoder>
 	</appender>
 
 	<appender name="asyncAUDIT" class="ch.qos.logback.classic.AsyncAppender">
-		<queueSize>1000</queueSize>
+		<queueSize>${queueSize}</queueSize>
 		<includeCallerData>true</includeCallerData>
 		<appender-ref ref="AUDIT" />
 	</appender>
 
 	<appender name="translog"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<file>${logDirectory}/rest/translog.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/translog.log.%d{yyyy-MM-dd}
-			</fileNamePattern>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${transLogPattern}</pattern>
 		</encoder>
 	</appender>
 	
 	<appender name="asynctranslog" class="ch.qos.logback.classic.AsyncAppender">
-		<queueSize>1000</queueSize>
+		<queueSize>${queueSize}</queueSize>
 		<includeCallerData>true</includeCallerData>
 		<appender-ref ref="translog" />
 	</appender>
 
 	<appender name="dmaapAAIEventConsumer"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
 		</filter>
-		<File>${logDirectory}/dmaapAAIEventConsumer/error.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/error.log.%d{yyyy-MM-dd}
-			</fileNamePattern>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${errorPattern}</pattern>
 		</encoder>
@@ -198,63 +161,43 @@
 	</appender>
 
 	<appender name="dmaapAAIEventConsumerDebug"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<File>${logDirectory}/dmaapAAIEventConsumer/debug.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/debug.log.%d{yyyy-MM-dd}
-			</fileNamePattern>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${debugPattern}</pattern>
 		</encoder>
 	</appender>
 	<appender name="dmaapAAIEventConsumerInfo"
-			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+			  class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>INFO</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<File>${logDirectory}/dmaapAAIEventConsumer/dmaap-transaction.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/dmaap-transaction.log.%d{yyyy-MM-dd}
-			</fileNamePattern>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${auditPattern}</pattern>
 		</encoder>
 	</appender>
 	<appender name="dmaapAAIEventConsumerMetric"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>INFO</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<File>${logDirectory}/dmaapAAIEventConsumer/metrics.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/metrics.log.%d{yyyy-MM-dd}
-			</fileNamePattern>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${metricPattern}</pattern>
 		</encoder>
 	</appender>
 	<appender name="external"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
 		</filter>
-		<file>${logDirectory}/external/external.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/external/external.log.%d{yyyy-MM-dd}
-			</fileNamePattern>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${debugPattern}</pattern>
 		</encoder>

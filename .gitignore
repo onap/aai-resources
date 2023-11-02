@@ -14,3 +14,4 @@ test_csvWriter.csv
 *.iml
 aai-resources/debug-logs/EELF/
 .vscode
+.classpath
