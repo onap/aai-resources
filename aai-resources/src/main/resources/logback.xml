@@ -21,7 +21,7 @@
     ECOMP is a trademark and service mark of AT&T Intellectual Property.
 
 -->
-<configuration scan="true" scanPeriod="60 seconds" debug="false">
+<configuration scan="true" scanPeriod="60 seconds" debug="true">
 	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
 	<property resource="application.properties" />
@@ -99,19 +99,12 @@
 	</appender>
 
 	<appender name="DEBUG"
-			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+			  class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<file>${logDirectory}/rest/debug.log</file>
-		<rollingPolicy
-				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/debug.log.%d{yyyy-MM-dd}.zip</fileNamePattern>
-			<maxHistory>${maxHistory}</maxHistory>
-			<totalSizeCap>${totalSizeCap}</totalSizeCap>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${debugPattern}</pattern>
 		</encoder>
@@ -123,14 +116,7 @@
 		<includeCallerData>true</includeCallerData>
 	</appender>
 	<appender name="ERROR"
-			  class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${logDirectory}/rest/error.log</file>
-		<rollingPolicy
-				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/error.log.%d{yyyy-MM-dd}.zip</fileNamePattern>
-			<maxHistory>${maxHistory}</maxHistory>
-			<totalSizeCap>${totalSizeCap}</totalSizeCap>
-		</rollingPolicy>
+			  class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
 		</filter>
@@ -165,19 +151,12 @@
 	</appender>
 
 	<appender name="translog"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<file>${logDirectory}/rest/translog.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/rest/translog.log.%d{yyyy-MM-dd}.zip
-			</fileNamePattern>
-			<maxHistory>${maxHistory}</maxHistory>
-			<totalSizeCap>${totalSizeCap}</totalSizeCap>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${transLogPattern}</pattern>
 		</encoder>
@@ -190,17 +169,10 @@
 	</appender>
 
 	<appender name="dmaapAAIEventConsumer"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
 		</filter>
-		<File>${logDirectory}/dmaapAAIEventConsumer/error.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/error.log.%d{yyyy-MM-dd}.zip
-			</fileNamePattern>
-			<maxHistory>${maxHistory}</maxHistory>
-			<totalSizeCap>${totalSizeCap}</totalSizeCap>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${errorPattern}</pattern>
 		</encoder>
@@ -208,37 +180,23 @@
 	</appender>
 
 	<appender name="dmaapAAIEventConsumerDebug"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<File>${logDirectory}/dmaapAAIEventConsumer/debug.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/debug.log.%d{yyyy-MM-dd}.zip
-			</fileNamePattern>
-			<maxHistory>${maxHistory}</maxHistory>
-			<totalSizeCap>${totalSizeCap}</totalSizeCap>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${debugPattern}</pattern>
 		</encoder>
 	</appender>
 	<appender name="dmaapAAIEventConsumerInfo"
-			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+			  class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>INFO</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
-		<File>${logDirectory}/dmaapAAIEventConsumer/dmaap-transaction.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/dmaapAAIEventConsumer/dmaap-transaction.log.%d{yyyy-MM-dd}.zip
-			</fileNamePattern>
-			<maxHistory>${maxHistory}</maxHistory>
-			<totalSizeCap>${totalSizeCap}</totalSizeCap>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${auditPattern}</pattern>
 		</encoder>
@@ -262,17 +220,10 @@
 		</encoder>
 	</appender>
 	<appender name="external"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>WARN</level>
+			<level>DEBUG</level>
 		</filter>
-		<file>${logDirectory}/external/external.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logDirectory}/external/external.log.%d{yyyy-MM-dd}.zip
-			</fileNamePattern>
-			<maxHistory>${maxHistory}</maxHistory>
-			<totalSizeCap>${totalSizeCap}</totalSizeCap>
-		</rollingPolicy>
 		<encoder>
 			<pattern>${debugPattern}</pattern>
 		</encoder>
