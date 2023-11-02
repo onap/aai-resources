@@ -1,0 +1,13 @@
+<model xmlns="http://org.onap.aai.inventory/v25">
+	<model-invariant-id>3d560d81-57d0-438b-a2a1-5334dba0651a</model-invariant-id>
+	<model-type>widget</model-type>
+	<model-role>someRole</model-role>
+	<data-owner>someOwner</data-owner>
+	<model-vers>
+		<model-ver>
+			<model-version-id>9111f20f-e680-4001-b83f-19a2fc23bfc1</model-version-id>
+			<model-version>1.0</model-version>
+			<model-name>l3-network</model-name>
+		</model-ver>
+	</model-vers>
+</model>
