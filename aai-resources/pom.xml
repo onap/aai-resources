@@ -579,7 +579,16 @@
                     <groupId>org.onap.aai.aai-common</groupId>
                     <artifactId>aai-aaf-auth</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.onap.aai.aai-common</groupId>
+                    <artifactId>aai-rest</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.onap.aai.aai-common</groupId>
+            <artifactId>aai-rest</artifactId>
+            <version>1.11.0</version>
         </dependency>
 
         <dependency>
@@ -702,6 +711,12 @@
             <version>${keycloak.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>1.19.1</version>
+			<scope>test</scope>
+		</dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -983,7 +998,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <configuration combine.children="append">
+                <configuration>
                     <excludes>
                         <exclude>**/*WebSecurityConfig.*</exclude>
                     </excludes>
