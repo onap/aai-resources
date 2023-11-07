@@ -93,6 +93,7 @@
         <micrometer-jersey2>1.6.6</micrometer-jersey2>
         <testcontainers.version>1.6.1</testcontainers.version>
         <mockito.core.version>3.4.0</mockito.core.version>
+        <eclipse.persistence.version>2.6.2</eclipse.persistence.version>
         <!-- Setting some default value to not complain by editor but it will be overridden by gmaven plugin -->
 
         <!-- Integration tests will be skipped by default. Could be enabled here or by -DskipITs=false-->

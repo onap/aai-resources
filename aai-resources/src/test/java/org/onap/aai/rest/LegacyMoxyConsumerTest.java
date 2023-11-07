@@ -65,8 +65,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class LegacyMoxyConsumerTest extends AAISetup {
 
     protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
-
     private static final Set<Integer> VALID_HTTP_STATUS_CODES = new HashSet<>();
+    private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
 
     static {
         VALID_HTTP_STATUS_CODES.add(200);
@@ -87,8 +87,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
     private boolean initialized = false;
+    private String defaultSchemaVersion;
 
-    private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
 
     @BeforeClass
     public static void setupRest() {
@@ -121,6 +121,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         aaiRequestContextList = new ArrayList<>();
         aaiRequestContextList.add("");
+        defaultSchemaVersion = schemaVersions.getDefaultVersion().toString();
 
         when(httpHeaders.getAcceptableMediaTypes()).thenReturn(outputMediaTypes);
         when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
@@ -154,13 +155,13 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(),
+        Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
                 uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+        response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri, httpHeaders,
                 uriInfo, mockReq);
 
         int code = response.getStatus();
@@ -172,7 +173,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         queryParameters.add("depth", "10000");
 
-        response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "10000", "false", httpHeaders, uriInfo, mockReqGet);
 
         code = response.getStatus();
@@ -192,7 +193,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         queryParameters.add("resource-version", resourceVersion);
 
         mockReq = new MockHttpServletRequest("DELETE", uri);
-        response = legacyMoxyConsumer.delete(schemaVersions.getDefaultVersion().toString(), uri, httpHeaders, uriInfo,
+        response = legacyMoxyConsumer.delete(defaultSchemaVersion, uri, httpHeaders, uriInfo,
                 "", mockReq);
 
         code = response.getStatus();
@@ -202,7 +203,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -221,7 +222,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy("", "1", "10", schemaVersions.getDefaultVersion().toString(),
+        Response response = legacyMoxyConsumer.getLegacy("", "1", "10", defaultSchemaVersion,
                 uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
@@ -246,7 +247,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 String.format("cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
         Response response = legacyMoxyConsumer.updateRelationship(cloudToPserverRelationshipData,
-                schemaVersions.getDefaultVersion().toString(), cloudToPserverRelationshipUri, httpHeaders, uriInfo,
+                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
                 mockReq);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -262,7 +263,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         // TODO - Need to actually verify the relationship between pserver and cloud-region
         mockReq = new MockHttpServletRequest("DELETE", cloudToPserverRelationshipUri);
         response = legacyMoxyConsumer.deleteRelationship(cloudToPserverRelationshipData,
-                schemaVersions.getDefaultVersion().toString(), cloudToPserverRelationshipUri, httpHeaders, uriInfo,
+                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
                 mockReq);
 
         code = response.getStatus();
@@ -295,7 +296,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        Response response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        Response response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
 
         int code = response.getStatus();
@@ -312,7 +313,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenThrow(new IllegalArgumentException());
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        Response response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        Response response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
 
         int code = response.getStatus();
@@ -320,7 +321,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
 
-        response = legacyMoxyConsumer.updateRelationship(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.updateRelationship(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
 
         code = response.getStatus();
@@ -328,19 +329,19 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         mockReq = new MockHttpServletRequest("GET", uri);
-        response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "all", "false", httpHeaders, uriInfo, mockReq);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
         mockReq = new MockHttpServletRequest("DELETE", uri);
-        response = legacyMoxyConsumer.delete(schemaVersions.getDefaultVersion().toString(), uri, httpHeaders, uriInfo,
+        response = legacyMoxyConsumer.delete(defaultSchemaVersion, uri, httpHeaders, uriInfo,
                 "", mockReq);
 
         code = response.getStatus();
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
 
-        response = legacyMoxyConsumer.deleteRelationship(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.deleteRelationship(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
         code = response.getStatus();
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
@@ -355,14 +356,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        Response response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        Response response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
 
         int code = response.getStatus();
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
-        response = legacyMoxyConsumer.updateRelationship(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.updateRelationship(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
 
         code = response.getStatus();
@@ -370,7 +371,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         mockReq = new MockHttpServletRequest("GET", uri);
-        response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "all", "false", httpHeaders, uriInfo, mockReq);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -378,14 +379,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         mockReq = new MockHttpServletRequest("DELETE", uri);
         queryParameters.add("resource-version", "3434394839483");
-        response = legacyMoxyConsumer.delete(schemaVersions.getDefaultVersion().toString(), uri, httpHeaders, uriInfo,
+        response = legacyMoxyConsumer.delete(defaultSchemaVersion, uri, httpHeaders, uriInfo,
                 "", mockReq);
 
         code = response.getStatus();
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
-        response = legacyMoxyConsumer.deleteRelationship(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.deleteRelationship(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
         code = response.getStatus();
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
@@ -406,12 +407,12 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         MockHttpServletRequest mockReq = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(),
+        Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
                 uri, "all", "false", httpHeaders, uriInfo, mockReq);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         mockReq = new MockHttpServletRequest("PUT", uri);
-        response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+        response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri, httpHeaders,
                 uriInfo, mockReq);
 
         int code = response.getStatus();
@@ -429,7 +430,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         outputMediaTypes.add(MediaType.valueOf("application/merge-patch+json"));
 
         mockReq = new MockHttpServletRequest("PATCH", uri);
-        response = legacyMoxyConsumer.patch(patchData, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+        response = legacyMoxyConsumer.patch(patchData, defaultSchemaVersion, uri, httpHeaders,
                 uriInfo, mockReq);
 
         code = response.getStatus();
@@ -445,16 +446,16 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-        when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + uri));
+        when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + uri));
 
-        Response response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(),
+        Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
                 uri, "all", "false", httpHeaders, uriInfo, mockRequest);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
         assertEquals("Expected to not have the data already in memory", Response.Status.NOT_FOUND.getStatusCode(),
                 response.getStatus());
 
-        response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+        response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri, httpHeaders,
                 uriInfo, mockRequest);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -466,7 +467,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 response.getStatus());
 
         queryParameters.add("depth", "10000");
-        response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "all", "false", httpHeaders, uriInfo, mockRequest);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -492,7 +493,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
         MockHttpServletRequest mockReq = new MockHttpServletRequest("DELETE", uri);
         Response response = legacyMoxyConsumer.deleteRelationship(payload,
-                schemaVersions.getDefaultVersion().toString(), uri, httpHeaders, uriInfo, mockReq);
+                defaultSchemaVersion, uri, httpHeaders, uriInfo, mockReq);
 
         int code = response.getStatus();
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
@@ -505,11 +506,13 @@ public class LegacyMoxyConsumerTest extends AAISetup {
     }
 
     public String getResourcePayload(String resourceName) throws IOException {
-        return getPayload("payloads/resource/" + resourceName + ".json");
+        String rawPayload = getPayload("payloads/resource/" + resourceName + ".json");
+        return String.format(rawPayload, defaultSchemaVersion);
     }
 
     public String getRelationshipPayload(String relationshipName) throws IOException {
-        return getPayload("payloads/relationship/" + relationshipName + ".json");
+        String rawPayload = getPayload("payloads/relationship/" + relationshipName + ".json");
+        return String.format(rawPayload, defaultSchemaVersion);
     }
 
     public String getUri(String hostname) {
@@ -580,7 +583,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
 
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(),
+        Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
                 uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -600,7 +603,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
 
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(),
+        Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
                 uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -626,7 +629,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 String.format("cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
         Response response = legacyMoxyConsumer.updateRelationship(cloudToPserverRelationshipData,
-                schemaVersions.getDefaultVersion().toString(), cloudToPserverRelationshipUri, httpHeaders, uriInfo,
+                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
                 mockReq);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -639,16 +642,12 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 response.getStatus());
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
 
-        String getRelationshipMockRequestUri =
-                String.format("cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
         String getRelationshipUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
         HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
         when(mockRequest.getRequestURL())
-                .thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + getRelationshipUri));
-        response = legacyMoxyConsumer.getRelationshipList("1", "1", schemaVersions.getDefaultVersion().toString(),
+                .thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + getRelationshipUri));
+        response = legacyMoxyConsumer.getRelationshipList("1", "1", defaultSchemaVersion,
                 getRelationshipUri, "false", httpHeaders, mockRequest, uriInfo);
-
-        String s = response.getEntity().toString();
 
         code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
@@ -679,7 +678,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 String.format("cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
         Response response = legacyMoxyConsumer.updateRelationship(cloudToPserverRelationshipData,
-                schemaVersions.getDefaultVersion().toString(), cloudToPserverRelationshipUri, httpHeaders, uriInfo,
+                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
                 mockReq);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -698,8 +697,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         queryParameters.add("format", "resource");
         HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
         when(mockRequest.getRequestURL())
-                .thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + getRelationshipUri));
-        response = legacyMoxyConsumer.getRelationshipList("1", "1", schemaVersions.getDefaultVersion().toString(),
+                .thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + getRelationshipUri));
+        response = legacyMoxyConsumer.getRelationshipList("1", "1", defaultSchemaVersion,
                 getRelationshipUri, "false", httpHeaders, mockRequest, uriInfo);
         queryParameters.remove("format");
 
@@ -762,9 +761,9 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         MockHttpServletRequest mockReq = new MockHttpServletRequest("GET_RELATIONSHIP", getRelationshipMockRequestUri);
         HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
         when(mockRequest.getRequestURL())
-                .thenReturn(new StringBuffer("https://localhost:8447/aai/v15/" + getRelationshipUri));
+                .thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + getRelationshipUri));
         Response response =
-                legacyMoxyConsumer.getRelationshipList("1", "1", schemaVersions.getDefaultVersion().toString(),
+                legacyMoxyConsumer.getRelationshipList("1", "1", defaultSchemaVersion,
                         getRelationshipUri, "false", httpHeaders, mockRequest, uriInfo);
 
         int code = response.getStatus();
@@ -1090,7 +1089,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         queryParameters.add("resource-version", resourceVersion);
 
         MockHttpServletRequest mockReq = new MockHttpServletRequest("DELETE", deleteUri);
-        Response deleteResponse = legacyMoxyConsumer.delete(schemaVersions.getDefaultVersion().toString(), deleteUri,
+        Response deleteResponse = legacyMoxyConsumer.delete(defaultSchemaVersion, deleteUri,
                 httpHeaders, uriInfo, resourceVersion, mockReq);
         return deleteResponse;
     }
@@ -1119,7 +1118,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        Response response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri,
+        Response response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
 
         assertNotNull("Response from the legacy moxy consumer returned null", response);
@@ -1135,7 +1134,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
     private Response getMockResponse(String mockUri) throws IOException, JSONException {
         MockHttpServletRequest mockReq = new MockHttpServletRequest("GET", mockUri);
-        Response response = legacyMoxyConsumer.getLegacy("", null, null, schemaVersions.getDefaultVersion().toString(),
+        Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
                 mockUri, "10000", "false", httpHeaders, uriInfo, mockReq);
         String responseEntity = response.getEntity().toString();
         int code = response.getStatus();

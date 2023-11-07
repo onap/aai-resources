@@ -12,7 +12,7 @@
       "is-closed-loop-disabled": false,
       "relationship-list": {"relationship": [         {
         "related-to": "pserver",
-        "related-link": "/aai/v15/cloud-infrastructure/pservers/pserver/pserver-hostname-test02"
+        "related-link": "/aai/%s/cloud-infrastructure/pservers/pserver/pserver-hostname-test02"
       }]}
     }]}
   }]}
