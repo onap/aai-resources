@@ -99,8 +99,8 @@
         <!-- Integration tests will be skipped by default. Could be enabled here or by -DskipITs=false-->
         <skipITs>true</skipITs>
 
-        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-core -->
         <swagger.version>1.6.8</swagger.version>
+        <spring-cloud.version>2020.0.2</spring-cloud.version>
     </properties>
     <profiles>
         <!-- Docker profile to be used for building docker image and pushing to nexus -->
@@ -311,6 +311,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
+        <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+          </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-spring-legacy</artifactId>
@@ -713,6 +721,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+              </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -984,7 +999,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <configuration combine.children="append">
+                <configuration>
                     <excludes>
                         <exclude>**/*WebSecurityConfig.*</exclude>
                     </excludes>
