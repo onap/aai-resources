@@ -47,7 +47,7 @@ public class ModelDistributionTest extends AbstractSpringRestTest {
     @Test
     public void thatModelsCanBeDistributed() throws Exception {
         final String MODEL_FILE = "src/test/resources/payloads/models/network-service.xml";
-        String uri = baseUrl + "/aai/v27/service-design-and-creation/models/model/d821d1aa-8a69-47a4-aa63-3dae1742c47c";
+        String uri = baseUrl + "/aai/v28/service-design-and-creation/models/model/d821d1aa-8a69-47a4-aa63-3dae1742c47c";
 
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
         headers.setContentType(null);
