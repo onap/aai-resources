@@ -354,6 +354,19 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
+    @Test
+    public void invalidNodeCreationPaylodTest() throws IOException {
+        String payload = getBulkPayload("single-transaction/put-complex-with-missing-properties")
+                .replaceAll("<methodName>", name.getMethodName());
+        Response response = executeRequest(payload);
+
+        assertEquals("Request fails with 400", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertThat("Response contains correct index of failed operation.", response.getEntity().toString(),
+                containsString("Error with operation 0"));
+        assertThat("Response contains information about missing properties.", response.getEntity().toString(),
+                containsString("Missing required property:"));
+    }
+
     protected Response executeRequest(String finalPayload) {
         MockHttpServletRequest mockReq = new MockHttpServletRequest(HttpMethod.POST, "http://www.test.com");
 

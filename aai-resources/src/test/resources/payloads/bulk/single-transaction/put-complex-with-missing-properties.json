@@ -1,0 +1,9 @@
+{
+    "operations": [
+        {
+            "action": "put",
+            "uri": "cloud-infrastructure/complexes/complex/complex-<methodName>",
+            "body": {}
+        }
+    ]
+}

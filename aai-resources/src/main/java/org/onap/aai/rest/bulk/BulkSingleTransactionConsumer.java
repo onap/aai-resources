@@ -213,7 +213,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
     /**
      * Builds the response
-     * 
+     *
      * @param transaction the input transactions
      * @param results the response of all of he operations
      * @return TansactionResponse obj representing the result of the transaction
@@ -242,7 +242,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
     /**
      * Generate one DBRequest per BulkOperation
-     * 
+     *
      * @param headers request headers
      * @param transId transaction id
      * @param bulkOperations operations to convert
@@ -268,7 +268,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
     /**
      * Sets the uriquery for each bulk operation
-     * 
+     *
      * @param bulkOperations operations to generate queries for
      * @param dbEngine engine for query builder generation
      * @throws AAIException thrown for issues with generating uri query
@@ -289,7 +289,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
     /**
      * Sets the introspector for each bulk operation. requires that uriquery is set per operation
-     * 
+     *
      * @param bulkOperations operations to generate introspector for
      * @param loader Loader for generating introspector
      * @throws AAIException thrown for issues with generating introspector
@@ -315,6 +315,8 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
                     }
                     bulkOperation.setIntrospector(obj);
                 }
+            } catch (AAIException e) {
+                throw new AAIException(e.getCode(), "Error with operation " + i + ": " + e.getMessage());
             } catch (UnsupportedEncodingException e) {
                 throw new AAIException("AAI_3000", String.format(objectUnMarshallMsg, i, bulkOperation.getRawReq()));
             }
@@ -327,7 +329,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
      * - Integer.MAX_VALUE if override limit is configured
      * - Property in aaiconfig
      * - 30 by default
-     * 
+     *
      * @param headers request header
      */
     private void setOperationCount(HttpHeaders headers) {
@@ -348,7 +350,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
     /**
      * Converts the request transaction into a list of bulk operations
-     * 
+     *
      * @param transaction transaction to extract bulk operations from
      * @return list of bulk operations
      */
@@ -381,7 +383,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
 
     /**
      * Map action to httpmethod
-     * 
+     *
      * @param action action to be mapped
      * @param uri uri of the action
      * @return HttpMethod thats action/uri maps to
@@ -415,7 +417,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
      * - action is provided and correct.
      * - uri exists
      * - body exists
-     * 
+     *
      * @param transaction parsed payload
      * @throws AAIException with the violations in the msg
      */
