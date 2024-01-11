@@ -16,6 +16,24 @@
       "message": "I would suggest to release this rather as 1.13.0 to be more in line with the versioning of the other services like aai-common and aai-traversal",
       "revId": "fa377bc1459c122ac7f9231cbbdc72e652d78bcf",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02a6a111_79419055",
+        "filename": "version.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2024-01-11T14:42:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a172357_9148f191",
+      "revId": "fa377bc1459c122ac7f9231cbbdc72e652d78bcf",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ]
 }
