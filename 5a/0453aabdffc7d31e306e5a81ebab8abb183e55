@@ -1,0 +1,8 @@
+Verified+1: ONAP Required GHA <releng+onap.required.gha@linuxfoundation.org>
+Code-Review+2: Nandkishor Patke <nandkishor-laxman.patke@t-systems.com>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Submitted-by: Nandkishor Patke <nandkishor-laxman.patke@t-systems.com>
+Submitted-at: Fri, 19 Jan 2024 13:56:36 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/aai/resources/+/137055
+Project: aai/resources
+Branch: refs/heads/master
