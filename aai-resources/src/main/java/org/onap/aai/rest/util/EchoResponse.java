@@ -140,7 +140,7 @@ public class EchoResponse extends RESTAPI {
         HashMap<AAIException, ArrayList<String>> exceptionList = new HashMap<>();
         exceptionList.put(new AAIException("AAI_0002", "OK"), templateVariables);
         return Response.status(Status.OK)
-                .entity(ErrorLogHelper.getRESTAPIInfoResponse(headers.getAcceptableMediaTypes(), exceptionList))
+                .entity(ErrorLogHelper.getRESTAPIInfoResponse(new ArrayList<>(headers.getAcceptableMediaTypes()), exceptionList))
                 .build();
     }
 

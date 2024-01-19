@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.13.0-SNAPSHOT</version>
+        <version>1.13.1-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -49,7 +49,7 @@
 
         <!--
              Location where assembly of our scripts, resources and main jar will be held
-	         Check the ${project.artifactId}/src/main/assembly/descriptor.xml for more info
+             Check the ${project.artifactId}/src/main/assembly/descriptor.xml for more info
         -->
         <aai.build.directory>${project.build.directory}/${project.artifactId}-${project.version}-build/
         </aai.build.directory>
@@ -312,9 +312,9 @@
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-sleuth</artifactId>
-		</dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-sleuth-zipkin</artifactId>
@@ -728,6 +728,14 @@
                 <type>pom</type>
                 <scope>import</scope>
               </dependency>
+            <!-- Keeping guava at 19 is necessary here, since the janusgraph-cql driver in version
+                 2.3 has a dependency on it. Remove this override, once we are using janusgraph > 0.2.3/tinkerpop > 3.2.3
+            -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>19.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
