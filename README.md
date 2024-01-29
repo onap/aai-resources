@@ -48,10 +48,3 @@ Integration tests are located in `it` directory, and disabled by default in the 
 `<skipITs>true</skipITs>`
 
 As a naming convention, All integration test classes should end with `IT`, and will be executed by changing the `skipITs` value in pom file, or through the command line `-DskipITs=false`
-
-## Docker
-
-To build the docker image, the maven `docker` profile can be used:
-```sh
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 mvn clean install -P docker -DskipTests
-```
