@@ -223,9 +223,12 @@
 	<logger name="org.zookeeper" level="OFF" />
 
 
-	<logger name="org.onap.aai" level="DEBUG" additivity="false">
+	<logger name="org.onap.aai" level="INFO" additivity="false">
 		<appender-ref ref="asyncDEBUG" />
 		<appender-ref ref="asyncSANE" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+	<logger name="org.onap.aai.dbgen" level="WARN" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
 	<logger name="org.onap.aai.aailog.logs.AaiScheduledTaskAuditLog" level="INFO">

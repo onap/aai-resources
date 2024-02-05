@@ -290,9 +290,8 @@ public class LegacyMoxyConsumer extends RESTAPI {
             Introspector obj = loader.introspectorFromName(objType);
             DBRequest request =
                     new DBRequest.Builder(HttpMethod.GET, uriObject, uriQuery, obj, headers, info, transId).build();
-            List<DBRequest> requests = new ArrayList<>();
-            requests.add(request);
-            if (resultIndex != null && !"-1".equals(resultIndex) && resultSize != null && !"-1".equals(resultSize)) {
+            List<DBRequest> requests = Collections.singletonList(request);
+            if (hasValidPaginationParams(resultIndex, resultSize)) {
                 traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
                 traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
             }
@@ -318,6 +317,10 @@ public class LegacyMoxyConsumer extends RESTAPI {
         }
 
         return response;
+    }
+
+    private boolean hasValidPaginationParams(String resultIndex, String resultSize) {
+        return resultIndex != null && !"-1".equals(resultIndex) && resultSize != null && !"-1".equals(resultSize);
     }
 
     private MultivaluedMap<String, String> removeNonFilterableParams(MultivaluedMap<String, String> params) {
@@ -554,7 +557,7 @@ public class LegacyMoxyConsumer extends RESTAPI {
                             .build();
             List<DBRequest> requests = new ArrayList<>();
             requests.add(request);
-            if (resultIndex != null && !"-1".equals(resultIndex) && resultSize != null && !"-1".equals(resultSize)) {
+            if (hasValidPaginationParams(resultIndex, resultSize)) {
                 traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
                 traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
             }
