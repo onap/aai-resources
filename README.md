@@ -11,7 +11,7 @@ AAI can be compiled easily with a `mvn clean install -DskipTests`. Integration t
 ## Starting AAI
 In a local development environment run:
 ``` bash
-mvn -N -P runAjsc
+mvn spring-boot:run
 ```
 You have to be in the `aai-resources` folder for that to work!
 

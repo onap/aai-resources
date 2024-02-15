@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-@PropertySource("file:${server.local.startpath}/etc/appprops/datatoolscrons.properties")
+@PropertySource(value="file:${server.local.startpath}/etc/appprops/datatoolscrons.properties", ignoreResourceNotFound=true)
 public class DataImportTasks {
 
     private static final Logger LOGGER;
