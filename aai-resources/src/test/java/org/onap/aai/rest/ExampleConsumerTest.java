@@ -20,8 +20,8 @@
 
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -38,9 +38,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
@@ -74,13 +74,13 @@ public class ExampleConsumerTest extends AAISetup {
 
     private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
 
-    @BeforeClass
+    @BeforeAll
     public static void setupRest() {
         AAIGraph.getInstance();
 
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
@@ -123,7 +123,7 @@ public class ExampleConsumerTest extends AAISetup {
         Response response = exampleConsumer.getExample(schemaVersions.getDefaultVersion().toString(), "pserver",
                 httpHeaders, uriInfo, null);
 
-        assertNotNull("Response from the example consumer returned null", response);
+        assertNotNull(response, "Response from the example consumer returned null");
 
         int code = Response.Status.OK.getStatusCode();
 
@@ -139,7 +139,7 @@ public class ExampleConsumerTest extends AAISetup {
         Response response = exampleConsumer.getExample(schemaVersions.getDefaultVersion().toString(),
                 "testRandomCrazyObject", httpHeaders, uriInfo, null);
 
-        assertNotNull("Response from the example consumer returned null", response);
+        assertNotNull(response, "Response from the example consumer returned null");
 
         int code = Response.Status.BAD_REQUEST.getStatusCode();
 

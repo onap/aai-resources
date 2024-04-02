@@ -28,11 +28,11 @@ import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphTransaction;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.dbmap.AAIGraph;
@@ -79,13 +79,13 @@ public abstract class AbstractSpringRestTest {
     protected String baseUrl;
     protected HttpHeaders headers;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupConfig() throws AAIException {
         System.setProperty("AJSC_HOME", "./");
         System.setProperty("BUNDLECONFIG_DIR", "src/main/resources/");
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws AAIException, UnsupportedEncodingException {
 
         AAIConfig.init();
@@ -106,7 +106,7 @@ public abstract class AbstractSpringRestTest {
         baseUrl = "http://localhost:" + randomPort;
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
 
         JanusGraph janusGraph = AAIGraph.getInstance().getGraph();

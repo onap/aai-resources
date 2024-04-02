@@ -21,15 +21,17 @@
 package org.onap.aai.rest.bulk;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
@@ -39,10 +41,9 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.onap.aai.db.props.AAIProperties;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.rest.BulkConsumer;
@@ -55,14 +56,18 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
 
     private BulkSingleTransactionConsumer bulkSingleTransactionConsumer = new BulkSingleTransactionConsumer("/aai");
 
-    @Rule
-    public TestName name = new TestName();
+    
+    public String name;
 
     private String sot = "Junit";
 
-    @Before
-    public void before() {
-        sot = "JUNIT-" + name.getMethodName();
+    @BeforeEach
+    public void before(TestInfo testInfo) {
+        Optional<Method> testMethod = testInfo.getTestMethod();
+        if (testMethod.isPresent()) {
+            this.name = testMethod.get().getName();
+        }
+        sot = "JUNIT-" + name;
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
         headersMultiMap.addFirst("X-FromAppId", sot);
@@ -72,63 +77,66 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
     @Test
     public void addPserverPatchSamePserverTest() throws IOException {
 
-        String payload = getBulkPayload("single-transaction/put-patch-same-pserver").replaceAll("<methodName>",
-                name.getMethodName());
+        String payload = getBulkPayload("single-transaction/put-patch-same-pserver").replaceAll("<methodName>", name);
         Response response = executeRequest(payload);
 
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("1 vertex from this test in graph", Long.valueOf(1L), AAIGraph.getInstance().getGraph()
-                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
-        assertEquals("1 vertex from this test  with fqdn = patched-fqdn", Long.valueOf(1L),
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
+        assertEquals(Long.valueOf(1L), AAIGraph.getInstance().getGraph()
+                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next(), "1 vertex from this test in graph");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
-                        .has(AAIProperties.SOURCE_OF_TRUTH, sot).has("fqdn", "patched-fqdn").count().next());
+                        .has(AAIProperties.SOURCE_OF_TRUTH, sot).has("fqdn", "patched-fqdn").count().next(),
+                "1 vertex from this test  with fqdn = patched-fqdn");
 
     }
 
     @Test
     public void putPserverComplexRelBetween() throws IOException {
 
-        String payload = getBulkPayload("single-transaction/put-pserver-complex-rel-between").replaceAll("<methodName>",
-                name.getMethodName());
+        String payload = getBulkPayload("single-transaction/put-pserver-complex-rel-between").replaceAll("<methodName>", name);
         Response response = executeRequest(payload);
 
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("2 vertex from this test in graph", Long.valueOf(2L), AAIGraph.getInstance().getGraph()
-                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
-        assertEquals("1 complex vertex", Long.valueOf(1L),
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
+        assertEquals(Long.valueOf(2L), AAIGraph.getInstance().getGraph()
+                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next(), "2 vertex from this test in graph");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "complex").count()
-                        .next());
-        assertEquals("1 pserver vertex", Long.valueOf(1L),
+                        .next(),
+                "1 complex vertex");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "pserver").count()
-                        .next());
-        assertEquals("pserver has edge to complex", Long.valueOf(1L),
+                        .next(),
+                "1 pserver vertex");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "pserver").bothE()
                         .otherV().has(AAIProperties.NODE_TYPE, "complex").has(AAIProperties.SOURCE_OF_TRUTH, sot)
-                        .count().next());
+                        .count().next(),
+                "pserver has edge to complex");
 
     }
 
     @Test
     public void putPatchSamePserverPutAnotherPserver() throws IOException {
         String payload = getBulkPayload("single-transaction/put-patch-same-pserver-put-another-pserver")
-                .replaceAll("<methodName>", name.getMethodName());
+                .replaceAll("<methodName>", name);
         Response response = executeRequest(payload);
 
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("2 vertex from this test in graph", Long.valueOf(2L), AAIGraph.getInstance().getGraph()
-                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
-        assertEquals("pserver 1 has hostname pserver-1-" + name.getMethodName() + " fqdn = patched-fqdn",
-                Long.valueOf(1L),
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
+        assertEquals(Long.valueOf(2L), AAIGraph.getInstance().getGraph()
+                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next(), "2 vertex from this test in graph");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
-                        .has(AAIProperties.SOURCE_OF_TRUTH, sot).has("hostname", "pserver-1-" + name.getMethodName())
-                        .has("fqdn", "patched-fqdn").count().next());
-        assertEquals("pserver 2 has hostname pserver-2-" + name.getMethodName(), Long.valueOf(1L),
+                        .has(AAIProperties.SOURCE_OF_TRUTH, sot).has("hostname", "pserver-1-" + name)
+                        .has("fqdn", "patched-fqdn").count().next(),
+                "pserver 1 has hostname pserver-1-" + name + " fqdn = patched-fqdn");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
-                        .has(AAIProperties.SOURCE_OF_TRUTH, sot).has("hostname", "pserver-2-" + name.getMethodName())
-                        .count().next());
+                        .has(AAIProperties.SOURCE_OF_TRUTH, sot).has("hostname", "pserver-2-" + name)
+                        .count().next(),
+                "pserver 2 has hostname pserver-2-" + name);
     }
 
     protected String asString(Vertex v) {
@@ -154,39 +162,44 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
                 .property(AAIProperties.SOURCE_OF_TRUTH, sot)
                 .property(AAIProperties.AAI_URI,
                         "/network/generic-vnfs/generic-vnf/gvnf-putPserverComplexRelBetweenDelExistingGvnf")
-                .property(AAIProperties.RESOURCE_VERSION, "0").property("vnf-id", "gvnf-" + name.getMethodName())
+                .property(AAIProperties.RESOURCE_VERSION, "0").property("vnf-id", "gvnf-" + name)
                 .next();
         AAIGraph.getInstance().getGraph().tx().commit();
 
-        assertEquals("1 generic-vnf vertex exists before payload", Long.valueOf(1L),
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "generic-vnf").count()
-                        .next());
+                        .next(),
+                "1 generic-vnf vertex exists before payload");
 
         String payload = getBulkPayload("single-transaction/put-pserver-complex-rel-between-del-existing-gvnf")
-                .replaceAll("<methodName>", name.getMethodName());
+                .replaceAll("<methodName>", name);
         Response response = executeRequest(payload);
 
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("2 vertex from this test in graph", Long.valueOf(2L), AAIGraph.getInstance().getGraph()
-                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
-        assertEquals("1 complex vertex", Long.valueOf(1L),
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
+        assertEquals(Long.valueOf(2L), AAIGraph.getInstance().getGraph()
+                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next(), "2 vertex from this test in graph");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "complex").count()
-                        .next());
-        assertEquals("1 pserver vertex", Long.valueOf(1L),
+                        .next(),
+                "1 complex vertex");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "pserver").count()
-                        .next());
-        assertEquals("pserver has edge to complex", Long.valueOf(1L),
+                        .next(),
+                "1 pserver vertex");
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "pserver").bothE()
                         .otherV().has(AAIProperties.NODE_TYPE, "complex").has(AAIProperties.SOURCE_OF_TRUTH, sot)
-                        .count().next());
-        assertEquals("0 generic-vnf vertex exists after payload", Long.valueOf(0L),
+                        .count().next(),
+                "pserver has edge to complex");
+        assertEquals(Long.valueOf(0L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "generic-vnf").count()
-                        .next());
+                        .next(),
+                "0 generic-vnf vertex exists after payload");
 
         assertThat("Response contains 204 status.", response.getEntity().toString(),
                 containsString("\"response-status-code\":204"));
@@ -200,25 +213,26 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
                 .property(AAIProperties.SOURCE_OF_TRUTH, sot)
                 .property(AAIProperties.AAI_URI,
                         "/network/generic-vnfs/generic-vnf/gvnf-putPserverComplexRelBetweenDelExistingGvnfFail")
-                .property(AAIProperties.RESOURCE_VERSION, "0").property("vnf-id", "gvnf-" + name.getMethodName())
+                .property(AAIProperties.RESOURCE_VERSION, "0").property("vnf-id", "gvnf-" + name)
                 .next();
         AAIGraph.getInstance().getGraph().tx().commit();
 
-        assertEquals("1 generic-vnf vertex exists before payload", Long.valueOf(1L),
+        assertEquals(Long.valueOf(1L),
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V()
                         .has(AAIProperties.SOURCE_OF_TRUTH, sot).has(AAIProperties.NODE_TYPE, "generic-vnf").count()
-                        .next());
+                        .next(),
+                "1 generic-vnf vertex exists before payload");
 
         String payload = getBulkPayload("single-transaction/put-pserver-complex-rel-between-del-existing-gvnf-fail")
-                .replaceAll("<methodName>", name.getMethodName());
+                .replaceAll("<methodName>", name);
         Response response = executeRequest(payload);
 
         System.out.println(response.getEntity().toString());
 
-        assertEquals("Request failed", Response.Status.PRECONDITION_FAILED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.PRECONDITION_FAILED.getStatusCode(), response.getStatus(), "Request failed");
 
-        assertEquals("1 vertex exists after payload due to failure", Long.valueOf(1L), AAIGraph.getInstance().getGraph()
-                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
+        assertEquals(Long.valueOf(1L), AAIGraph.getInstance().getGraph()
+                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next(), "1 vertex exists after payload due to failure");
 
         assertThat("Response contains resource version msg for failed transaction.", response.getEntity().toString(),
                 containsString("Precondition Failed:resource-version MISMATCH for delete of generic-vnf"));
@@ -237,7 +251,7 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         String payload = getBulkPayload("single-transaction/pserver-bulk-limit-exceed");
         Response response = executeRequest(payload);
 
-        assertEquals("Request fails with 400", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Request fails with 400");
         assertThat("Response contains payload limit msg.", response.getEntity().toString(),
                 containsString("Payload Limit Reached, reduce payload: Allowed limit = "));
     }
@@ -248,7 +262,7 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         String payload = "{]}";// malformed json
         Response response = executeRequest(payload);
 
-        assertEquals("Request fails with 400", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Request fails with 400");
         assertThat("Response contains invalid payload msg.", response.getEntity().toString(), containsString(
                 "JSON processing error:Input payload does not follow bulk/single-transaction interface"));
     }
@@ -259,7 +273,7 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         String payload = "{'operations':[]}";
         Response response = executeRequest(payload);
 
-        assertEquals("Request fails with 400", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Request fails with 400");
         assertThat("Response contains invalid payload msg.", response.getEntity().toString(),
                 containsString("Required Field not passed.: Payload has no objects to operate on"));
     }
@@ -270,7 +284,7 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         String payload = getBulkPayload("single-transaction/invalid-action");
         Response response = executeRequest(payload);
 
-        assertEquals("Request fails with 400", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Request fails with 400");
         assertThat("Response contains invalid payload msg.", response.getEntity().toString(),
                 containsString("JSON processing error:input payload missing required properties"));
         assertThat("Response contains invalid payload details.", response.getEntity().toString(),
@@ -284,7 +298,7 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         String payload = getBulkPayload("single-transaction/missing-fields");
         Response response = executeRequest(payload);
 
-        assertEquals("Request fails with 400", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Request fails with 400");
         assertThat("Response contains invalid payload msg.", response.getEntity().toString(),
                 containsString("JSON processing error:input payload missing required properties"));
         assertThat("Response contains invalid payload details.", response.getEntity().toString(), containsString(
@@ -296,13 +310,13 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
     public void putComplexWithRelToNonExistentPserverBetween() throws IOException {
 
         String payload = getBulkPayload("single-transaction/put-complex-with-rel-to-non-existent")
-                .replaceAll("<methodName>", name.getMethodName());
+                .replaceAll("<methodName>", name);
         Response response = executeRequest(payload);
 
-        assertEquals("Request success", Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-        assertEquals("0 vertex from this test in graph", Long.valueOf(0L), AAIGraph.getInstance().getGraph()
-                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next());
-        assertEquals("Request fails with 404", Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus(), "Request success");
+        assertEquals(Long.valueOf(0L), AAIGraph.getInstance().getGraph()
+                .newTransaction().traversal().V().has(AAIProperties.SOURCE_OF_TRUTH, sot).count().next(), "0 vertex from this test in graph");
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus(), "Request fails with 404");
 
         assertThat("Response contains correct index of failed operation.", response.getEntity().toString(),
                 containsString("Operation 0"));
@@ -323,17 +337,17 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         JsonArray requests =
                 JsonParser
                         .parseString(getBulkPayload("single-transaction/delete-child-recreate-child")
-                                .replaceAll("<methodName>", name.getMethodName()))
+                                .replaceAll("<methodName>", name))
                         .getAsJsonObject().getAsJsonArray("array");
         String payload = requests.get(0).toString();
         Response response = executeRequest(payload);
         System.out.println(response.getEntity().toString());
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
 
         payload = requests.get(1).toString();
         response = executeRequest(payload);
         System.out.println(response.getEntity().toString());
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
     }
 
     @Test
@@ -341,26 +355,26 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         JsonArray requests =
                 JsonParser
                         .parseString(getBulkPayload("single-transaction/delete-node-recreate-node")
-                                .replaceAll("<methodName>", name.getMethodName()))
+                                .replaceAll("<methodName>", name))
                         .getAsJsonObject().getAsJsonArray("array");
         String payload = requests.get(0).toString();
         Response response = executeRequest(payload);
         System.out.println(response.getEntity().toString());
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
 
         payload = requests.get(1).toString();
         response = executeRequest(payload);
         System.out.println(response.getEntity().toString());
-        assertEquals("Request success", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Request success");
     }
 
     @Test
     public void invalidNodeCreationPaylodTest() throws IOException {
         String payload = getBulkPayload("single-transaction/put-complex-with-missing-properties")
-                .replaceAll("<methodName>", name.getMethodName());
+                .replaceAll("<methodName>", name);
         Response response = executeRequest(payload);
 
-        assertEquals("Request fails with 400", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Request fails with 400");
         assertThat("Response contains correct index of failed operation.", response.getEntity().toString(),
                 containsString("Error with operation 0"));
         assertThat("Response contains information about missing properties.", response.getEntity().toString(),

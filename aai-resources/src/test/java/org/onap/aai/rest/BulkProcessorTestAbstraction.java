@@ -37,8 +37,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
@@ -76,13 +76,13 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
     private boolean initialized = false;
     private static final Logger logger = LoggerFactory.getLogger(BulkProcessorTestAbstraction.class.getName());
 
-    @BeforeClass
+    @BeforeAll
     public static void setupRest() {
         // AAIGraph.getInstance();
 
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         if (!initialized) {
             initialized = true;

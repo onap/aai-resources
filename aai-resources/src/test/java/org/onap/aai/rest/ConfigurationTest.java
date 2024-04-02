@@ -20,8 +20,8 @@
 
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -30,8 +30,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.config.SpringContextAware;
@@ -79,7 +79,7 @@ public class ConfigurationTest extends AbstractSpringRestTest {
     private HttpHeaders headersGet;
     private HttpHeaders headersPutPatch;
 
-    @Before
+    @BeforeEach
     public void setup() throws UnsupportedEncodingException {
 
         headersGet = new HttpHeaders();

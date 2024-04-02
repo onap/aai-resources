@@ -20,7 +20,7 @@
 
 package org.onap.aai;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,9 +28,11 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.onap.aai.config.ConfigConfiguration;
 import org.onap.aai.config.IntrospectionConfig;
 import org.onap.aai.config.RestBeanConfig;
@@ -48,9 +50,11 @@ import org.onap.aai.setup.SchemaVersions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {ConfigConfiguration.class, AAIConfigTranslator.class, NodeIngestor.class, EdgeIngestor.class,
                 EdgeSerializer.class, SpringContextAware.class, IntrospectionConfig.class,
@@ -84,7 +88,7 @@ public abstract class AAISetup {
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
-    @BeforeClass
+    @BeforeAll
     public static void setupBundleconfig() throws Exception {
         System.setProperty("AJSC_HOME", "./");
         System.setProperty("BUNDLECONFIG_DIR", "src/main/resources/");
@@ -95,7 +99,7 @@ public abstract class AAISetup {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename);
 
         String message = String.format("Unable to find the %s in src/test/resources", filename);
-        assertNotNull(message, inputStream);
+        assertNotNull(inputStream, message);
 
         String resource = IOUtils.toString(inputStream, Charset.defaultCharset());
         return resource;

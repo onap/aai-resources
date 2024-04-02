@@ -20,10 +20,10 @@
 
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -46,10 +46,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
@@ -90,12 +90,12 @@ public class LegacyMoxyConsumerTest extends AAISetup {
     private String defaultSchemaVersion;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setupRest() {
         // AAIGraph.getInstance();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         if (!initialized) {
             initialized = true;
@@ -144,8 +144,8 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         String uri = getUri();
         String payload = getResourcePayload(getObjectName());
 
-        assertNotNull("Introspector returned invalid string when marshalling the object", payload);
-        assertNotNull("Introspector failed to return a valid uri", uri);
+        assertNotNull(payload, "Introspector returned invalid string when marshalling the object");
+        assertNotNull(uri, "Introspector failed to return a valid uri");
 
         if (uri.length() != 0 && uri.charAt(0) == '/') {
             uri = uri.substring(1);
@@ -250,14 +250,15 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
                 mockReq);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         int code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
             logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
 
-        assertEquals("Expected to return status created from the response", Response.Status.OK.getStatusCode(),
-                response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(),
+                response.getStatus(),
+                "Expected to return status created from the response");
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
 
         // TODO - Need to actually verify the relationship between pserver and cloud-region
@@ -317,7 +318,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 httpHeaders, uriInfo, mockReq);
 
         int code = response.getStatus();
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
 
@@ -325,14 +326,14 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 httpHeaders, uriInfo, mockReq);
 
         code = response.getStatus();
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         mockReq = new MockHttpServletRequest("GET", uri);
         response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "all", "false", httpHeaders, uriInfo, mockReq);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), code);
         mockReq = new MockHttpServletRequest("DELETE", uri);
         response = legacyMoxyConsumer.delete(defaultSchemaVersion, uri, httpHeaders, uriInfo,
@@ -374,7 +375,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "all", "false", httpHeaders, uriInfo, mockReq);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
         mockReq = new MockHttpServletRequest("DELETE", uri);
@@ -393,7 +394,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
     }
 
     @Test
-    @Ignore("Unable to test this method due to WRITE_BIGDECIMAL_AS_PLAIN error")
+    @Disabled("Unable to test this method due to WRITE_BIGDECIMAL_AS_PLAIN error")
     public void testPatchWithValidData() throws IOException {
 
         String payload = getResourcePayload("pserver-patch-test");
@@ -434,7 +435,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 uriInfo, mockReq);
 
         code = response.getStatus();
-        assertNotNull("Response from the patch returned null", response);
+        assertNotNull(response, "Response from the patch returned null");
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         assertEquals(Response.Status.OK.getStatusCode(), code);
 
@@ -451,28 +452,29 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
                 uri, "all", "false", httpHeaders, uriInfo, mockRequest);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
-        assertEquals("Expected to not have the data already in memory", Response.Status.NOT_FOUND.getStatusCode(),
-                response.getStatus());
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
+                response.getStatus(),
+                "Expected to not have the data already in memory");
 
         response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri, httpHeaders,
                 uriInfo, mockRequest);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         int code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
             logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
-        assertEquals("Expected to return status created from the response", Response.Status.CREATED.getStatusCode(),
-                response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(),
+                response.getStatus(),
+                "Expected to return status created from the response");
 
         queryParameters.add("depth", "10000");
         response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
                 "all", "false", httpHeaders, uriInfo, mockRequest);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
-        assertEquals("Expected to return the pserver data that was just put in memory",
-                Response.Status.OK.getStatusCode(), response.getStatus());
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus(), "Expected to return the pserver data that was just put in memory");
 
         if ("".equalsIgnoreCase(payload)) {
             payload = "{}";
@@ -568,7 +570,7 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         assertEquals(-1, timeout);
     }
 
-    @Ignore("Time sensitive test only times out if the response takes longer than 1 second")
+    @Disabled("Time sensitive test only times out if the response takes longer than 1 second")
     @Test
     public void testTimeoutGetCall() throws Exception {
         String uri = getUri();
@@ -632,14 +634,15 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
                 mockReq);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         int code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
             logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
 
-        assertEquals("Expected to return status created from the response", Response.Status.OK.getStatusCode(),
-                response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(),
+                response.getStatus(),
+                "Expected to return status created from the response");
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
 
         String getRelationshipUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
@@ -681,14 +684,15 @@ public class LegacyMoxyConsumerTest extends AAISetup {
                 defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
                 mockReq);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         int code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
             logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
 
-        assertEquals("Expected to return status created from the response", Response.Status.OK.getStatusCode(),
-                response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(),
+                response.getStatus(),
+                "Expected to return status created from the response");
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
 
         String getRelationshipMockRequestUri =
@@ -1121,14 +1125,15 @@ public class LegacyMoxyConsumerTest extends AAISetup {
         Response response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri,
                 httpHeaders, uriInfo, mockReq);
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         int code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
             logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
 
-        assertEquals("Expected to return status created from the response", Response.Status.CREATED.getStatusCode(),
-                response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(),
+                response.getStatus(),
+                "Expected to return status created from the response");
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
     }
 

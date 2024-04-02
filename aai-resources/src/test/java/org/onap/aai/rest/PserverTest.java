@@ -20,13 +20,13 @@
 
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
-
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -22,11 +22,11 @@ package org.onap.aai.rest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onap.aai.PayloadUtil;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;

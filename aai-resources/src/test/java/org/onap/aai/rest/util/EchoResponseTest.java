@@ -20,8 +20,8 @@
 
 package org.onap.aai.rest.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -40,8 +40,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.tasks.AaiGraphChecker;
@@ -68,7 +68,7 @@ public class EchoResponseTest extends AAISetup {
         this.echoResponse = new EchoResponse(aaiGraphCheckerMock);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 

@@ -28,8 +28,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphTransaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -58,7 +58,7 @@ public class IncreaseNodesToolTest extends AAISetup {
     String[] args = {"-numberOfNodes", "5", "-nodeType", "pserver", "-uri", "/cloud-infrastructure/pservers/pserver/",
             "-child", "false"};
 
-    @Before
+    @BeforeEach
     public void setup() {
         increaseNodesTool = new IncreaseNodesTool(loaderFactory, schemaVersions);
     }

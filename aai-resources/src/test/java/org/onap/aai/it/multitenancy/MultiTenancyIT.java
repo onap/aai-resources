@@ -20,14 +20,14 @@
 
 package org.onap.aai.it.multitenancy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import org.junit.Test;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.representations.AccessTokenResponse;

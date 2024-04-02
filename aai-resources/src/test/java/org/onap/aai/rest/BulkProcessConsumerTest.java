@@ -20,8 +20,8 @@
 
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onap.aai.dbmap.AAIGraph;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
@@ -51,9 +51,10 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String payload = getBulkPayload("pserver-transactions");
         Response response = executeRequest(payload);
 
-        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 3 {\"201\":null}", 3,
-                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Valid Response Code");
+        assertEquals(3,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"),
+                "Contains 3 {\"201\":null}");
     }
 
     @Test
@@ -65,13 +66,16 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String payload = getBulkPayload("pserver-bulk-process-transactions");
         Response response = executeRequest(payload);
 
-        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 1 {\"201\":null}", 1,
-                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
-        assertEquals("Contains 1 {\"404\":\"{", 1,
-                StringUtils.countMatches(response.getEntity().toString(), "{\"404\":\"{"));
-        assertEquals("Contains 1 ERR.5.4.6114", 1,
-                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6114"));
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Valid Response Code");
+        assertEquals(1,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"),
+                "Contains 1 {\"201\":null}");
+        assertEquals(1,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"404\":\"{"),
+                "Contains 1 {\"404\":\"{");
+        assertEquals(1,
+                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6114"),
+                "Contains 1 ERR.5.4.6114");
     }
 
     @Test
@@ -85,7 +89,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         System.out.println(response.getEntity());
         System.out.println(
                 AAIGraph.getInstance().getGraph().newTransaction().traversal().V().has("fqdn", "NEW").count().next());
-        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Valid Response Code");
     }
 
     @Test
@@ -98,13 +102,16 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         Response response = executeRequest(payload);
 
         System.out.println(response.getEntity().toString());
-        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 0 {\"201\":null}", 0,
-                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
-        assertEquals("Contains 1 {\"404\":\"{", 1,
-                StringUtils.countMatches(response.getEntity().toString(), "{\"404\":\"{"));
-        assertEquals("Contains 1 ERR.5.4.6114", 1,
-                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6114"));
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Valid Response Code");
+        assertEquals(0,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"),
+                "Contains 0 {\"201\":null}");
+        assertEquals(1,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"404\":\"{"),
+                "Contains 1 {\"404\":\"{");
+        assertEquals(1,
+                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6114"),
+                "Contains 1 ERR.5.4.6114");
     }
 
     @Test
@@ -133,14 +140,15 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 schemaVersions.getDefaultVersion().toString(), complexToPserverRelationshipUri, httpHeaders, uriInfo,
                 new MockHttpServletRequest("DELETE", "http://www.test.com"));
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         int code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
             System.out.println("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
 
-        assertEquals("Expected to return status created from the response", Response.Status.OK.getStatusCode(),
-                response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(),
+                response.getStatus(),
+                "Expected to return status created from the response");
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
 
         // TODO - Need to actually verify the relationship between pserver and cloud-region
@@ -156,10 +164,12 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
             System.out.println("Response Code: " + code + "\tEntity: " + responseBulkDelete.getEntity());
             System.out.println("Response Code: " + code + "\tEntity: " + responseBulkDelete.getEntity());
         }
-        assertEquals("Expected to return status created from the response", Response.Status.CREATED.getStatusCode(),
-                responseBulkDelete.getStatus());
-        assertEquals("Contains 0 {\"204\":null}", 1,
-                StringUtils.countMatches(responseBulkDelete.getEntity().toString(), "{\"204\":null}"));
+        assertEquals(Response.Status.CREATED.getStatusCode(),
+                responseBulkDelete.getStatus(),
+                "Expected to return status created from the response");
+        assertEquals(1,
+                StringUtils.countMatches(responseBulkDelete.getEntity().toString(), "{\"204\":null}"),
+                "Contains 0 {\"204\":null}");
 
     }
 
@@ -171,28 +181,29 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         Response response = legacyMoxyConsumer.getLegacy("", "-1", "-1", schemaVersions.getDefaultVersion().toString(),
                 uri, "all", "false", httpHeaders, uriInfo, new MockHttpServletRequest("GET", "http://www.test.com"));
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
-        assertEquals("Expected to not have the data already in memory", Response.Status.NOT_FOUND.getStatusCode(),
-                response.getStatus());
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
+                response.getStatus(),
+                "Expected to not have the data already in memory");
 
         response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
                 uriInfo, new MockHttpServletRequest("PUT", "http://www.test.com"));
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
         int code = response.getStatus();
         if (!VALID_HTTP_STATUS_CODES.contains(code)) {
             System.out.println("Response Code: " + code + "\tEntity: " + response.getEntity());
         }
-        assertEquals("Expected to return status created from the response", Response.Status.CREATED.getStatusCode(),
-                response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(),
+                response.getStatus(),
+                "Expected to return status created from the response");
 
         queryParameters.add("depth", "10000");
         response = legacyMoxyConsumer.getLegacy("", "-1", "-1", schemaVersions.getDefaultVersion().toString(), uri,
                 "all", "false", httpHeaders, uriInfo, new MockHttpServletRequest("GET", "http://www.test.com"));
 
-        assertNotNull("Response from the legacy moxy consumer returned null", response);
-        assertEquals("Expected to return the pserver data that was just put in memory",
-                Response.Status.OK.getStatusCode(), response.getStatus());
+        assertNotNull(response, "Response from the legacy moxy consumer returned null");
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus(), "Expected to return the pserver data that was just put in memory");
 
         if ("".equalsIgnoreCase(payload)) {
             payload = "{}";
@@ -210,11 +221,13 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String payload = getBulkPayload("pserver-transactions-invalid-method");
         Response response = executeRequest(payload);
 
-        assertEquals("Valid Response Code", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 1 {\"400\":\"{", 1,
-                StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"));
-        assertEquals("Contains 1 ERR.5.4.6118", 1,
-                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"));
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Valid Response Code");
+        assertEquals(1,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"400\":\"{"),
+                "Contains 1 {\"400\":\"{");
+        assertEquals(1,
+                StringUtils.countMatches(response.getEntity().toString(), "ERR.5.4.6118"),
+                "Contains 1 ERR.5.4.6118");
     }
 
     @Test
@@ -226,8 +239,8 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String payload = "{\"transactions\":[]}";
         Response response = executeRequest(payload);
 
-        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6118"));
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Bad Request");
+        assertEquals(true, response.getEntity().toString().contains("ERR.5.4.6118"), "Contains error code");
     }
 
     @Test
@@ -239,8 +252,8 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String payload = "{";
         Response response = executeRequest(payload);
 
-        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6111"));
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Bad Request");
+        assertEquals(true, response.getEntity().toString().contains("ERR.5.4.6111"), "Contains error code");
     }
 
     @Test
@@ -251,9 +264,10 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String payload = getBulkPayload("pserver-bulk-limit-meet");
         Response response = executeRequest(payload);
 
-        assertEquals("Created", Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertEquals("Contains 30 {\"201\":null}", 30,
-                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"));
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus(), "Created");
+        assertEquals(30,
+                StringUtils.countMatches(response.getEntity().toString(), "{\"201\":null}"),
+                "Contains 30 {\"201\":null}");
     }
 
     @Test
@@ -264,8 +278,8 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String payload = getBulkPayload("pserver-bulk-limit-exceed");
         Response response = executeRequest(payload);
 
-        assertEquals("Bad Request", Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals("Contains error code", true, response.getEntity().toString().contains("ERR.5.4.6147"));
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Bad Request");
+        assertEquals(true, response.getEntity().toString().contains("ERR.5.4.6147"), "Contains error code");
     }
 
     @Override

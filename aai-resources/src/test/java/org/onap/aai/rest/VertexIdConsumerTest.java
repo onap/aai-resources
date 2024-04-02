@@ -20,9 +20,9 @@
 
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -41,9 +41,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
@@ -81,12 +81,12 @@ public class VertexIdConsumerTest extends AAISetup {
     private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
     private boolean initialized = false;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupRest() {
         // AAIGraph.getInstance();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         if (!initialized) {
             initialized = true;
@@ -157,8 +157,8 @@ public class VertexIdConsumerTest extends AAISetup {
 
         MultivaluedMap<String, Object> responseHeaders = response.getMetadata();
 
-        assertNotNull("Unable to retrieve the response headers from response object", responseHeaders);
-        assertTrue("Response doesn't contain the key vertexId", responseHeaders.containsKey("vertex-id"));
+        assertNotNull(responseHeaders, "Unable to retrieve the response headers from response object");
+        assertTrue(responseHeaders.containsKey("vertex-id"), "Response doesn't contain the key vertexId");
 
         String vertexId = responseHeaders.get("vertex-id").get(0).toString();
 

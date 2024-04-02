@@ -20,12 +20,12 @@
 
 package org.onap.aai.rest.retired;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onap.aai.rest.AbstractSpringRestTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

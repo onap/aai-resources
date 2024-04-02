@@ -19,7 +19,7 @@
  */
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -27,7 +27,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onap.aai.rest.AbstractSpringRestTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
