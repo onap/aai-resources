@@ -149,7 +149,7 @@
 		<appender-ref ref="translog" />
 	</appender>
 
-	<appender name="dmaapAAIEventConsumer"
+	<appender name="kafkaAAIEventConsumer"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
@@ -160,7 +160,7 @@
 
 	</appender>
 
-	<appender name="dmaapAAIEventConsumerDebug"
+	<appender name="kafkaAAIEventConsumerDebug"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
@@ -171,7 +171,7 @@
 			<pattern>${debugPattern}</pattern>
 		</encoder>
 	</appender>
-	<appender name="dmaapAAIEventConsumerInfo"
+	<appender name="kafkaAAIEventConsumerInfo"
 			  class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>INFO</level>
@@ -182,7 +182,7 @@
 			<pattern>${auditPattern}</pattern>
 		</encoder>
 	</appender>
-	<appender name="dmaapAAIEventConsumerMetric"
+	<appender name="kafkaAAIEventConsumerMetric"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>INFO</level>
@@ -247,14 +247,14 @@
 		<appender-ref ref="asynctranslog" />
 	</logger>
 
-	<logger name="org.onap.aai.dmaap" level="DEBUG" additivity="false">
-		<appender-ref ref="dmaapAAIEventConsumer" />
-		<appender-ref ref="dmaapAAIEventConsumerDebug" />
-		<appender-ref ref="dmaapAAIEventConsumerMetric" />
+	<logger name="org.onap.aai.kafka" level="DEBUG" additivity="false">
+		<appender-ref ref="kafkaAAIEventConsumer" />
+		<appender-ref ref="kafkaAAIEventConsumerDebug" />
+		<appender-ref ref="kafkaAAIEventConsumerMetric" />
 	</logger>
 
 	<logger name="com.att.nsa.mr" level="INFO" >
-		<appender-ref ref="dmaapAAIEventConsumerInfo" />
+		<appender-ref ref="kafkaAAIEventConsumerInfo" />
 	</logger>
 
 	<!-- ============================================================================ -->
