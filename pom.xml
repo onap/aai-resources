@@ -30,7 +30,7 @@
     </parent>
     <groupId>org.onap.aai.resources</groupId>
     <artifactId>resources</artifactId>
-    <version>1.13.3-SNAPSHOT</version>
+    <version>1.13.4-SNAPSHOT</version>
     <name>aai-resources</name>
     <packaging>pom</packaging>
     <modules>
