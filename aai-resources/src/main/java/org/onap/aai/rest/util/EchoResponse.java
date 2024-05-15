@@ -56,6 +56,8 @@ public class EchoResponse extends RESTAPI {
 
     private static final String CHECK_DB_STATUS_NOW_ACTION = "checkDBNow";
 
+    private static final String UP_RESPONSE="{\"status\":\"UP\",\"groups\":[\"liveness\",\"readiness\"]}";
+
     private final AaiGraphChecker aaiGraphChecker;
 
     public EchoResponse(AaiGraphChecker aaiGraphChecker) {
@@ -101,7 +103,7 @@ public class EchoResponse extends RESTAPI {
                     || CHECK_DB_STATUS_NOW_ACTION.equalsIgnoreCase(myAction)) {
                 validateDBStatus(myAction);
             }
-            return generateSuccessResponse(headers, templateVars);
+            return generateSuccessResponse();
 
         } catch (AAIException aaiException) {
             LOGGER.error("Error while processing echo request ", aaiException);
@@ -136,11 +138,9 @@ public class EchoResponse extends RESTAPI {
 
     }
 
-    private Response generateSuccessResponse(HttpHeaders headers, ArrayList<String> templateVariables) {
-        HashMap<AAIException, ArrayList<String>> exceptionList = new HashMap<>();
-        exceptionList.put(new AAIException("AAI_0002", "OK"), templateVariables);
+    private Response generateSuccessResponse() {
         return Response.status(Status.OK)
-                .entity(ErrorLogHelper.getRESTAPIInfoResponse(new ArrayList<>(headers.getAcceptableMediaTypes()), exceptionList))
+                .entity(UP_RESPONSE)
                 .build();
     }
 

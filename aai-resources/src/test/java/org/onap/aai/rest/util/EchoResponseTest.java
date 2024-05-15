@@ -124,17 +124,6 @@ public class EchoResponseTest extends AAISetup {
     }
 
     @Test
-    public void testEchoResultWhenValidHeadersButMediaTypeWrong() {
-
-        when(httpHeaders.getAcceptableMediaTypes()).thenThrow(new IllegalStateException()).thenReturn(outputMediaTypes);
-
-        Response response = echoResponse.echoResult(httpHeaders, null, "");
-
-        assertNotNull(response);
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-    }
-
-    @Test
     public void testCheckDbAction_CachedSuccess() {
         // Prepare
         when(aaiGraphCheckerMock.isAaiGraphDbAvailable(CheckerType.CACHED)).thenReturn(Boolean.TRUE);
