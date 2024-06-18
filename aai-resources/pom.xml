@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.14.1-SNAPSHOT</version>
+        <version>1.14.2-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -454,7 +454,8 @@
         </dependency>
         <dependency>
           <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-junit</artifactId>
+          <artifactId>hamcrest</artifactId>
+          <version>2.2</version>
           <exclusions>
             <exclusion>
               <groupId>junit</groupId>
@@ -661,13 +662,14 @@
             <version>${groovy.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Only used for the WebTestClient -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
