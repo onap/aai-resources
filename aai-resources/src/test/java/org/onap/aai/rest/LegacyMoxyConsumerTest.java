@@ -20,6 +20,9 @@
 
 package org.onap.aai.rest;
 
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +46,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,18 +56,34 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.onap.aai.AAISetup;
+import org.onap.aai.config.WebClientConfiguration;
 import org.onap.aai.dbmap.AAIGraph;
+import org.onap.aai.entities.PServer;
 import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
-// TODO: Change the following test to use spring boot
-public class LegacyMoxyConsumerTest extends AAISetup {
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(WebClientConfiguration.class)
+public class LegacyMoxyConsumerTest {
+
+    @Autowired WebTestClient webClient;
+
+    @Autowired SchemaVersions schemaVersions;
+
+    ObjectMapper mapper = new ObjectMapper();
 
     protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
     private static final Set<Integer> VALID_HTTP_STATUS_CODES = new HashSet<>();
@@ -140,73 +161,49 @@ public class LegacyMoxyConsumerTest extends AAISetup {
 
     @Test
     public void testResponsePutGetDeleteOnResource() throws JSONException, IOException, AAIException {
-
-        String uri = getUri();
         String payload = getResourcePayload(getObjectName());
+        PServer expected = mapper.readValue(payload, PServer.class);
 
-        assertNotNull(payload, "Introspector returned invalid string when marshalling the object");
-        assertNotNull(uri, "Introspector failed to return a valid uri");
+        webClient.get()
+            .uri(String.format("/aai/%s/cloud-infrastructure/pservers/pserver/someHostname?cleanup=false", defaultSchemaVersion) )
+            .exchange()
+            .expectStatus()
+            .isNotFound();
 
-        if (uri.length() != 0 && uri.charAt(0) == '/') {
-            uri = uri.substring(1);
-        }
+        webClient.put()
+            .uri(String.format("/aai/%s/cloud-infrastructure/pservers/pserver/pserver-hostname-test", defaultSchemaVersion))
+            .bodyValue(payload)
+            .exchange()
+            .expectStatus()
+            .isCreated();
 
-        when(uriInfo.getPath()).thenReturn(uri);
-        when(uriInfo.getPath(false)).thenReturn(uri);
+        PServer pserver = webClient.get()
+            .uri(String.format("/aai/%s/cloud-infrastructure/pservers/pserver/pserver-hostname-test?cleanup=false&depth=10000", defaultSchemaVersion) )
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .returnResult(PServer.class)
+            .getResponseBody()
+            .blockFirst();
 
-        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion,
-                uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
+        assertThat(pserver, samePropertyValuesAs(expected, "resourceVersion"));
 
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        String resourceVersion = pserver.getResourceVersion();
 
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        response = legacyMoxyConsumer.update(payload, defaultSchemaVersion, uri, httpHeaders,
-                uriInfo, mockReq);
+        webClient.delete()
+            .uri(uriBuilder -> uriBuilder
+                .path(String.format("/aai/%s/cloud-infrastructure/pservers/pserver/pserver-hostname-test", defaultSchemaVersion))
+                .queryParam("resource-version", resourceVersion)
+                .build())
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-
-        queryParameters.add("depth", "10000");
-
-        response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
-                "10000", "false", httpHeaders, uriInfo, mockReqGet);
-
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        String pserverEntity = response.getEntity().toString();
-        JSONObject pserverJsonbject = new JSONObject(pserverEntity);
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-        JSONAssert.assertEquals(payload, pserverEntity, false);
-
-        String resourceVersion = pserverJsonbject.getString("resource-version");
-
-        queryParameters.add("resource-version", resourceVersion);
-
-        mockReq = new MockHttpServletRequest("DELETE", uri);
-        response = legacyMoxyConsumer.delete(defaultSchemaVersion, uri, httpHeaders, uriInfo,
-                "", mockReq);
-
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-
-        response = legacyMoxyConsumer.getLegacy("", null, null, defaultSchemaVersion, uri,
-                "all", "false", httpHeaders, uriInfo, mockReqGet);
-
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        webClient.get()
+            .uri(String.format("/aai/%s/cloud-infrastructure/pservers/pserver/pserver-hostname-test?cleanup=false&depth=10000", defaultSchemaVersion) )
+            .exchange()
+            .expectStatus()
+            .isNotFound();
     }
 
     @Test
@@ -508,12 +505,15 @@ public class LegacyMoxyConsumerTest extends AAISetup {
     }
 
     public String getResourcePayload(String resourceName) throws IOException {
-        String rawPayload = getPayload("payloads/resource/" + resourceName + ".json");
+        // String rawPayload = getPayload("payloads/resource/" + resourceName + ".json");
+        String rawPayload = IOUtils.toString(this.getClass().getResourceAsStream("/payloads/resource/" + resourceName + ".json"), StandardCharsets.UTF_8);
+        // String rawPayload = FileUtils.readFileToString(new File("payloads/resource/" + resourceName + ".json"), StandardCharsets.UTF_8);
         return String.format(rawPayload, defaultSchemaVersion);
     }
 
     public String getRelationshipPayload(String relationshipName) throws IOException {
-        String rawPayload = getPayload("payloads/relationship/" + relationshipName + ".json");
+        // String rawPayload = FileUtils.readFileToString(new File("payloads/relationship/" + relationshipName + ".json"), StandardCharsets.UTF_8);
+        String rawPayload = IOUtils.toString(this.getClass().getResourceAsStream("/payloads/relationship/" + relationshipName + ".json"), StandardCharsets.UTF_8);
         return String.format(rawPayload, defaultSchemaVersion);
     }
 
