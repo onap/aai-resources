@@ -73,19 +73,11 @@ public abstract class BulkProcessorTestAbstraction extends AAISetup {
 
     protected String uri;
 
-    private boolean initialized = false;
     private static final Logger logger = LoggerFactory.getLogger(BulkProcessorTestAbstraction.class.getName());
-
-    @BeforeAll
-    public static void setupRest() {
-        // AAIGraph.getInstance();
-
-    }
 
     @BeforeEach
     public void setup() {
-        if (!initialized) {
-            initialized = true;
+        if (!AAIGraph.isInit()) {
             AAIGraph.getInstance();
         }
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
