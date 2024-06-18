@@ -74,14 +74,11 @@ public class ExampleConsumerTest extends AAISetup {
 
     private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
 
-    @BeforeAll
-    public static void setupRest() {
-        AAIGraph.getInstance();
-
-    }
-
     @BeforeEach
     public void setup() {
+        if(!AAIGraph.isInit()) {
+            AAIGraph.getInstance();
+        }
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
         exampleConsumer = new ExampleConsumer();

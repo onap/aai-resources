@@ -56,13 +56,9 @@ public class K6PerformanceTest {
   @LocalServerPort
   private int port;
 
-
-  private boolean initialized = false;
-
   @BeforeEach
   public void setup() {
-    if (!initialized) {
-      initialized = true;
+    if (!AAIGraph.isInit()) {
       AAIGraph.getInstance();
 
       long startTime = System.currentTimeMillis();
