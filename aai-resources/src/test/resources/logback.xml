@@ -142,7 +142,7 @@
 			<pattern>${transLogPattern}</pattern>
 		</encoder>
 	</appender>
-	
+
 	<appender name="asynctranslog" class="ch.qos.logback.classic.AsyncAppender">
 		<queueSize>${queueSize}</queueSize>
 		<includeCallerData>true</includeCallerData>
@@ -265,6 +265,9 @@
 		<appender-ref ref="asyncERROR" />
 		<appender-ref ref="asyncMETRIC" />
 	</logger>
+
+	<logger name="org.testcontainers" level="INFO"/>
+	<logger name="com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.wire" level="OFF"/>
 
 	<root level="DEBUG">
 		<appender-ref ref="external" />

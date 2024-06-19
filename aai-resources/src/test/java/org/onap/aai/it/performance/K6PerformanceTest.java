@@ -1,0 +1,139 @@
+/**
+ * ============LICENSE_START=======================================================
+ * org.onap.aai
+ * ================================================================================
+ * Copyright © 2024 Deutsche Telekom. All rights reserved.
+ * ================================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ============LICENSE_END=========================================================
+ */
+
+package org.onap.aai.it.performance;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.janusgraph.core.JanusGraph;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.onap.aai.ResourcesApp;
+import org.onap.aai.db.props.AAIProperties;
+import org.onap.aai.dbmap.AAIGraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.testcontainers.containers.output.WaitingConsumer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.k6.K6Container;
+import org.testcontainers.utility.MountableFile;
+
+import lombok.SneakyThrows;
+
+@Testcontainers
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class K6PerformanceTest {
+
+  private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
+  private static final long nPservers = 10;
+
+  @LocalServerPort
+  private int port;
+
+
+  private boolean initialized = false;
+
+  @BeforeEach
+  public void setup() {
+    if (!initialized) {
+      initialized = true;
+      AAIGraph.getInstance();
+
+      long startTime = System.currentTimeMillis();
+      logger.info("Creating pserver nodes");
+      loadPerformanceTestData();
+      long endTime = System.currentTimeMillis();
+      logger.info("Created pserver nodes in {} seconds", (endTime - startTime) / 1000);
+    }
+  }
+
+  @AfterAll
+  public static void cleanup() {
+    JanusGraph graph = AAIGraph.getInstance().getGraph();
+    graph.traversal().V().has("aai-node-type", "pserver").drop().iterate();
+    graph.tx().commit();
+  }
+
+  @Test
+  public void k6StandardTest() throws Exception {
+    int testDuration = 5;
+
+    try (
+        K6Container container = new K6Container("grafana/k6:0.49.0")
+            .withNetworkMode("host")
+            .withAccessToHost(true)
+            .withTestScript(MountableFile.forClasspathResource("k6/test.js"))
+            .withScriptVar("API_PORT", String.valueOf(port))
+            .withScriptVar("API_VERSION", "v29")
+            .withScriptVar("DURATION_SECONDS", String.valueOf(testDuration))
+            .withScriptVar("N_PSERVERS", String.valueOf(nPservers))
+            .withCmdOptions("--quiet", "--no-usage-report");) {
+      container.start();
+
+      WaitingConsumer consumer = new WaitingConsumer();
+      container.followOutput(consumer);
+
+      // Wait for test script results to be collected
+      consumer.waitUntil(
+          frame -> {
+            return frame.getUtf8String().contains("iteration_duration");
+          },
+          testDuration + 30,
+          TimeUnit.SECONDS);
+
+      logger.debug(container.getLogs());
+      assertThat(container.getLogs(), containsString("✓ status was 200"));
+      assertThat(container.getLogs(), containsString("✓ returned correct number of results"));
+      assertThat(container.getLogs(), containsString("✓ http_req_duration"));
+      assertThat(container.getLogs(), containsString("✓ http_req_failed"));
+    }
+  }
+
+  @SneakyThrows
+  public static void loadPerformanceTestData() {
+    JanusGraph graph = AAIGraph.getInstance().getGraph();
+    GraphTraversalSource g = graph.traversal();
+    long n = nPservers;
+    for (long i = 0; i < n; i++) {
+      createPServer(g, i);
+    }
+    graph.tx().commit();
+  }
+
+  private static void createPServer(GraphTraversalSource g, long i) {
+    String hostname = "hostname" + i;
+    String uri = "/cloud-infrastructure/pservers/pserver/" + hostname;
+    g.addV()
+        .property("aai-node-type", "pserver")
+        .property("hostname", hostname)
+        .property("resource-version", UUID.randomUUID().toString())
+        .property(AAIProperties.AAI_URI, uri)
+        .next();
+  }
+}
