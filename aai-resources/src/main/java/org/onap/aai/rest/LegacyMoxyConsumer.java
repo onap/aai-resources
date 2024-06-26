@@ -43,7 +43,10 @@ import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.Loader;
 import org.onap.aai.introspection.sideeffect.OwnerCheck;
+import org.onap.aai.query.builder.Pageable;
 import org.onap.aai.parsers.query.QueryParser;
+import org.onap.aai.query.builder.QueryOptions;
+import org.onap.aai.query.builder.Sort;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
 import org.onap.aai.rest.exceptions.AAIInvalidXMLNamespace;
@@ -67,16 +70,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumer.class.getName());
 
-    /**
-     *
-     * @param content
-     * @param versionParam
-     * @param uri
-     * @param headers
-     * @param info
-     * @param req
-     * @return
-     */
     @PUT
     @Path("/{uri: .+}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -89,17 +82,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
         return this.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info, roles);
     }
 
-    /**
-     * Update relationship.
-     *
-     * @param content the content
-     * @param versionParam the version param
-     * @param uri the uri
-     * @param headers the headers
-     * @param info the info
-     * @param req the req
-     * @return the response
-     */
     @PUT
     @Path("/{uri: .+}/relationship-list/relationship")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -164,17 +146,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
         return response;
     }
 
-    /**
-     * Patch.
-     *
-     * @param content the content
-     * @param versionParam the version param
-     * @param uri the uri
-     * @param headers the headers
-     * @param info the info
-     * @param req the req
-     * @return the response
-     */
     @PATCH
     @Path("/{uri: .+}")
     @Consumes({"application/merge-patch+json"})
@@ -204,57 +175,43 @@ public class LegacyMoxyConsumer extends RESTAPI {
             .build();
     }
 
-    /**
-     * Gets the legacy.
-     *
-     * @param content the content
-     * @param versionParam the version param
-     * @param uri the uri
-     * @param depthParam the depth param
-     * @param cleanUp the clean up
-     * @param headers the headers
-     * @param info the info
-     * @param req the req
-     * @return the legacy
-     */
     @GET
     @Path("/{uri: .+}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getLegacy(String content, @DefaultValue("-1") @QueryParam("resultIndex") String resultIndex,
-            @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version") String versionParam,
-            @PathParam("uri") @Encoded String uri, @DefaultValue("all") @QueryParam("depth") String depthParam,
-            @DefaultValue("false") @QueryParam("cleanup") String cleanUp, @Context HttpHeaders headers,
-            @Context UriInfo info, @Context HttpServletRequest req) {
+    public Response getLegacy(
+            @PathParam("version") String versionParam,
+            @PathParam("uri") @Encoded String uri,
+            @DefaultValue("-1") @QueryParam("resultIndex") int resultIndex,
+            @DefaultValue("-1") @QueryParam("resultSize") int resultSize,
+            @DefaultValue("true") @QueryParam("includeTotalCount") boolean includeTotalCount,
+            // @DefaultValue("false") @QueryParam("sort") Sort sort,
+            @DefaultValue("all") @QueryParam("depth") String depthParam,
+            @DefaultValue("false") @QueryParam("cleanup") String cleanUp,
+            @Context HttpHeaders headers,
+            @Context UriInfo info,
+            @Context HttpServletRequest req) {
         Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
+        Pageable pageable = includeTotalCount == false
+            ? new Pageable(resultIndex -1, resultSize)
+            : new Pageable(resultIndex -1, resultSize).includeTotalCount();
 
         return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED, AAIConstants.AAI_CRUD_TIMEOUT_APP,
                 AAIConstants.AAI_CRUD_TIMEOUT_LIMIT, headers, info, HttpMethod.GET, new AaiCallable<Response>() {
                     @Override
                     public Response process() {
-                        return getLegacy(content, versionParam, uri, depthParam, cleanUp, headers, info, req,
-                                new HashSet<String>(), resultIndex, resultSize, roles);
+                        return getLegacy(versionParam, uri, depthParam, cleanUp, headers, info, req,
+                                new HashSet<String>(), pageable, roles);
                     }
                 });
     }
 
     /**
      * This method exists as a workaround for filtering out undesired query params while routing between REST consumers
-     *
-     * @param content
-     * @param versionParam
-     * @param uri
-     * @param depthParam
-     * @param cleanUp
-     * @param headers
-     * @param info
-     * @param req
-     * @param removeQueryParams
-     * @return
      */
-    public Response getLegacy(String content, String versionParam, String uri, String depthParam, String cleanUp,
+    public Response getLegacy(String versionParam, String uri, String depthParam, String cleanUp,
             HttpHeaders headers, UriInfo info, HttpServletRequest req, Set<String> removeQueryParams,
-            String resultIndex, String resultSize, Set<String> roles) {
+            Pageable pageable, Set<String> roles) {
         String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
         String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
         Response response;
@@ -291,12 +248,13 @@ public class LegacyMoxyConsumer extends RESTAPI {
             DBRequest request =
                     new DBRequest.Builder(HttpMethod.GET, uriObject, uriQuery, obj, headers, info, transId).build();
             List<DBRequest> requests = Collections.singletonList(request);
-            if (hasValidPaginationParams(resultIndex, resultSize)) {
-                traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
-                traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
+
+            Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = null;
+            if (hasValidPaginationParams(pageable)) {
+                responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth, roles, true, new QueryOptions(pageable));
+            } else {
+                responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth, roles);
             }
-            Pair<Boolean, List<Pair<URI, Response>>> responsesTuple =
-                    traversalUriHttpEntry.process(requests, sourceOfTruth, roles);
 
             response = responsesTuple.getValue1().get(0).getValue1();
 
@@ -319,14 +277,14 @@ public class LegacyMoxyConsumer extends RESTAPI {
         return response;
     }
 
-    private boolean hasValidPaginationParams(String resultIndex, String resultSize) {
-        return resultIndex != null && !"-1".equals(resultIndex) && resultSize != null && !"-1".equals(resultSize);
+    private boolean hasValidPaginationParams(Pageable pageable) {
+        return pageable.getPage() >= 0 && pageable.getPageSize() > 0;
     }
 
     private MultivaluedMap<String, String> removeNonFilterableParams(MultivaluedMap<String, String> params) {
 
         String[] toRemove =
-                {"depth", "cleanup", "nodes-only", "format", "resultIndex", "resultSize", "skip-related-to"};
+                {"depth", "cleanup", "nodes-only", "format", "resultIndex", "resultSize", "includeTotalCount", "skip-related-to"};
         Set<String> toRemoveSet = Arrays.stream(toRemove).collect(Collectors.toSet());
 
         MultivaluedMap<String, String> cleanedParams = new MultivaluedHashMap<>();
@@ -339,17 +297,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
         return cleanedParams;
     }
 
-    /**
-     * Delete.
-     *
-     * @param versionParam the version param
-     * @param uri the uri
-     * @param headers the headers
-     * @param info the info
-     * @param resourceVersion the resource version
-     * @param req the req
-     * @return the response
-     */
     @DELETE
     @Path("/{uri: .+}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -494,31 +441,30 @@ public class LegacyMoxyConsumer extends RESTAPI {
     @Path("/{uri: .+}/relationship-list")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getRelationshipList(@DefaultValue("-1") @QueryParam("resultIndex") String resultIndex,
-            @DefaultValue("-1") @QueryParam("resultSize") String resultSize, @PathParam("version") String versionParam,
-            @PathParam("uri") @Encoded String uri, @DefaultValue("false") @QueryParam("cleanup") String cleanUp,
-            @Context HttpHeaders headers, @Context HttpServletRequest req, @Context UriInfo info) {
+    public Response getRelationshipList(
+            @PathParam("version") String versionParam,
+            @PathParam("uri") @Encoded String uri,
+            @DefaultValue("-1") @QueryParam("resultIndex") int resultIndex,
+            @DefaultValue("-1") @QueryParam("resultSize") int resultSize,
+            @DefaultValue("true") @QueryParam("includeTotalCount") boolean includeTotalCount,
+            @DefaultValue("false") @QueryParam("cleanup") String cleanUp,
+            @Context HttpHeaders headers,
+            @Context HttpServletRequest req,
+            @Context UriInfo info) {
+        Pageable pageable = includeTotalCount == false
+            ? new Pageable(resultIndex -1, resultSize)
+            : new Pageable(resultIndex -1, resultSize).includeTotalCount();
         return runner(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED, AAIConstants.AAI_CRUD_TIMEOUT_APP,
                 AAIConstants.AAI_CRUD_TIMEOUT_LIMIT, headers, info, HttpMethod.GET, new AaiCallable<Response>() {
                     @Override
                     public Response process() {
-                        return getRelationshipList(versionParam, req, uri, cleanUp, headers, info, resultIndex,
-                                resultSize);
+                        return getRelationshipList(versionParam, req, uri, cleanUp, headers, info, pageable);
                     }
                 });
     }
 
-    /**
-     *
-     * @param versionParam
-     * @param uri
-     * @param cleanUp
-     * @param headers
-     * @param info
-     * @return
-     */
     public Response getRelationshipList(String versionParam, HttpServletRequest req, String uri, String cleanUp,
-            HttpHeaders headers, UriInfo info, String resultIndex, String resultSize) {
+            HttpHeaders headers, UriInfo info, Pageable pageable) {
         String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
         String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
         Response response = null;
@@ -557,13 +503,13 @@ public class LegacyMoxyConsumer extends RESTAPI {
                             .build();
             List<DBRequest> requests = new ArrayList<>();
             requests.add(request);
-            if (hasValidPaginationParams(resultIndex, resultSize)) {
-                traversalUriHttpEntry.setPaginationIndex(Integer.parseInt(resultIndex));
-                traversalUriHttpEntry.setPaginationBucket(Integer.parseInt(resultSize));
-            }
-            Pair<Boolean, List<Pair<URI, Response>>> responsesTuple =
-                    traversalUriHttpEntry.process(requests, sourceOfTruth);
 
+            Pair<Boolean, List<Pair<URI, Response>>> responsesTuple = null;
+            if (hasValidPaginationParams(pageable)) {
+                responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth, Collections.emptySet(), true, new QueryOptions(pageable));
+            } else {
+                responsesTuple = traversalUriHttpEntry.process(requests, sourceOfTruth);
+            }
             response = responsesTuple.getValue1().get(0).getValue1();
         } catch (AAIException e) {
             response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET_RELATIONSHIP, e);
@@ -583,13 +529,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
         return response;
     }
 
-    /**
-     * Validate request.
-     *
-     * @param info the info
-     * @throws AAIException the AAI exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
-     */
     private void validateRequest(UriInfo info) throws AAIException, UnsupportedEncodingException {
 
         if (!ValidateEncoding.getInstance().validate(info)) {
@@ -597,12 +536,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
         }
     }
 
-    /**
-     * Gets the path.
-     *
-     * @param info the info
-     * @return the path
-     */
     private String getPath(UriInfo info) {
         String path = info.getPath(false);
         MultivaluedMap<String, String> map = info.getQueryParameters(false);
@@ -622,18 +555,6 @@ public class LegacyMoxyConsumer extends RESTAPI {
 
     }
 
-    /**
-     * Handle writes.
-     *
-     * @param mediaType the media type
-     * @param method the method
-     * @param content the content
-     * @param versionParam the version param
-     * @param uri the uri
-     * @param headers the headers
-     * @param info the info
-     * @return the response
-     */
     private Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam,
             String uri, HttpHeaders headers, UriInfo info, Set<String> roles) {
 
