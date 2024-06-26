@@ -178,8 +178,8 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
-        Response response = legacyMoxyConsumer.getLegacy("", "-1", "-1", schemaVersions.getDefaultVersion().toString(),
-                uri, "all", "false", httpHeaders, uriInfo, new MockHttpServletRequest("GET", "http://www.test.com"));
+        Response response = legacyMoxyConsumer.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1, false,
+                "all", "false", httpHeaders, uriInfo, new MockHttpServletRequest("GET", "http://www.test.com"));
 
         assertNotNull(response, "Response from the legacy moxy consumer returned null");
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
@@ -199,7 +199,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 "Expected to return status created from the response");
 
         queryParameters.add("depth", "10000");
-        response = legacyMoxyConsumer.getLegacy("", "-1", "-1", schemaVersions.getDefaultVersion().toString(), uri,
+        response = legacyMoxyConsumer.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1, false,
                 "all", "false", httpHeaders, uriInfo, new MockHttpServletRequest("GET", "http://www.test.com"));
 
         assertNotNull(response, "Response from the legacy moxy consumer returned null");

@@ -139,8 +139,8 @@ public class VertexIdConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy("", "-1", "-1", schemaVersions.getDefaultVersion().toString(),
-                uri, "all", "false", httpHeaders, uriInfo, mockReqGet);
+        Response response = legacyMoxyConsumer.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1,
+                false, "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
