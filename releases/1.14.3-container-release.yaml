@@ -1,0 +1,7 @@
+distribution_type: container
+container_release_tag: 1.14.3
+project: resources
+ref:  4f5404caa0664bf264223c7a0c5adadb34341bdc
+containers:
+    - name: aai-resources
+      version: 1.14-STAGING-20240701T095657Z
