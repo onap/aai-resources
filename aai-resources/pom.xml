@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.14.4-SNAPSHOT</version>
+        <version>1.14.5-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>1.8</java.version>
@@ -83,8 +83,8 @@
         <!-- End of Default ONAP Schema Properties -->
         <spring.boot.version>2.4.13</spring.boot.version>
 
-        <janusgraph.version>0.5.3</janusgraph.version>
-        <gremlin.version>3.4.13</gremlin.version>
+        <janusgraph.version>0.6.0</janusgraph.version>
+        <gremlin.version>3.5.1</gremlin.version>
 
         <javax.servlet.version>4.0.1</javax.servlet.version>
         <keycloak.version>11.0.2</keycloak.version>
