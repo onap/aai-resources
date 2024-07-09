@@ -20,7 +20,7 @@
 
 package org.onap.aai.rest.bulk.pojos;
 
-import com.google.gson.*;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
 public class Operation {
