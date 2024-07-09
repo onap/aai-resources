@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -46,7 +48,7 @@ import org.springframework.core.env.Profiles;
 
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class})
+                HibernateJpaAutoConfiguration.class, CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class})
 // Component Scan provides a way to look for spring beans
 // It only searches beans in the following packages
 // Any method annotated with @Bean annotation or any class
