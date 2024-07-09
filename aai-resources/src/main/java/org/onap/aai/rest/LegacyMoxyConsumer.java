@@ -47,7 +47,6 @@ import org.onap.aai.introspection.sideeffect.OwnerCheck;
 import org.onap.aai.query.builder.Pageable;
 import org.onap.aai.parsers.query.QueryParser;
 import org.onap.aai.query.builder.QueryOptions;
-import org.onap.aai.query.builder.Sort;
 import org.onap.aai.rest.db.DBRequest;
 import org.onap.aai.rest.db.HttpEntry;
 import org.onap.aai.rest.exceptions.AAIInvalidXMLNamespace;
