@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sun.istack.SAXParseException2;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;

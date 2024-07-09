@@ -26,9 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.onap.aai.rest.AbstractSpringRestTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
