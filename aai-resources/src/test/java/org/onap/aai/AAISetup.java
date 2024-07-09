@@ -32,7 +32,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.onap.aai.config.ConfigConfiguration;
 import org.onap.aai.config.IntrospectionConfig;
 import org.onap.aai.config.RestBeanConfig;
@@ -43,6 +42,7 @@ import org.onap.aai.introspection.LoaderFactory;
 import org.onap.aai.introspection.MoxyLoader;
 import org.onap.aai.nodes.NodeIngestor;
 import org.onap.aai.rest.db.HttpEntry;
+import org.onap.aai.rest.notification.NotificationService;
 import org.onap.aai.serialization.db.EdgeSerializer;
 import org.onap.aai.setup.AAIConfigTranslator;
 import org.onap.aai.setup.SchemaVersion;
@@ -58,7 +58,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 @ContextConfiguration(
         classes = {ConfigConfiguration.class, AAIConfigTranslator.class, NodeIngestor.class, EdgeIngestor.class,
                 EdgeSerializer.class, SpringContextAware.class, IntrospectionConfig.class,
-                XmlFormatTransformerConfiguration.class, RestBeanConfig.class})
+                XmlFormatTransformerConfiguration.class, RestBeanConfig.class, LoaderFactory.class, NotificationService.class})
 @TestPropertySource(
         properties = {"schema.uri.base.path = /aai",
                 "schema.ingest.file = src/test/resources/application-test.properties"})
