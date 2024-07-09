@@ -37,24 +37,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class})
-// Component Scan provides a way to look for spring beans
-// It only searches beans in the following packages
-// Any method annotated with @Bean annotation or any class
-// with @Component, @Configuration, @Service will be picked up
-@ComponentScan(
-        basePackages = {"org.onap.aai.config", "org.onap.aai.web", "org.onap.aai.setup", "org.onap.aai.tasks",
-                "org.onap.aai.service", "org.onap.aai.rest", "org.onap.aai.aaf", "org.onap.aai.TenantIsolation",
-                "org.onap.aai.aailog", "org.onap.aai.prevalidation"})
+                HibernateJpaAutoConfiguration.class, CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class})
 public class ResourcesApp {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
