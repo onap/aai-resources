@@ -47,7 +47,6 @@ import org.onap.aai.rest.bulk.BulkSingleTransactionConsumer;
 import org.onap.aai.rest.util.EchoResponse;
 import org.onap.logging.filter.base.AuditLogContainerFilter;
 import org.reflections.Reflections;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
