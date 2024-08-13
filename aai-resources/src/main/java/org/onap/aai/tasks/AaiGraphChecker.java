@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,7 +48,6 @@ import org.springframework.stereotype.Component;
  * The check can run as a scheduled task or on demand.
  */
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class AaiGraphChecker extends TimerTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AaiGraphChecker.class);
@@ -115,14 +115,14 @@ public class AaiGraphChecker extends TimerTask {
 
     /**
      * Indicate if AAI Graph database is available either from actual db connection or from cached property state.
-     * 
+     *
      * @param checkerType the type of check to be made (actual or cached). Null is not supported.
      * @return
      *         <li>true, if database is available</li>
      *         <li>false, if database is NOT available</li>
      *         <li>null, if database availability can not be determined</li>
      */
-    public Boolean isAaiGraphDbAvailable(CheckerType checkerType) {
+    public boolean isAaiGraphDbAvailable(CheckerType checkerType) {
         Validate.notNull(checkerType);
         if (CheckerType.ACTUAL.equals(checkerType)) {
             isAaiGraphDbAvailableCache = isAaiGraphDbAvailableActual();
@@ -131,8 +131,7 @@ public class AaiGraphChecker extends TimerTask {
         return isAaiGraphDbAvailableCache;
     }
 
-    private Boolean isAaiGraphDbAvailableActual() {
-        Boolean dbAvailable;
+    private boolean isAaiGraphDbAvailableActual() {
         JanusGraphTransaction transaction = null;
         try {
             transaction = AAIGraph.getInstance().getGraph().newTransaction();
@@ -142,12 +141,12 @@ public class AaiGraphChecker extends TimerTask {
             }
             vertexIterator.hasNext();
             LOGGER.debug("Actual database availability is true");
-            dbAvailable = Boolean.TRUE;
+            return true;
         } catch (JanusGraphException e) {
             String message = "Actual database availability is false (after JanusGraph exception)";
             ErrorLogHelper.logError("500", message + ": " + e.getMessage());
             LOGGER.error(message, e);
-            dbAvailable = Boolean.FALSE;
+            return false;
         } catch (Error e) {
             // Following error occurs when aai resources is starting:
             // - UnsatisfiedLinkError (for org.onap.aai.dbmap.AAIGraph$Helper instantiation)
@@ -157,12 +156,12 @@ public class AaiGraphChecker extends TimerTask {
             String message = "Actual database availability is false (after error)";
             ErrorLogHelper.logError("500", message + ": " + e.getMessage());
             LOGGER.error(message, e);
-            dbAvailable = Boolean.FALSE;
+            return false;
         } catch (Exception e) {
             String message = "Actual database availability can not be determined";
             ErrorLogHelper.logError("500", message + ": " + e.getMessage());
             LOGGER.error(message, e);
-            dbAvailable = null;
+            return false;
         } finally {
             if (transaction != null && !transaction.isClosed()) {
                 // check if transaction is open then close instead of flag
@@ -175,7 +174,6 @@ public class AaiGraphChecker extends TimerTask {
                 }
             }
         }
-        return dbAvailable;
     }
 
     private void logDbState(CheckerType type) {
