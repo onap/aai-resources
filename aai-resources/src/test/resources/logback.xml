@@ -269,7 +269,7 @@
 	<logger name="org.testcontainers" level="INFO"/>
 	<logger name="com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.wire" level="OFF"/>
 
-	<root level="DEBUG">
+	<root level="INFO">
 		<appender-ref ref="external" />
 		<appender-ref ref="STDOUT" />
 	</root>
