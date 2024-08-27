@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.actuate.metrics.AutoConfigureMetrics;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
@@ -58,6 +59,7 @@ import org.springframework.web.client.RestTemplate;
  * Test REST requests against configuration resource
  */
 
+@AutoConfigureMetrics
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ContextConfiguration(initializers = PropertyPasswordConfiguration.class, classes = {SpringContextAware.class})
 @EnableAutoConfiguration(exclude={CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class}) // there is no running cassandra instance for the test
@@ -66,6 +68,7 @@ import org.springframework.web.client.RestTemplate;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = {SpringContextAware.class, ResourcesApp.class})
 public class ConfigurationTest extends AbstractSpringRestTest {
+
     @Autowired
     RestTemplate restTemplate;
 
@@ -92,7 +95,7 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         headersGet.add("X-FromAppId", "JUNIT");
         headersGet.add("X-TransactionId", "JUNIT");
 
-        headersGet.setBasicAuth("AAI","AAI");
+        headersGet.setBasicAuth("AAI", "AAI");
 
         headersPutPatch = new HttpHeaders();
         headersPutPatch.putAll(headersGet);
@@ -112,7 +115,8 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         responseEntity = restTemplate.exchange(baseUrl + endpoint, HttpMethod.GET, httpEntityGet, String.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
-        // String putBody = " configuration-id, configuration-type configuration-sub-type";
+        // String putBody = " configuration-id, configuration-type
+        // configuration-sub-type";
         String putBody = "{" + "\"configuration-id\": \"" + cid + "\"," + "\"configuration-type\": \"type1\","
                 + "\"configuration-sub-type\": \"subtype1\", " + "\"operational-status\": \"example1\", "
                 + "\"orchestration-status\": \"example1\", " + "\"configuration-selflink\": \"example1\", "
@@ -171,29 +175,31 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         ResponseEntity<String> responseEntity = null;
         String responseBody = null;
 
-        // set Accept as text/plain in order to get access of endpoint "/actuator/prometheus"
+        // set Accept as text/plain in order to get access of endpoint
+        // "/actuator/prometheus"
         headersGet.set("Accept", "text/plain");
         headersGet.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
         httpEntityGet = new HttpEntity<String>(headersGet);
-        responseEntity =
-                restTemplate.exchange(actuatorurl + "/actuator/prometheus", HttpMethod.GET, httpEntityGet, String.class);
+        responseEntity = restTemplate.exchange(actuatorurl + "/actuator/prometheus", HttpMethod.GET, httpEntityGet,
+                String.class);
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseBody.contains("group_id"));
         assertTrue(responseBody.contains("aai_uri"));
 
-        // Set Accept as MediaType.APPLICATION_JSON in order to get access of endpoint "/actuator/info" and
+        // Set Accept as MediaType.APPLICATION_JSON in order to get access of endpoint
+        // "/actuator/info" and
         // "/actuator/health"
         headersGet.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         httpEntityGet = new HttpEntity<String>(headersGet);
-        responseEntity =
-                restTemplate.exchange(actuatorurl + "/actuator/info", HttpMethod.GET, httpEntityGet, String.class);
+        responseEntity = restTemplate.exchange(actuatorurl + "/actuator/info", HttpMethod.GET, httpEntityGet,
+                String.class);
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseBody.contains("aai-resources"));
 
-        responseEntity =
-                restTemplate.exchange(actuatorurl + "/actuator/health", HttpMethod.GET, httpEntityGet, String.class);
+        responseEntity = restTemplate.exchange(actuatorurl + "/actuator/health", HttpMethod.GET, httpEntityGet,
+                String.class);
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseBody.contains("UP"));
