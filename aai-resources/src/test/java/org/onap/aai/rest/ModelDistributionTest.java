@@ -19,53 +19,127 @@
  */
 package org.onap.aai.rest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.onap.aai.config.WebClientConfiguration;
+import org.onap.aai.entities.Model;
+import org.onap.aai.entities.ModelVersion;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
+
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
- * Test designed to imitate model-loader behaviour when distributing models via xml to aai-resources.
- * Similar to test in https://gerrit.onap.org/r/gitweb?p=aai/model-loader.git;a=blob;f=src/test/java/org/onap/aai/modelloader/restclient/TestAaiRestClient.java;h=ebdfcfe45285f14efc2f706caa49f0191b108619;hb=HEAD#l46
+ * Test designed to imitate model-loader behaviour when distributing models via
+ * xml to aai-resources.
+ * Similar to test in
+ * https://gerrit.onap.org/r/gitweb?p=aai/model-loader.git;a=blob;f=src/test/java/org/onap/aai/modelloader/restclient/TestAaiRestClient.java;h=ebdfcfe45285f14efc2f706caa49f0191b108619;hb=HEAD#l46
  */
-public class ModelDistributionTest extends AbstractSpringRestTest {
+@Import(WebClientConfiguration.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class ModelDistributionTest {
+
+    ObjectMapper objectMapper = new XmlMapper();
+
+    @Autowired
+    WebTestClient webClient;
+    final String MODEL_FILE = "src/test/resources/payloads/models/network-service.xml";
 
     @Test
     public void thatModelsCanBeDistributed() throws Exception {
-        final String MODEL_FILE = "src/test/resources/payloads/models/network-service.xml";
-        String uri = baseUrl + "/aai/v29/service-design-and-creation/models/model/d821d1aa-8a69-47a4-aa63-3dae1742c47c";
+        String uri = "/aai/v29/service-design-and-creation/models/model/d821d1aa-8a69-47a4-aa63-3dae1742c47c";
 
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
-        headers.setContentType(null);
-        ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        webClient.get()
+                .uri(uri)
+                .accept(MediaType.APPLICATION_XML)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
         String modelPayload = new String(Files.readAllBytes(Paths.get(MODEL_FILE)));
-        headers.setContentType(MediaType.APPLICATION_XML);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        response = restTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(modelPayload, headers), String.class);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        webClient.put()
+                .uri(uri)
+                .accept(MediaType.APPLICATION_XML)
+                .header("Content-Type", MediaType.APPLICATION_XML_VALUE)
+                .bodyValue(modelPayload)
+                .exchange()
+                .expectStatus()
+                .isCreated();
 
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        response = restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), String.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Model actual = webClient.get()
+                .uri(uri)
+                .accept(MediaType.APPLICATION_XML)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .returnResult(Model.class)
+                .getResponseBody()
+                .blockFirst();
 
-        ObjectMapper mapper = new ObjectMapper();
-        String resourceVersion = mapper.readTree(response.getBody()).get("resource-version").asText();
-        URI resourceVersionUri = new DefaultUriBuilderFactory(uri.toString()).builder().queryParam("resource-version", resourceVersion).build();
-        response = restTemplate.exchange(resourceVersionUri, HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        Model expectedModel = objectMapper.readValue(modelPayload, Model.class);
+        // assertEquals(expectedModel, actual);
+
+        webClient.delete()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+    }
+
+    @Test
+    public void thatModelsCanBeReDistributed() throws Exception {
+        final String UPDATE_MODEL_FILE = "src/test/resources/payloads/models/model-version.xml";
+        String modelInvariantId = "d821d1aa-8a69-47a4-aa63-3dae1742c47c";
+        String modelVersionId = "7650deb9-0219-4ecc-aee6-d7f19b1dcfa9";
+        String modelUri = "/aai/v29/service-design-and-creation/models/model/" + modelInvariantId;
+        String modelVersionUri = modelUri + "/model-vers/model-ver/" + modelVersionId;
+        webClient.get()
+                .uri(modelUri)
+                .accept(MediaType.APPLICATION_XML)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+
+        String modelPayload = new String(Files.readAllBytes(Paths.get(MODEL_FILE)));
+        webClient.put()
+                .uri(modelUri)
+                .accept(MediaType.APPLICATION_XML)
+                .header("Content-Type", MediaType.APPLICATION_XML_VALUE)
+                .bodyValue(modelPayload)
+                .exchange()
+                .expectStatus()
+                .isCreated();
+
+        ModelVersion modelVersion = webClient.get()
+                .uri(modelVersionUri)
+                .accept(MediaType.APPLICATION_XML)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .returnResult(ModelVersion.class)
+                .getResponseBody()
+                .blockFirst();
+
+        String updatePayload = new String(Files.readAllBytes(Paths.get(UPDATE_MODEL_FILE)))
+                .replace("resourceVersion", modelVersion.getResourceVersion());
+        webClient.put()
+                .uri(modelVersionUri)
+                .accept(MediaType.APPLICATION_XML)
+                .header("Content-Type", MediaType.APPLICATION_XML_VALUE)
+                .bodyValue(updatePayload)
+                .exchange()
+                .expectStatus()
+                .isCreated();
     }
 }

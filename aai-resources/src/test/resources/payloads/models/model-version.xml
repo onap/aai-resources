@@ -1,0 +1,13 @@
+<model-ver xmlns="http://org.onap.aai.inventory/v29">
+    <model-version-id>7650deb9-0219-4ecc-aee6-d7f19b1dcfa9</model-version-id>
+    <model-name>service_without_resources</model-name>
+    <model-version>4.0</model-version>
+    <resource-version>resourceVersion</resource-version>
+    <model-elements>
+        <model-element>
+            <new-data-del-flag>T</new-data-del-flag>
+            <cardinality>unbounded</cardinality>
+        <model-elements/>
+        </model-element>
+    </model-elements>
+  </model-ver>
