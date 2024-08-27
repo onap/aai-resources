@@ -8,19 +8,6 @@
           <model-name>test-svc-distribution</model-name>
           <model-version>1.0</model-version>
           <model-description>test-svc-distribution</model-description>
-          <model-elements>
-              <model-element>
-                  <new-data-del-flag>T</new-data-del-flag>
-                  <cardinality>unbounded</cardinality>
-                  <model-elements>
-                      <model-element>
-                          <new-data-del-flag>T</new-data-del-flag>
-                          <cardinality>unbounded</cardinality>
-                          <model-elements/>
-                      </model-element>
-                  </model-elements>
-              </model-element>
-          </model-elements>
       </model-ver>
   </model-vers>
 </model>

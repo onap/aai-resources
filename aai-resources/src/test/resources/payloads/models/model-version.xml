@@ -1,0 +1,13 @@
+<model-ver xmlns="http://org.onap.aai.inventory/v29">
+    <model-version-id>8b713350-90fc-44b1-8c6e-a2b3973aa9d3</model-version-id>
+    <model-name>test-svc-distribution</model-name>
+    <model-version>2.0</model-version>
+    <resource-version>resourceVersion</resource-version>
+    <model-elements>
+        <model-element>
+            <new-data-del-flag>T</new-data-del-flag>
+            <cardinality>unbounded</cardinality>
+        <model-elements/>
+        </model-element>
+    </model-elements>
+  </model-ver>
