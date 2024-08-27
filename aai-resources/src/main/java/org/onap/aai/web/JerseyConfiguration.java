@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.ReaderInterceptor;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.onap.aai.rest.BulkAddConsumer;
@@ -80,6 +81,7 @@ public class JerseyConfiguration {
                 LegacyMoxyConsumer.class, URLFromVertexIdConsumer.class);
         resourceConfig.registerClasses(classes);
         registerFiltersForClasses(resourceConfig, ContainerRequestFilter.class, ContainerResponseFilter.class,
+                ReaderInterceptor.class,
                 AuditLogContainerFilter.class);
 
         if (isLoggingEnabled()) {
