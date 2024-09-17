@@ -37,7 +37,7 @@ public class VersionLatestInterceptor extends AAIContainerFilter implements Cont
 
     private final SchemaVersions schemaVersions;
 
-    @Autowired
+    @Autowired // remove this
     public VersionLatestInterceptor(SchemaVersions schemaVersions) {
         this.schemaVersions = schemaVersions;
     }

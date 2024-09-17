@@ -29,7 +29,7 @@ public class LogFormatToolsTest {
     @Test
     public void testLogFormatTools() {
 
-        String dateTime = new LogFormatTools().getCurrentDateTime();
+        String dateTime = LogFormatTools.getCurrentDateTime();
         assertNotNull(dateTime);
     }
 }

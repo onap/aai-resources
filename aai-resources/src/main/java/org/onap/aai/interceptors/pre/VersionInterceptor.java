@@ -49,7 +49,7 @@ public class VersionInterceptor extends AAIContainerFilter implements ContainerR
 
     private final SchemaVersions schemaVersions;
 
-    @Autowired
+    @Autowired // remove this
     public VersionInterceptor(SchemaVersions schemaVersions) {
         this.schemaVersions = schemaVersions;
         allowedVersions =

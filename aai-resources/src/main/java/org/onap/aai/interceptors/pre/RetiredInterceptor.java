@@ -53,7 +53,7 @@ public class RetiredInterceptor extends AAIContainerFilter implements ContainerR
 
     private String basePath;
 
-    @Autowired
+    @Autowired // remove this
     public RetiredInterceptor(RetiredService retiredService, @Value("${schema.uri.base.path}") String basePath) {
         this.retiredService = retiredService;
         this.basePath = basePath;

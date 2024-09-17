@@ -28,8 +28,6 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.onap.aai.config.ConfigConfiguration;
@@ -48,14 +46,12 @@ import org.onap.aai.setup.AAIConfigTranslator;
 import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.setup.SchemaVersions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(
+@SpringJUnitConfig(
         classes = {ConfigConfiguration.class, AAIConfigTranslator.class, NodeIngestor.class, EdgeIngestor.class,
                 EdgeSerializer.class, SpringContextAware.class, IntrospectionConfig.class,
                 XmlFormatTransformerConfiguration.class, RestBeanConfig.class, LoaderFactory.class, NotificationService.class})
@@ -81,12 +77,6 @@ public abstract class AAISetup {
 
     @Autowired
     protected SchemaVersions schemaVersions;
-
-    @ClassRule
-    public static final SpringClassRule springClassRule = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @BeforeAll
     public static void setupBundleconfig() throws Exception {

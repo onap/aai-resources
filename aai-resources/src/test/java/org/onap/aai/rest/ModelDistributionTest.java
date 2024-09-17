@@ -19,8 +19,8 @@
  */
 package org.onap.aai.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
