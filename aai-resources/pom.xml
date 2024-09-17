@@ -31,7 +31,7 @@
         <version>1.14.7-SNAPSHOT</version>
     </parent>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <start-class>org.onap.aai.ResourcesApp</start-class>
 
         <!-- Default docker registry that maven fabric plugin will try to pull from -->

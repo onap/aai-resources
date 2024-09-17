@@ -24,7 +24,6 @@ import static java.lang.Boolean.parseBoolean;
 import static java.util.Comparator.comparingInt;
 
 import com.google.common.collect.Sets;
-import com.sun.jersey.api.client.filter.LoggingFilter;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
@@ -37,6 +36,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.ReaderInterceptor;
 
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.onap.aai.rest.BulkAddConsumer;
 import org.onap.aai.rest.BulkProcessConsumer;
@@ -119,7 +119,9 @@ public class JerseyConfiguration {
     }
 
     private void logRequests(ResourceConfig resourceConfig) {
-        resourceConfig.register(new LoggingFilter(log, ENABLE_RESPONSE_LOGGING ? null : 0));
+        if(ENABLE_RESPONSE_LOGGING) {
+            resourceConfig.register(new LoggingFeature(log));
+        }
     }
 
     private boolean isLoggingEnabled() {
