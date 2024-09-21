@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -73,7 +73,7 @@ public class ModelDistributionTest {
                 .expectStatus()
                 .isNotFound();
 
-        String modelPayload = new String(Files.readAllBytes(Paths.get(MODEL_FILE)));
+        String modelPayload = new String(Files.readAllBytes(Path.of(MODEL_FILE)));
         webClient.put()
                 .uri(uri)
                 .accept(MediaType.APPLICATION_XML)
@@ -126,7 +126,7 @@ public class ModelDistributionTest {
                 .expectStatus()
                 .isNotFound();
 
-        String modelPayload = new String(Files.readAllBytes(Paths.get(MODEL_FILE)));
+        String modelPayload = new String(Files.readAllBytes(Path.of(MODEL_FILE)));
         webClient.put()
                 .uri(modelUri)
                 .accept(MediaType.APPLICATION_XML)
@@ -148,7 +148,7 @@ public class ModelDistributionTest {
         ModelVersion modelVersion = objectMapper.readValue(modelVersionResponse, ModelVersion.class);
         assertNull(modelVersion.getModelElements());
 
-        String updatePayload = new String(Files.readAllBytes(Paths.get(UPDATE_MODEL_FILE)))
+        String updatePayload = new String(Files.readAllBytes(Path.of(UPDATE_MODEL_FILE)))
                 .replace("resourceVersion", modelVersion.getResourceVersion());
         webClient.put()
                 .uri(modelVersionUri)

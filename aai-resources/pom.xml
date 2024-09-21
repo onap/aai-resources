@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.14.7-SNAPSHOT</version>
+        <version>1.15.0-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>11</java.version>
@@ -73,7 +73,7 @@
         <schema.version.namespace.change.start>v12</schema.version.namespace.change.start>
         <schema.version.edge.label.start>v12</schema.version.edge.label.start>
         <schema.version.api.default>v29</schema.version.api.default>
-        <schema.version.list>v10,v11,v12,v13,v14,v15,v16,v17,v18,v19,v20,v21,v22,v23,v24,v25,v26,v27,v28,v29</schema.version.list>
+        <schema.version.list>v10,v11,v12,v13,v14,v15,v23,v29</schema.version.list>
         <schema.uri.base.path>/aai</schema.uri.base.path>
         <!-- <schema.translator.list>config</schema.translator.list> -->
         <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>
@@ -186,7 +186,7 @@
             <properties>
                 <schema.source.name>onap</schema.source.name>
                 <schema.version.namespace.change.start>v12</schema.version.namespace.change.start>
-                <schema.version.list>v10,v11,v12,v13,v14,v15,v16,v17,v18,v19,v20,v21,v22,v23,v24,v25,v26,v27,v28,v29</schema.version.list>
+                <schema.version.list>v10,v11,v12,v13,v14,v15,v16,v23,v29</schema.version.list>
                 <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>
             </properties>
         </profile>
@@ -330,16 +330,12 @@
             <version>2.1</version>
         </dependency>
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
         <dependency>
@@ -738,7 +734,7 @@
         <dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.30</version>
+			<version>1.18.34</version>
 			<scope>provided</scope>
 		</dependency>
         <dependency>
