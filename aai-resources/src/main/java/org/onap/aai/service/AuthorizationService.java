@@ -23,7 +23,7 @@ package org.onap.aai.service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class AuthorizationService {
 
         String basicAuthFile = getBasicAuthFilePath();
 
-        try (Stream<String> stream = Files.lines(Paths.get(basicAuthFile))) {
+        try (Stream<String> stream = Files.lines(Path.of(basicAuthFile))) {
             stream.filter(line -> !line.startsWith("#")).forEach(str -> {
                 byte[] bytes = null;
 
