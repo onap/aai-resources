@@ -30,8 +30,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.janusgraph.core.JanusGraph;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.onap.aai.ResourcesApp;
 import org.onap.aai.db.props.AAIProperties;
 import org.onap.aai.dbmap.AAIGraph;
 import org.slf4j.Logger;
@@ -52,9 +52,9 @@ import lombok.SneakyThrows;
 @Testcontainers
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration(exclude={CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class}) // there is no running cassandra instance for the test
-public class K6PerformanceTest {
+public class K6ReadTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(K6ReadTest.class);
   private static final long nPservers = 10;
 
   @LocalServerPort
@@ -81,38 +81,82 @@ public class K6PerformanceTest {
   }
 
   @Test
-  public void k6StandardTest() throws Exception {
+  public void readWithoutRelationsTest() throws Exception {
     int testDuration = 5;
 
-    try (
-        K6Container container = new K6Container("grafana/k6:0.49.0")
-            .withNetworkMode("host")
-            .withAccessToHost(true)
-            .withTestScript(MountableFile.forClasspathResource("k6/test.js"))
-            .withScriptVar("API_PORT", String.valueOf(port))
-            .withScriptVar("API_VERSION", "v29")
-            .withScriptVar("DURATION_SECONDS", String.valueOf(testDuration))
-            .withScriptVar("N_PSERVERS", String.valueOf(nPservers))
-            .withCmdOptions("--quiet", "--no-usage-report");) {
-      container.start();
+    K6Container container = new K6Container("grafana/k6:0.49.0")
+        .withNetworkMode("host")
+        .withAccessToHost(true)
+        .withTestScript(MountableFile.forClasspathResource("k6/readWithoutRelations.js"))
+        .withScriptVar("API_PORT", String.valueOf(port))
+        .withScriptVar("API_VERSION", "v29")
+        .withScriptVar("DURATION_SECONDS", String.valueOf(testDuration))
+        .withScriptVar("N_PSERVERS", String.valueOf(nPservers))
+        .withCmdOptions("--quiet", "--no-usage-report");
+    container.start();
 
-      WaitingConsumer consumer = new WaitingConsumer();
-      container.followOutput(consumer);
+    WaitingConsumer consumer = new WaitingConsumer();
+    container.followOutput(consumer);
 
-      // Wait for test script results to be collected
+    // Wait for test script results to be collected
+    try {
       consumer.waitUntil(
           frame -> {
             return frame.getUtf8String().contains("iteration_duration");
           },
-          testDuration + 30,
+          testDuration + 10,
           TimeUnit.SECONDS);
-
-      logger.debug(container.getLogs());
-      assertThat(container.getLogs(), containsString("✓ status was 200"));
-      assertThat(container.getLogs(), containsString("✓ returned correct number of results"));
-      assertThat(container.getLogs(), containsString("✓ http_req_duration"));
-      assertThat(container.getLogs(), containsString("✓ http_req_failed"));
+    } catch (Exception e) {
+      logger.error(container.getLogs());
     }
+
+    logger.debug(container.getLogs());
+    assertThat(container.getLogs(), containsString("✓ status was 200"));
+    assertThat(container.getLogs(), containsString("✓ returned correct number of results"));
+    assertThat(container.getLogs(), containsString("✓ http_req_duration"));
+    assertThat(container.getLogs(), containsString("✓ http_req_failed"));
+    container.stop();
+
+  }
+
+  @Test
+  @Disabled
+  public void writeWithoutRelations() throws Exception {
+    int testDuration = 5;
+
+    K6Container container = new K6Container("grafana/k6:0.49.0")
+        .withNetworkMode("host")
+        .withAccessToHost(true)
+        .withTestScript(MountableFile.forClasspathResource("k6/writeWithoutRelations.js"))
+        .withScriptVar("API_PORT", String.valueOf(port))
+        .withScriptVar("API_VERSION", "v29")
+        .withScriptVar("DURATION_SECONDS", String.valueOf(testDuration))
+        .withScriptVar("N_PSERVERS", String.valueOf(nPservers))
+        .withCmdOptions("--quiet", "--no-usage-report");
+    container.start();
+
+    WaitingConsumer consumer = new WaitingConsumer();
+    container.followOutput(consumer);
+
+    // Wait for test script results to be collected
+    try {
+      consumer.waitUntil(
+          frame -> {
+            return frame.getUtf8String().contains("iteration_duration");
+          },
+          testDuration + 10,
+          TimeUnit.SECONDS);
+    } catch (Exception e) {
+      // log the container stdout in case of failure in the test script
+      logger.error(container.getLogs());
+    }
+
+    String report = container.getLogs().substring(container.getLogs().indexOf("✓ status was 201"));
+    logger.info(report);
+    assertThat(report, containsString("✓ status was 201"));
+    assertThat(report, containsString("✓ http_req_duration"));
+    assertThat(report, containsString("✓ http_req_failed"));
+    container.stop();
   }
 
   @SneakyThrows
