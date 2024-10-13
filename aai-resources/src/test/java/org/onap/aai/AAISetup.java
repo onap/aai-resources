@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.onap.aai.config.ConfigConfiguration;
 import org.onap.aai.config.IntrospectionConfig;
+import org.onap.aai.config.KafkaConfig;
 import org.onap.aai.config.RestBeanConfig;
 import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.config.XmlFormatTransformerConfiguration;
@@ -54,7 +55,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 @SpringJUnitConfig(
         classes = {ConfigConfiguration.class, AAIConfigTranslator.class, NodeIngestor.class, EdgeIngestor.class,
                 EdgeSerializer.class, SpringContextAware.class, IntrospectionConfig.class,
-                XmlFormatTransformerConfiguration.class, RestBeanConfig.class, LoaderFactory.class, NotificationService.class})
+                XmlFormatTransformerConfiguration.class, RestBeanConfig.class, LoaderFactory.class, NotificationService.class, KafkaConfig.class})
 @TestPropertySource(
         properties = {"schema.uri.base.path = /aai",
                 "schema.ingest.file = src/test/resources/application-test.properties"})

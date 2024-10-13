@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.onap.aai.resources</groupId>
         <artifactId>resources</artifactId>
-        <version>1.15.0-SNAPSHOT</version>
+        <version>1.15.1-SNAPSHOT</version>
     </parent>
     <properties>
         <java.version>11</java.version>
@@ -79,8 +79,8 @@
         <schema.ingest.file>${project.basedir}/src/main/resources/application.properties</schema.ingest.file>
 
         <!-- End of Default ONAP Schema Properties -->
-        <janusgraph.version>0.6.4</janusgraph.version>
-        <gremlin.version>3.5.8</gremlin.version>
+        <!-- <janusgraph.version>0.6.4</janusgraph.version>
+        <gremlin.version>3.5.8</gremlin.version> -->
 
         <javax.servlet.version>4.0.1</javax.servlet.version>
         <keycloak.version>11.0.2</keycloak.version>
@@ -505,17 +505,6 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
         </dependency>
-        <!-- Do not use activemq-all because they force you to use a specific logging
-            and they shade it so you can't simply exclude it and when you deploy the
-            jar, you will notice failure -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-client</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.onap.aai.aai-common</groupId>
             <artifactId>aai-core</artifactId>
@@ -523,10 +512,6 @@
                 <exclusion>
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.jackson</groupId>
-                    <artifactId>jackson-mapper-asl</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
@@ -549,17 +534,6 @@
         <dependency>
             <groupId>org.onap.aai.aai-common</groupId>
             <artifactId>aai-schema-ingest</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- Do not use the jersey-client since jersey client 1.0 version clashes
             with jersey 2 which we are using -->
