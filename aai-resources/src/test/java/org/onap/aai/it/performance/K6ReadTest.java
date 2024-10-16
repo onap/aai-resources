@@ -110,11 +110,12 @@ public class K6ReadTest {
       logger.error(container.getLogs());
     }
 
-    logger.debug(container.getLogs());
-    assertThat(container.getLogs(), containsString("✓ status was 200"));
-    assertThat(container.getLogs(), containsString("✓ returned correct number of results"));
-    assertThat(container.getLogs(), containsString("✓ http_req_duration"));
-    assertThat(container.getLogs(), containsString("✓ http_req_failed"));
+    String report = container.getLogs();
+    logger.info(report);
+    assertThat(report, containsString("✓ status was 200"));
+    assertThat(report, containsString("✓ returned correct number of results"));
+    assertThat(report, containsString("✓ http_req_duration"));
+    assertThat(report, containsString("✓ http_req_failed"));
     container.stop();
 
   }

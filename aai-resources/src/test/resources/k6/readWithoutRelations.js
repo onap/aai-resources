@@ -22,7 +22,7 @@ import { check } from "k6";
 
 export const options = {
   vus: 3,
-  duration: `${__ENV.DURATION_SECONDS}s`,
+  duration: `${__ENV.DURATION_SECONDS || 10}s`,
   thresholds: {
     http_req_failed: ["rate<0.01"], // http errors should be less than 1%
     http_req_duration: [
@@ -46,8 +46,8 @@ export default function () {
       "X-TransactionId": "someTransaction",
     },
   };
-  const pserverCount = parseInt(`${__ENV.N_PSERVERS}`, 10);
-  const baseUrl = `http://localhost:${__ENV.API_PORT}/aai/${__ENV.API_VERSION}`;
+  const pserverCount = parseInt(`${__ENV.N_PSERVERS || 100000}`, 10);
+  const baseUrl = `http://localhost:${__ENV.API_PORT || 8447}/aai/${__ENV.API_VERSION || 'v29'}`;
   const url = `/cloud-infrastructure/pservers`;
   const res = http.get(baseUrl + url, options);
 

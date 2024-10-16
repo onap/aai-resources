@@ -23,7 +23,7 @@ import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.3.0/index.js';
 
 export const options = {
   vus: 3,
-  duration: `${__ENV.DURATION_SECONDS}s`,
+  duration: `${__ENV.DURATION_SECONDS || 10}s`,
   thresholds: {
     http_req_failed: ["rate<0.01"], // http errors should be less than 1%
     http_req_duration: [
@@ -68,7 +68,7 @@ function generatePServer(someInt) {
   });
 }
 
-const baseUrl = `http://localhost:${__ENV.API_PORT}/aai/${__ENV.API_VERSION}`;
+const baseUrl = `http://localhost:${__ENV.API_PORT || 8447}/aai/${__ENV.API_VERSION || 'v29'}`;
 const path = `/cloud-infrastructure/pservers/pserver`;
 const url = baseUrl + path;
 const encodedCredentials = 'QUFJOkFBSQ==';

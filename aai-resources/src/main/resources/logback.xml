@@ -134,7 +134,7 @@
 			<pattern>${transLogPattern}</pattern>
 		</encoder>
 	</appender>
-	
+
 	<appender name="asynctranslog" class="ch.qos.logback.classic.AsyncAppender">
 		<queueSize>${queueSize}</queueSize>
 		<includeCallerData>true</includeCallerData>
@@ -264,7 +264,7 @@
 	<logger name="org.zookeeper" level="OFF" />
 
 
-	<logger name="org.onap.aai" level="DEBUG" additivity="false">
+	<logger name="org.onap.aai" level="INFO" additivity="false">
 		<appender-ref ref="asyncDEBUG" />
 		<appender-ref ref="asyncSANE" />
 		<appender-ref ref="STDOUT" />
@@ -275,7 +275,10 @@
 	<logger name="org.onap.aai.aailog.logs.AaiScheduledTaskAuditLog" level="INFO">
 		<appender-ref ref="asyncAUDIT"/>
 	</logger>
-	<logger name="org.onap.logging.filter.base.AbstractAuditLogFilter" level="INFO">
+	<logger name="org.onap.logging.filter.base.AbstractAuditLogFilter" level="WARN">
+		<appender-ref ref="asyncAUDIT"/>
+	</logger>
+	<logger name="org.onap.logging.filter.base.MDCSetup" level="WARN">
 		<appender-ref ref="asyncAUDIT"/>
 	</logger>
 	<logger name="org.onap.aai.aailog.logs.AaiDBMetricLog" level="INFO">
@@ -287,7 +290,7 @@
 	<logger name="org.onap.aai.logging.ErrorLogHelper" level="WARN">
 		<appender-ref ref="asyncERROR"/>
 	</logger>
-	<logger name="org.onap.aai.interceptors.post" level="DEBUG" additivity="false">
+	<logger name="org.onap.aai.interceptors.post" level="WARN" additivity="false">
 		<appender-ref ref="asynctranslog" />
 	</logger>
 
@@ -300,7 +303,7 @@
 		<appender-ref ref="kafkaAAIEventConsumerInfo" />
 	</logger>
 
-	<root level="DEBUG">
+	<root level="INFO">
 		<appender-ref ref="external" />
 		<appender-ref ref="STDOUT" />
 	</root>
