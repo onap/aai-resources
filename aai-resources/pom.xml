@@ -298,6 +298,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -525,10 +526,6 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-web</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -599,17 +596,7 @@
             <artifactId>netty-all</artifactId>
             <version>${netty.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <classifier>indy</classifier>
-            <version>${groovy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <!-- Only used for the WebTestClient -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
