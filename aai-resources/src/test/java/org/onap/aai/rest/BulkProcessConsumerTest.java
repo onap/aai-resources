@@ -40,7 +40,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkProcessConsumerTest.class.getName());
-    private LegacyMoxyConsumer legacyMoxyConsumer;
+    private ResourcesController resourcesController;
 
     @Test
     public void bulkAddPayloadInBulkProcessTest() throws IOException {
@@ -117,7 +117,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
     @Test
     public void testBulkDeletePserverAndComplexRelationship() throws IOException, JSONException {
 
-        legacyMoxyConsumer = new LegacyMoxyConsumer();
+        resourcesController = new ResourcesController();
 
         String pserverData = getPayload("payloads/relationship/pserver-bugfix.json");
         String complexData = getPayload("payloads/relationship/complex-bugfix.json");
@@ -136,7 +136,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String complexToPserverRelationshipUri =
                 String.format("cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
 
-        Response response = legacyMoxyConsumer.updateRelationship(complexToPserverRelationshipData,
+        Response response = resourcesController.updateRelationship(complexToPserverRelationshipData,
                 schemaVersions.getDefaultVersion().toString(), complexToPserverRelationshipUri, httpHeaders, uriInfo,
                 new MockHttpServletRequest("DELETE", "http://www.test.com"));
 
@@ -178,7 +178,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
 
-        Response response = legacyMoxyConsumer.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1, false,
+        Response response = resourcesController.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1, false,
                 "all", "false", httpHeaders, uriInfo, new MockHttpServletRequest("GET", "http://www.test.com"));
 
         assertNotNull(response, "Response from the legacy moxy consumer returned null");
@@ -186,7 +186,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 response.getStatus(),
                 "Expected to not have the data already in memory");
 
-        response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+        response = resourcesController.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
                 uriInfo, new MockHttpServletRequest("PUT", "http://www.test.com"));
 
         assertNotNull(response, "Response from the legacy moxy consumer returned null");
@@ -199,7 +199,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
                 "Expected to return status created from the response");
 
         queryParameters.add("depth", "10000");
-        response = legacyMoxyConsumer.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1, false,
+        response = resourcesController.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1, false,
                 "all", "false", httpHeaders, uriInfo, new MockHttpServletRequest("GET", "http://www.test.com"));
 
         assertNotNull(response, "Response from the legacy moxy consumer returned null");

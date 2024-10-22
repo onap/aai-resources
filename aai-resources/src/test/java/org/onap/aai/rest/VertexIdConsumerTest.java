@@ -64,7 +64,7 @@ public class VertexIdConsumerTest extends AAISetup {
     }
 
     private VertexIdConsumer vertexIdConsumer;
-    private LegacyMoxyConsumer legacyMoxyConsumer;
+    private ResourcesController resourcesController;
 
     private HttpHeaders httpHeaders;
 
@@ -77,7 +77,7 @@ public class VertexIdConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
 
-    private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class.getName());
 
     @BeforeEach
     public void setup() {
@@ -87,7 +87,7 @@ public class VertexIdConsumerTest extends AAISetup {
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
         vertexIdConsumer = new VertexIdConsumer();
-        legacyMoxyConsumer = new LegacyMoxyConsumer();
+        resourcesController = new ResourcesController();
 
         httpHeaders = Mockito.mock(HttpHeaders.class);
         uriInfo = Mockito.mock(UriInfo.class);
@@ -131,13 +131,13 @@ public class VertexIdConsumerTest extends AAISetup {
         when(uriInfo.getPath(false)).thenReturn(uri);
 
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = legacyMoxyConsumer.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1,
+        Response response = resourcesController.getLegacy(schemaVersions.getDefaultVersion().toString(), uri, -1, -1,
                 false, "all", "false", httpHeaders, uriInfo, mockReqGet);
 
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
 
-        response = legacyMoxyConsumer.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
+        response = resourcesController.update(payload, schemaVersions.getDefaultVersion().toString(), uri, httpHeaders,
                 uriInfo, mockReq);
 
         int code = response.getStatus();

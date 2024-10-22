@@ -41,7 +41,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.onap.aai.rest.BulkAddConsumer;
 import org.onap.aai.rest.BulkProcessConsumer;
 import org.onap.aai.rest.ExampleConsumer;
-import org.onap.aai.rest.LegacyMoxyConsumer;
+import org.onap.aai.rest.ResourcesController;
 import org.onap.aai.rest.URLFromVertexIdConsumer;
 import org.onap.aai.rest.VertexIdConsumer;
 import org.onap.aai.rest.bulk.BulkSingleTransactionConsumer;
@@ -78,7 +78,7 @@ public class JerseyConfiguration {
 
         Set<Class<?>> classes = Sets.newHashSet(EchoResponse.class, VertexIdConsumer.class, ExampleConsumer.class,
                 BulkAddConsumer.class, BulkProcessConsumer.class, BulkSingleTransactionConsumer.class,
-                LegacyMoxyConsumer.class, URLFromVertexIdConsumer.class);
+                ResourcesController.class, URLFromVertexIdConsumer.class);
         resourceConfig.registerClasses(classes);
         registerFiltersForClasses(resourceConfig, ContainerRequestFilter.class, ContainerResponseFilter.class,
                 ReaderInterceptor.class,
