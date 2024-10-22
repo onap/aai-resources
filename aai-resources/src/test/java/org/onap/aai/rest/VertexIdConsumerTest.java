@@ -47,6 +47,7 @@ import org.mockito.Mockito;
 import org.onap.aai.AAISetup;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.service.ResourcesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -77,7 +78,7 @@ public class VertexIdConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class.getName());
 
     @BeforeEach
     public void setup() {
@@ -87,7 +88,7 @@ public class VertexIdConsumerTest extends AAISetup {
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
         vertexIdConsumer = new VertexIdConsumer();
-        resourcesController = new ResourcesController();
+        resourcesController = new ResourcesController(new ResourcesService());
 
         httpHeaders = Mockito.mock(HttpHeaders.class);
         uriInfo = Mockito.mock(UriInfo.class);
