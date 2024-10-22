@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.onap.aai.dbmap.AAIGraph;
+import org.onap.aai.service.ResourcesService;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +118,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
     @Test
     public void testBulkDeletePserverAndComplexRelationship() throws IOException, JSONException {
 
-        resourcesController = new ResourcesController();
+        resourcesController = new ResourcesController(new ResourcesService());
 
         String pserverData = getPayload("payloads/relationship/pserver-bugfix.json");
         String complexData = getPayload("payloads/relationship/complex-bugfix.json");

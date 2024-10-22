@@ -67,6 +67,7 @@ import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.entities.PServer;
 import org.onap.aai.entities.PServerListResponse;
 import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.service.ResourcesService;
 import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
@@ -117,7 +118,7 @@ public class ResourcesControllerTest {
         }
         logger.info("Starting the setup for the integration tests of Rest Endpoints");
 
-        resourcesController = new ResourcesController();
+        resourcesController = new ResourcesController(new ResourcesService());
         httpHeaders = Mockito.mock(HttpHeaders.class);
         uriInfo = Mockito.mock(UriInfo.class);
 
