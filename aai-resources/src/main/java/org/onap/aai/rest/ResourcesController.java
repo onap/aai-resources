@@ -60,15 +60,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
-/**
- * The Class LegacyMoxyConsumer.
- */
+@Timed
 @Controller
 @Path("{version: v[1-9][0-9]*|latest}")
-@Timed
-public class LegacyMoxyConsumer extends RESTAPI {
+public class ResourcesController extends RESTAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(LegacyMoxyConsumer.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class.getName());
 
     @PUT
     @Path("/{uri: .+}")
