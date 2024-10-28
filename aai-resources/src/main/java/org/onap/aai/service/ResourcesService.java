@@ -81,7 +81,7 @@ public class ResourcesService {
     Loader loader;
 
     try {
-      validateRequest(info);
+      validateUriEncoding(info);
       SchemaVersion version = new SchemaVersion(versionParam);
 
       final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
@@ -150,7 +150,7 @@ public class ResourcesService {
     boolean success = true;
 
     try {
-      validateRequest(info);
+      validateUriEncoding(info);
       SchemaVersion version = new SchemaVersion(versionParam);
 
       HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
@@ -208,7 +208,7 @@ public class ResourcesService {
     boolean success = true;
 
     try {
-      validateRequest(info);
+      validateUriEncoding(info);
 
       version = new SchemaVersion(versionParam);
 
@@ -281,7 +281,7 @@ public class ResourcesService {
     boolean success = true;
 
     try {
-      this.validateRequest(info);
+      this.validateUriEncoding(info);
       SchemaVersion version = new SchemaVersion(versionParam);
 
       HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
@@ -337,7 +337,7 @@ public class ResourcesService {
     Loader loader = null;
 
     try {
-      validateRequest(info);
+      validateUriEncoding(info);
       SchemaVersion version = new SchemaVersion(versionParam);
 
       final HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
@@ -408,7 +408,7 @@ public class ResourcesService {
 
     try {
 
-      validateRequest(info);
+      validateUriEncoding(info);
       SchemaVersion version = new SchemaVersion(versionParam);
 
       HttpEntry traversalUriHttpEntry = SpringContextAware.getBean("traversalUriHttpEntry", HttpEntry.class);
@@ -496,7 +496,7 @@ public class ResourcesService {
     return uri.toString().contains("/" + RestTokens.COUSIN + "/");
   }
 
-  private void validateRequest(UriInfo info) throws AAIException, UnsupportedEncodingException {
+  private void validateUriEncoding(UriInfo info) throws AAIException, UnsupportedEncodingException {
 
     if (!ValidateEncoding.getInstance().validate(info)) {
       throw new AAIException("AAI_3008", "uri=" + getPath(info));
