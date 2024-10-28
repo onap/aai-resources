@@ -58,8 +58,12 @@ public class ResourcesController extends RESTAPI {
     @Path("/{uri: .+}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response update(String content, @PathParam("version") String versionParam,
-            @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info,
+    public Response update(
+            String content,
+            @PathParam("version") String versionParam,
+            @PathParam("uri") @Encoded String uri,
+            @Context HttpHeaders headers,
+            @Context UriInfo info,
             @Context HttpServletRequest req) {
         Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
         MediaType mediaType = headers.getMediaType();
@@ -70,8 +74,12 @@ public class ResourcesController extends RESTAPI {
     @Path("/{uri: .+}/relationship-list/relationship")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateRelationship(String content, @PathParam("version") String versionParam,
-            @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info,
+    public Response updateRelationship(
+            String content,
+            @PathParam("version") String versionParam,
+            @PathParam("uri") @Encoded String uri,
+            @Context HttpHeaders headers,
+            @Context UriInfo info,
             @Context HttpServletRequest req) {
 
         return resourcesService.updateRelationship(content, versionParam, uri, headers, info);
@@ -81,8 +89,12 @@ public class ResourcesController extends RESTAPI {
     @Path("/{uri: .+}")
     @Consumes({"application/merge-patch+json"})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response patch(String content, @PathParam("version") String versionParam,
-            @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info,
+    public Response patch(
+            String content,
+            @PathParam("version") String versionParam,
+            @PathParam("uri") @Encoded String uri,
+            @Context HttpHeaders headers,
+            @Context UriInfo info,
             @Context HttpServletRequest req) {
         Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
         MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
@@ -140,8 +152,12 @@ public class ResourcesController extends RESTAPI {
     @DELETE
     @Path("/{uri: .+}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response delete(@PathParam("version") String versionParam, @PathParam("uri") @Encoded String uri,
-            @Context HttpHeaders headers, @Context UriInfo info, @QueryParam("resource-version") String resourceVersion,
+    public Response delete(
+            @PathParam("version") String versionParam,
+            @PathParam("uri") @Encoded String uri,
+            @Context HttpHeaders headers,
+            @Context UriInfo info,
+            @QueryParam("resource-version") String resourceVersion,
             @Context HttpServletRequest req) {
         Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
         return resourcesService.delete(versionParam, uri, headers, info, req, roles);
@@ -149,21 +165,17 @@ public class ResourcesController extends RESTAPI {
 
     /**
      * This whole method does nothing because the body is being dropped while fielding the request.
-     *
-     * @param content the content
-     * @param versionParam the version param
-     * @param uri the uri
-     * @param headers the headers
-     * @param info the info
-     * @param req the req
-     * @return the response
      */
     @DELETE
     @Path("/{uri: .+}/relationship-list/relationship")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response deleteRelationship(String content, @PathParam("version") String versionParam,
-            @PathParam("uri") @Encoded String uri, @Context HttpHeaders headers, @Context UriInfo info,
+    public Response deleteRelationship(
+            String content,
+            @PathParam("version") String versionParam,
+            @PathParam("uri") @Encoded String uri,
+            @Context HttpHeaders headers,
+            @Context UriInfo info,
             @Context HttpServletRequest req) {
 
         return resourcesService.deleteRelationship(content, versionParam, uri, headers, info);
