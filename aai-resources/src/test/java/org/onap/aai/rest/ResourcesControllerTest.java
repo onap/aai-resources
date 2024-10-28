@@ -24,10 +24,10 @@ package org.onap.aai.rest;
 
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,12 +51,13 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import org.hamcrest.Matcher;
 import org.janusgraph.core.JanusGraph;
+import org.janusgraph.core.JanusGraphTransaction;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -64,8 +65,10 @@ import org.mockito.Mockito;
 import org.onap.aai.config.WebClientConfiguration;
 import org.onap.aai.db.props.AAIProperties;
 import org.onap.aai.dbmap.AAIGraph;
+import org.onap.aai.entities.AAIErrorResponse;
 import org.onap.aai.entities.PServer;
 import org.onap.aai.entities.PServerListResponse;
+import org.onap.aai.entities.ServiceException;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.service.ResourcesService;
 import org.onap.aai.setup.SchemaVersions;
@@ -150,6 +153,25 @@ public class ResourcesControllerTest {
         Mockito.doReturn(null).when(queryParameters).remove(any());
 
         when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        JanusGraph janusGraph = AAIGraph.getInstance().getGraph();
+        JanusGraphTransaction transaction = janusGraph.newTransaction();
+        boolean success = true;
+        try {
+            GraphTraversalSource g = transaction.traversal();
+            g.V().drop().iterate();
+        } catch (Exception ex) {
+            success = false;
+        } finally {
+            if (success) {
+                transaction.commit();
+            } else {
+                transaction.rollback();
+            }
+        }
     }
 
     @Test
@@ -320,6 +342,17 @@ public class ResourcesControllerTest {
         String payload = "{}";
         String uri = "fake-infrastructure/pservers/pserver/fajsidj";
 
+        // webClient.put()
+        //     .uri(uri)
+        //     .bodyValue(payload)
+        //     .exchange()
+        //     .expectStatus().isEqualTo(500)
+        //     .expectBody(AAIErrorResponse.class)
+        //     .value(responseBody -> {
+        //         assertNotNull(responseBody, "Response body should not be null");
+        //         assertEquals("SVC3002", responseBody.getRequestError().getServiceException().getMessageId());
+        //     });
+
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenThrow(new IllegalArgumentException());
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
@@ -361,29 +394,56 @@ public class ResourcesControllerTest {
     public void testInvalidUriContainingRelatedToShouldThrowAAIException() throws JSONException {
 
         String payload = "{}";
-        String uri = "cloud-infrastructure/related-to/fsdf";
+        String uri = "/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf";
+
+        AAIErrorResponse errorResponse = webClient.put()
+                .uri(uri)
+                .bodyValue(payload)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .returnResult(AAIErrorResponse.class)
+                .getResponseBody()
+                .blockFirst();
+
+        ServiceException serviceException = errorResponse.getRequestError().getServiceException();
+        assertEquals("SVC3002", serviceException.getMessageId());
+        assertEquals("Error writing output performing %1 on %2 (msg=%3) (ec=%4)", serviceException.getText());
+        List<String> expected = List.of(
+            "PUT",
+            "v29/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf",
+            "Cannot write via this URL",
+            "ERR.5.6.3010");
+        assertIterableEquals(expected, serviceException.getVariables());
+
+        uri = "/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf/relationship-list/relationship";
+
+        errorResponse = webClient.put()
+                .uri(uri)
+                .bodyValue(payload)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .returnResult(AAIErrorResponse.class)
+                .getResponseBody()
+                .blockFirst();
+
+        serviceException = errorResponse.getRequestError().getServiceException();
+        expected = List.of(
+            "PUT",
+            "v29/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf/relationship-list/relationship",
+            "Cannot write via this URL",
+            "ERR.5.6.3010");
+        assertIterableEquals(expected, serviceException.getVariables());
+
 
         when(uriInfo.getPath()).thenReturn(uri);
         when(uriInfo.getPath(false)).thenReturn(uri);
         MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        Response response = resourcesController.update(payload, defaultSchemaVersion, uri,
-                httpHeaders, uriInfo, mockReq);
-
-        int code = response.getStatus();
-        logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
-
-        response = resourcesController.updateRelationship(payload, defaultSchemaVersion, uri,
-                httpHeaders, uriInfo, mockReq);
-
-        code = response.getStatus();
-        logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
-
+        Response response;
+        int code;
         mockReq = new MockHttpServletRequest("GET", uri);
         response = resourcesController.getLegacy(defaultSchemaVersion, uri, -1, -1, false,
                 "all", "false", httpHeaders, uriInfo, mockReq);
-
+        code = response.getStatus();
         assertNotNull(response, "Response from the legacy moxy consumer returned null");
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), code);
 
