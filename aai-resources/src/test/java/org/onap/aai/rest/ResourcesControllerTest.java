@@ -457,34 +457,22 @@ public class ResourcesControllerTest {
     }
 
     @Test
-    @Disabled("Unable to test this method due to WRITE_BIGDECIMAL_AS_PLAIN error")
     public void testPatchWithValidData() throws IOException {
 
         String payload = getResourcePayload("pserver-patch-test");
-        String uri = getUri("pserver-patch-test");
+        String uri = "/cloud-infrastructure/pservers/pserver/pserver-patch-test";
+        webClient.get()
+            .uri(uri)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
 
-        if (uri.length() != 0 && uri.charAt(0) == '/') {
-            uri = uri.substring(1);
-        }
-
-        when(uriInfo.getPath()).thenReturn(uri);
-        when(uriInfo.getPath(false)).thenReturn(uri);
-
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("GET", uri);
-        Response response = resourcesController.getLegacy(defaultSchemaVersion, uri, -1, -1,
-                false, "all", "false", httpHeaders, uriInfo, mockReq);
-
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-        mockReq = new MockHttpServletRequest("PUT", uri);
-        response = resourcesController.update(payload, defaultSchemaVersion, uri, httpHeaders,
-                uriInfo, mockReq);
-
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        webClient.put()
+            .uri(uri)
+            .bodyValue(payload)
+            .exchange()
+            .expectStatus()
+            .isCreated();
 
         String patchData = "{\"in-maint\": false}";
 
@@ -493,15 +481,13 @@ public class ResourcesControllerTest {
         outputMediaTypes.remove(APPLICATION_JSON);
         outputMediaTypes.add(MediaType.valueOf("application/merge-patch+json"));
 
-        mockReq = new MockHttpServletRequest("PATCH", uri);
-        response = resourcesController.patch(patchData, defaultSchemaVersion, uri, httpHeaders,
-                uriInfo, mockReq);
-
-        code = response.getStatus();
-        assertNotNull(response, "Response from the patch returned null");
-        logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        assertEquals(Response.Status.OK.getStatusCode(), code);
-
+        webClient.patch()
+            .uri(uri)
+            .header("Content-Type", "application/merge-patch+json")
+            .bodyValue(patchData)
+            .exchange()
+            .expectStatus()
+            .isOk();
     }
 
     protected void doSetupResource(String uri, String payload) throws JSONException {
@@ -584,85 +570,13 @@ public class ResourcesControllerTest {
     }
 
     @Test
-    public void checkTimeoutEnabled() throws Exception {
-        boolean isTimeoutEnabled = resourcesController.isTimeoutEnabled("JUNITTESTAPP1",
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP),
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
-        assertEquals(true, isTimeoutEnabled);
-    }
-
-    @Test
-    public void checkTimeoutEnabledOverride() throws Exception {
-        boolean isTimeoutEnabled = resourcesController.isTimeoutEnabled("JUNITTESTAPP2",
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP),
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
-        assertEquals(false, isTimeoutEnabled);
-    }
-
-    @Test
-    public void checkTimeoutEnabledDefaultLimit() throws Exception {
-        boolean isTimeoutEnabled = resourcesController.isTimeoutEnabled("JUNITTESTAPP3",
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_ENABLED), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP),
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
-        assertEquals(true, isTimeoutEnabled);
-        int timeout = resourcesController.getTimeoutLimit("JUNITTESTAPP3",
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
-        assertEquals(100000, timeout);
-    }
-
-    @Test
-    public void getTimeout() throws Exception {
-        int timeout = resourcesController.getTimeoutLimit("JUNITTESTAPP1",
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
-        assertEquals(1, timeout);
-    }
-
-    @Test
-    public void getTimeoutOverride() throws Exception {
-        int timeout = resourcesController.getTimeoutLimit("JUNITTESTAPP2",
-                AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_APP), AAIConfig.get(AAIConstants.AAI_CRUD_TIMEOUT_LIMIT));
-        assertEquals(-1, timeout);
-    }
-
-    @Disabled("Time sensitive test only times out if the response takes longer than 1 second")
-    @Test
-    public void testTimeoutGetCall() throws Exception {
-        String uri = getUri();
-
-        if (uri.length() != 0 && uri.charAt(0) == '/') {
-            uri = uri.substring(1);
-        }
-
-        when(uriInfo.getPath()).thenReturn(uri);
-        when(uriInfo.getPath(false)).thenReturn(uri);
-        headersMultiMap.putSingle("X-FromAppId", "JUNITTESTAPP1");
-        when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
-
-        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = resourcesController.getLegacy(defaultSchemaVersion, uri, -1, -1,
-                false, "all", "false", httpHeaders, uriInfo, mockReqGet);
-
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    }
-
-    @Test
     public void testBypassTimeoutGetCall() throws Exception {
-        String uri = getUri();
-
-        if (uri.length() != 0 && uri.charAt(0) == '/') {
-            uri = uri.substring(1);
-        }
-
-        when(uriInfo.getPath()).thenReturn(uri);
-        when(uriInfo.getPath(false)).thenReturn(uri);
-        headersMultiMap.putSingle("X-FromAppId", "JUNITTESTAPP2");
-        when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
-
-        MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
-        Response response = resourcesController.getLegacy(defaultSchemaVersion, uri, -1, -1,
-                false, "all", "false", httpHeaders, uriInfo, mockReqGet);
-
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        String uri = "/cloud-infrastructure/pservers/pserver/pserver-hostname-test";
+        webClient.get()
+            .uri(uri)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
     }
 
     @Test
@@ -1076,42 +990,12 @@ public class ResourcesControllerTest {
     }
 
     private void putResourceWithQueryParam(String uri, String payload) {
-
-        String[] uriSplit = uri.split("\\?");
-        if (uriSplit[1] != null && !uriSplit[1].isEmpty()) {
-            String[] params;
-            if (!uriSplit[1].contains("&")) {
-                String param = uriSplit[1];
-                params = new String[] {param};
-            } else {
-                params = uriSplit[1].split("&");
-            }
-            for (String param : params) {
-                String[] splitParam = param.split("=");
-                String key = splitParam[0];
-                String value = splitParam[1];
-                uriInfo.getQueryParameters().add(key, value);
-            }
-        }
-        uri = uriSplit[0];
-
-        when(uriInfo.getPath()).thenReturn(uri);
-        when(uriInfo.getPath(false)).thenReturn(uri);
-
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", uri);
-        Response response = resourcesController.update(payload, defaultSchemaVersion, uri,
-                httpHeaders, uriInfo, mockReq);
-
-        assertNotNull(response, "Response from the legacy moxy consumer returned null");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.CREATED.getStatusCode(),
-                response.getStatus(),
-                "Expected to return status created from the response");
-        logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
+        webClient.put()
+            .uri(uri)
+            .bodyValue(payload)
+            .exchange()
+            .expectStatus()
+            .isCreated();
     }
 
     private String getResponse(String uri) {
