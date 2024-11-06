@@ -78,7 +78,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(URLFromVertexIdConsumerTest.class.getName());
 
     @BeforeEach
     public void setup() {
