@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -280,34 +279,19 @@ public class ResourcesControllerTest {
         String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship");
         String cloudToPserverRelationshipUri =
                 String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
-        Response response = resourcesController.updateRelationship(cloudToPserverRelationshipData,
-                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
-                mockReq);
 
-        assertNotNull(response, "Response from the legacy moxy consumer returned null");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
+        webClient.put()
+                .uri(cloudToPserverRelationshipUri)
+                .bodyValue(cloudToPserverRelationshipData)
+                .exchange()
+                .expectStatus().isOk();
 
-        assertEquals(Response.Status.OK.getStatusCode(),
-                response.getStatus(),
-                "Expected to return status created from the response");
-        logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-
-        // TODO - Need to actually verify the relationship between pserver and cloud-region
-        mockReq = new MockHttpServletRequest("DELETE", cloudToPserverRelationshipUri);
-        response = resourcesController.deleteRelationship(cloudToPserverRelationshipData,
-                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
-                mockReq);
-
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        webClient.method(HttpMethod.DELETE)
+            .uri(cloudToPserverRelationshipUri)
+            .body(Mono.just(cloudToPserverRelationshipData), String.class)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
     }
 
     @Test
@@ -521,59 +505,32 @@ public class ResourcesControllerTest {
     }
 
     protected void doSetupResource(String uri, String payload) throws JSONException {
-        when(uriInfo.getPath()).thenReturn(uri);
-        when(uriInfo.getPath(false)).thenReturn(uri);
-        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-        when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + uri));
-        Response response = resourcesController.getLegacy(defaultSchemaVersion, uri, -1, -1,
-                false, "all", "false", httpHeaders, uriInfo, mockRequest);
-        assertNotNull(response, "Response from the legacy moxy consumer returned null");
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
-                response.getStatus(),
-                "Expected to not have the data already in memory");
-        response = resourcesController.update(payload, defaultSchemaVersion, uri, httpHeaders,
-                uriInfo, mockRequest);
-        assertNotNull(response, "Response from the legacy moxy consumer returned null");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.CREATED.getStatusCode(),
-                response.getStatus(),
-                "Expected to return status created from the response");
-        queryParameters.add("depth", "10000");
-        response = resourcesController.getLegacy(defaultSchemaVersion, uri, -1, -1, false,
-                "all", "false", httpHeaders, uriInfo, mockRequest);
-        assertNotNull(response, "Response from the legacy moxy consumer returned null");
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus(), "Expected to return the pserver data that was just put in memory");
-        if ("".equalsIgnoreCase(payload)) {
-            payload = "{}";
-        }
-        JSONAssert.assertEquals(payload, response.getEntity().toString(), false);
+        webClient.get()
+            .uri(uri)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
 
-        // TODO: Replace the above with this
-        // webClient.get()
-        //     .uri(uri)
-        //     .exchange()
-        //     .expectStatus()
-        //     .isNotFound();
+        webClient.put()
+            .uri(uri)
+            .bodyValue(payload)
+            .exchange()
+            .expectStatus()
+            .isCreated();
 
-        // webClient.put()
-        //     .uri(uri)
-        //     .bodyValue(payload)
-        //     .exchange()
-        //     .expectStatus()
-        //     .isCreated();
+        String responseBody = webClient.get()
+            .uri(uriBuilder ->
+                uriBuilder
+                    .path(uri)
+                    .queryParam("depth", "10000")
+                    .build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult().getResponseBody();
 
-        // String responseBody = webClient.get()
-        //     .uri(uri)
-        //     .exchange()
-        //     .expectStatus()
-        //     .isOk()
-        //     .expectBody(String.class)
-        //     .returnResult().getResponseBody();
-
-        // JSONAssert.assertEquals(payload, responseBody, false);
+        JSONAssert.assertEquals(payload, responseBody, false);
     }
 
     @Test
@@ -726,36 +683,29 @@ public class ResourcesControllerTest {
         String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship2");
         String cloudToPserverRelationshipUri =
                 String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
-        Response response = resourcesController.updateRelationship(cloudToPserverRelationshipData,
-                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
-                mockReq);
 
-        assertNotNull(response, "Response from the legacy moxy consumer returned null");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
+        webClient.put()
+            .uri(cloudToPserverRelationshipUri)
+            .bodyValue(cloudToPserverRelationshipData)
+            .exchange()
+            .expectStatus()
+            .isOk();
 
-        assertEquals(Response.Status.OK.getStatusCode(),
-                response.getStatus(),
-                "Expected to return status created from the response");
-        logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-
-        String getRelationshipUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-        when(mockRequest.getRequestURL())
-                .thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + getRelationshipUri));
-        response = resourcesController.getRelationshipList(defaultSchemaVersion,
-                getRelationshipUri, 1,1, false, "false", httpHeaders, mockRequest, uriInfo);
-
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        JSONAssert.assertEquals(payload, response.getEntity().toString(), false);
+        String getRelationshipUri = String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
+        String responseBody = webClient.get()
+            .uri(uriBuilder ->
+                uriBuilder
+                    .path(getRelationshipUri)
+                    .queryParam("resultIndex", "1")
+                    .queryParam("resultSize", "1")
+                    .queryParam("includeTotalCount", "false")
+                    .build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult().getResponseBody();
+        JSONAssert.assertEquals(payload, responseBody, false);
     }
 
     @Test
@@ -776,41 +726,31 @@ public class ResourcesControllerTest {
         String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship3");
         String cloudToPserverRelationshipUri =
                 String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("PUT", cloudToPserverRelationshipUri);
-        Response response = resourcesController.updateRelationship(cloudToPserverRelationshipData,
-                defaultSchemaVersion, cloudToPserverRelationshipUri, httpHeaders, uriInfo,
-                mockReq);
 
-        assertNotNull(response, "Response from the legacy moxy consumer returned null");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
+        webClient.put()
+            .uri(cloudToPserverRelationshipUri)
+            .bodyValue(cloudToPserverRelationshipData)
+            .exchange()
+            .expectStatus()
+            .isOk();
 
-        assertEquals(Response.Status.OK.getStatusCode(),
-                response.getStatus(),
-                "Expected to return status created from the response");
-        logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-
-        String getRelationshipMockRequestUri =
-                String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
         String getRelationshipUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        queryParameters.add("format", "resource");
-        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-        when(mockRequest.getRequestURL())
-                .thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + getRelationshipUri));
-        response = resourcesController.getRelationshipList(defaultSchemaVersion,
-                getRelationshipUri, 1, 1, false, "false", httpHeaders, mockRequest, uriInfo);
-        queryParameters.remove("format");
+        String responseBody = webClient.get()
+            .uri(uriBuilder ->
+                uriBuilder
+                    .path(getRelationshipUri)
+                    .queryParam("resultIndex", "1")
+                    .queryParam("resultSize", "1")
+                    .queryParam("includeTotalCount", "false")
+                    .queryParam("format", "resource")
+                    .build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult().getResponseBody();
 
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-        String responsePayload = response.getEntity().toString();
+        String responsePayload = responseBody.toString();
         JSONObject payloadJsonObject = new JSONObject(payload);
         JSONObject responseJsonObject = new JSONObject(responsePayload);
 
@@ -858,21 +798,11 @@ public class ResourcesControllerTest {
 
         String getRelationshipMockRequestUri =
                 String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
-        String getRelationshipUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("GET_RELATIONSHIP", getRelationshipMockRequestUri);
-        HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-        when(mockRequest.getRequestURL())
-                .thenReturn(new StringBuffer(String.format("https://localhost:8447/aai/%s/", defaultSchemaVersion) + getRelationshipUri));
-        Response response =
-                resourcesController.getRelationshipList(defaultSchemaVersion,
-                        getRelationshipUri, 1, 1, false, "false", httpHeaders, mockRequest, uriInfo);
-
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        webClient.get()
+            .uri(getRelationshipMockRequestUri)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
     }
 
     @Test
@@ -901,11 +831,11 @@ public class ResourcesControllerTest {
 
         // === GET - related-to-property should not exist ===
         // pserver
-        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        String pserverResponse = getResponse(pserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
 
         // vserver
-        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        String vserverResponse = getResponse(vserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
         // ===
 
@@ -914,21 +844,11 @@ public class ResourcesControllerTest {
         String deleteUri = String.format(
                 "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
                 cloudRegionId, tenant, vserver);
-        Response response = deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
 
         // pserver
         deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
     @Test
@@ -955,11 +875,11 @@ public class ResourcesControllerTest {
 
         // === GET - related-to-property should not exist ===
         // pserver
-        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        String pserverResponse = getResponse(pserverMockRequestUri);
         assertFalse(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
 
         // vserver
-        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        String vserverResponse = getResponse(vserverMockRequestUri);
         assertFalse(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
         // ===
 
@@ -968,21 +888,11 @@ public class ResourcesControllerTest {
         String deleteUri = String.format(
                 "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
                 cloudRegionId, tenant, vserver);
-        Response response = deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
 
         // pserver
         deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
     @Test
@@ -1013,11 +923,11 @@ public class ResourcesControllerTest {
 
         // === GET - related-to-property should not exist ===
         // pserver
-        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        String pserverResponse = getResponse(pserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
 
         // vserver
-        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        String vserverResponse = getResponse(vserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
         // ===
 
@@ -1029,22 +939,11 @@ public class ResourcesControllerTest {
         String vserverMockRequestUriNoFormat = String.format(
                 "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
                 cloudRegionId, tenant, vserver);
-        Response response = deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
 
         // pserver
         deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-
+        deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
     @Test
@@ -1075,11 +974,11 @@ public class ResourcesControllerTest {
 
         // === GET - related-to-property should not exist ===
         // pserver
-        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        String pserverResponse = getResponse(pserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
 
         // vserver
-        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        String vserverResponse = getResponse(vserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
         // ===
 
@@ -1091,21 +990,11 @@ public class ResourcesControllerTest {
         String vserverMockRequestUriNoFormat = String.format(
                 "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
                 cloudRegionId, tenant, vserver);
-        Response response = deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
 
         // pserver
         deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
     @Test
@@ -1134,11 +1023,11 @@ public class ResourcesControllerTest {
 
         // === GET - related-to-property should not exist ===
         // pserver
-        Response pserverResponse = getMockResponse(pserverMockRequestUri);
+        String pserverResponse = getResponse(pserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(pserverResponse, "pserver"));
 
         // vserver
-        Response vserverResponse = getMockResponse(vserverMockRequestUri);
+        String vserverResponse = getResponse(vserverMockRequestUri);
         assertTrue(isRelatedToPropertiesFieldNullInResponse(vserverResponse, "vserver"));
         // ===
 
@@ -1150,27 +1039,17 @@ public class ResourcesControllerTest {
         String vserverMockRequestUriNoFormat = String.format(
                 "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
                 cloudRegionId, tenant, vserver);
-        Response response = deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
 
         // pserver
         deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        response = deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
-        code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
-    private Response deleteServerObject(String mockUri, String deleteUri, String nodeType)
+    private String deleteServerObject(String mockUri, String deleteUri, String nodeType)
             throws IOException, JSONException {
-        Response response = getMockResponse(mockUri);
-        String serverEntity = response.getEntity().toString();
+        String serverEntity = getResponse(mockUri);
+
         JSONObject serverJsonObject = new JSONObject(serverEntity);
         boolean noResultsArray = false;
         String resourceVersion = "";
@@ -1184,15 +1063,16 @@ public class ResourcesControllerTest {
         } catch (Exception e) {
             noResultsArray = true;
         }
-        if (noResultsArray)
+        if (noResultsArray) {
             resourceVersion = serverJsonObject.getString("resource-version");
-        queryParameters.clear();
-        queryParameters.add("resource-version", resourceVersion);
-
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("DELETE", deleteUri);
-        Response deleteResponse = resourcesController.delete(defaultSchemaVersion, deleteUri,
-                httpHeaders, uriInfo, resourceVersion, mockReq);
-        return deleteResponse;
+        }
+        return webClient.delete()
+            .uri(deleteUri + "?resource-version=" + resourceVersion)
+            .exchange()
+            .expectStatus()
+            .isNoContent()
+            .expectBody(String.class)
+            .returnResult().getResponseBody();
     }
 
     private void putResourceWithQueryParam(String uri, String payload) {
@@ -1234,21 +1114,18 @@ public class ResourcesControllerTest {
         logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
     }
 
-    private Response getMockResponse(String mockUri) throws IOException, JSONException {
-        MockHttpServletRequest mockReq = new MockHttpServletRequest("GET", mockUri);
-        Response response = resourcesController.getLegacy(defaultSchemaVersion, mockUri, -1, -1,
-                false, "10000", "false", httpHeaders, uriInfo, mockReq);
-        String responseEntity = response.getEntity().toString();
-        int code = response.getStatus();
-        if (!VALID_HTTP_STATUS_CODES.contains(code)) {
-            logger.info("Response Code: " + code + "\tEntity: " + response.getEntity());
-        }
-        return response;
+    private String getResponse(String uri) {
+        return webClient.get()
+            .uri(uri)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult().getResponseBody();
     }
 
-    private boolean isRelatedToPropertiesFieldNullInResponse(Response response, String nodeType)
+    private boolean isRelatedToPropertiesFieldNullInResponse(String responseEntity, String nodeType)
             throws IOException, JSONException {
-        String responseEntity = response.getEntity().toString();
         boolean noResultsArray = false;
         JSONObject responseJsonObj = new JSONObject(responseEntity);
         try {
@@ -1262,8 +1139,9 @@ public class ResourcesControllerTest {
                     if (relationship != null) {
                         JSONObject relationshipObj = relationship.getJSONObject(0);
                         JSONArray relatedToProperty = (JSONArray) relationshipObj.get("related-to-property");
-                        if (relatedToProperty != null)
+                        if (relatedToProperty != null) {
                             return false;
+                        }
                     }
                 }
             }
@@ -1279,8 +1157,9 @@ public class ResourcesControllerTest {
                     if (relationship != null) {
                         JSONObject relationshipObj = relationship.getJSONObject(0);
                         JSONArray relatedToProperty = (JSONArray) relationshipObj.get("related-to-property");
-                        if (relatedToProperty != null)
+                        if (relatedToProperty != null) {
                             return false;
+                        }
                     }
                 }
             } catch (JSONException je) {
