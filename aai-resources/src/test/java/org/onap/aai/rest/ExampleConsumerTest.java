@@ -71,7 +71,7 @@ public class ExampleConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ExampleConsumerTest.class);
 
     @BeforeEach
     public void setup() {
