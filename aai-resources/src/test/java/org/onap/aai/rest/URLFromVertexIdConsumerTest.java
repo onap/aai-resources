@@ -78,7 +78,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(URLFromVertexIdConsumerTest.class.getName());
 
     @BeforeEach
     public void setup() {
@@ -153,7 +153,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         assertTrue(responseHeaders.containsKey("vertex-id"), "Response doesn't contain the key vertexId");
 
         String vertexId = responseHeaders.get("vertex-id").get(0).toString();
-        response = urlFromVertexIdConsumer.generateUrlFromVertexId("", schemaVersions.getDefaultVersion().toString(),
+        response = urlFromVertexIdConsumer.generateUrlFromVertexId(schemaVersions.getDefaultVersion().toString(),
                 Long.valueOf(vertexId).longValue(), httpHeaders, uriInfo, mockReqGet);
 
         assertNotNull(response);
@@ -171,7 +171,7 @@ public class URLFromVertexIdConsumerTest extends AAISetup {
         String vertexId = "384584";
         MockHttpServletRequest mockReqGet = new MockHttpServletRequest("GET", uri);
         Response response =
-                urlFromVertexIdConsumer.generateUrlFromVertexId("", schemaVersions.getDefaultVersion().toString(),
+                urlFromVertexIdConsumer.generateUrlFromVertexId(schemaVersions.getDefaultVersion().toString(),
                         Long.valueOf(vertexId).longValue(), httpHeaders, uriInfo, mockReqGet);
 
         assertNotNull(response, "Check if the response is not null");

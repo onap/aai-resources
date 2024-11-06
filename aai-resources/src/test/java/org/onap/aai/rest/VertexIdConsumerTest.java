@@ -78,7 +78,7 @@ public class VertexIdConsumerTest extends AAISetup {
 
     private List<MediaType> outputMediaTypes;
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(VertexIdConsumerTest.class.getName());
 
     @BeforeEach
     public void setup() {
@@ -155,7 +155,7 @@ public class VertexIdConsumerTest extends AAISetup {
 
         String vertexId = responseHeaders.get("vertex-id").get(0).toString();
 
-        response = vertexIdConsumer.getByVertexId("", schemaVersions.getDefaultVersion().toString(),
+        response = vertexIdConsumer.getByVertexId(schemaVersions.getDefaultVersion().toString(),
                 Long.valueOf(vertexId).longValue(), "10000", httpHeaders, uriInfo, mockReqGet);
 
         assertNotNull(response);

@@ -47,8 +47,8 @@ import org.onap.aai.setup.SchemaVersion;
 /**
  * The Class URLFromVertexIdConsumer.
  */
-@Path("{version: v[1-9][0-9]*|latest}/generateurl")
 @Timed
+@Path("{version: v[1-9][0-9]*|latest}/generateurl")
 public class URLFromVertexIdConsumer extends RESTAPI {
     private ModelType introspectorFactoryType = ModelType.MOXY;
 
@@ -57,7 +57,6 @@ public class URLFromVertexIdConsumer extends RESTAPI {
     /**
      * Generate url from vertex id.
      *
-     * @param content the content
      * @param versionParam the version param
      * @param vertexid the vertexid
      * @param headers the headers
@@ -68,7 +67,7 @@ public class URLFromVertexIdConsumer extends RESTAPI {
     @GET
     @Path(ID_ENDPOINT)
     @Produces({MediaType.WILDCARD})
-    public Response generateUrlFromVertexId(String content, @PathParam("version") String versionParam,
+    public Response generateUrlFromVertexId(@PathParam("version") String versionParam,
             @PathParam("vertexid") long vertexid, @Context HttpHeaders headers, @Context UriInfo info,
             @Context HttpServletRequest req) {
 

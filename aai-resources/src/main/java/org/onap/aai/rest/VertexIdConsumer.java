@@ -64,7 +64,6 @@ public class VertexIdConsumer extends RESTAPI {
     /**
      * Gets the by vertex id.
      *
-     * @param content the content
      * @param versionParam the version param
      * @param vertexid the vertexid
      * @param depthParam the depth param
@@ -76,7 +75,7 @@ public class VertexIdConsumer extends RESTAPI {
     @GET
     @Path(ID_ENDPOINT)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getByVertexId(String content, @PathParam("version") String versionParam,
+    public Response getByVertexId(@PathParam("version") String versionParam,
             @PathParam("vertexid") long vertexid, @DefaultValue("all") @QueryParam("depth") String depthParam,
             @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
 
