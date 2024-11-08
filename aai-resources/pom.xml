@@ -93,7 +93,7 @@
         <skipITs>true</skipITs>
 
         <swagger.version>1.6.8</swagger.version>
-        <spring-cloud.version>2020.0.6</spring-cloud.version>
+        <spring-cloud.version>2021.0.9</spring-cloud.version>
         <!-- fix the driver version to match the one defined in janusgraph-cql
             spring-boot (2.4) is otherwise downgrading it to 4.9.0 -->
         <!-- see https://github.com/spring-projects/spring-boot/blob/d336a96b7f204a398b8237560c5dfa7095c53460/spring-boot-project/spring-boot-dependencies/build.gradle#L163 -->
@@ -360,11 +360,6 @@
             <version>${swagger.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-configuration2</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jersey2-jaxrs</artifactId>
             <version>${swagger.version}</version>
@@ -423,6 +418,7 @@
         <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
+            <version>3.1.12</version>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
@@ -500,7 +496,6 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>2.7.14</version>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
@@ -708,7 +703,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>25.0-jre</version>
+                <version>33.3.1-jre</version>
             </dependency>
             <!-- cassandra driver -->
             <dependency>
@@ -727,6 +722,11 @@
                 <version>${datastax.native-protocol.version}</version>
             </dependency>
             <!-- /cassandra driver -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>2.11.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
