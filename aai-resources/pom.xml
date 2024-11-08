@@ -93,7 +93,7 @@
         <skipITs>true</skipITs>
 
         <swagger.version>1.6.8</swagger.version>
-        <spring-cloud.version>2020.0.6</spring-cloud.version>
+        <spring-cloud.version>2021.0.9</spring-cloud.version>
         <!-- fix the driver version to match the one defined in janusgraph-cql
             spring-boot (2.4) is otherwise downgrading it to 4.9.0 -->
         <!-- see https://github.com/spring-projects/spring-boot/blob/d336a96b7f204a398b8237560c5dfa7095c53460/spring-boot-project/spring-boot-dependencies/build.gradle#L163 -->
@@ -500,7 +500,6 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>2.7.14</version>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>

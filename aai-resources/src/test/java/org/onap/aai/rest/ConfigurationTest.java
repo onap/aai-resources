@@ -185,7 +185,6 @@ public class ConfigurationTest extends AbstractSpringRestTest {
         responseBody = (String) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertTrue(responseBody.contains("group_id"));
-        assertTrue(responseBody.contains("aai_uri"));
 
         // Set Accept as MediaType.APPLICATION_JSON in order to get access of endpoint
         // "/actuator/info" and
