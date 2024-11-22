@@ -20,8 +20,6 @@
 
 package org.onap.aai.TenantIsolation;
 
-import com.att.eelf.configuration.Configuration;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -32,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
@@ -42,31 +39,24 @@ import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * DataImportTasks
  *
  */
+@Slf4j
 @Component
 @PropertySource(value="file:${server.local.startpath}/etc/appprops/datatoolscrons.properties", ignoreResourceNotFound=true)
 public class DataImportTasks {
 
-    private static final Logger LOGGER;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private static final List<String> EXTS = Arrays.asList("tar.gz", "tgz");
-
-    static {
-        Properties props = System.getProperties();
-        props.setProperty(Configuration.PROPERTY_LOGGING_FILE_NAME, AAIConstants.AAI_LOGBACK_PROPS);
-        props.setProperty(Configuration.PROPERTY_LOGGING_FILE_PATH, AAIConstants.AAI_HOME_BUNDLECONFIG);
-        LOGGER = LoggerFactory.getLogger(DataImportTasks.class);
-    }
 
     /**
      * Scheduled task to invoke importTask
@@ -87,16 +77,16 @@ public class DataImportTasks {
     public void importTask() throws AAIException, Exception {
 
         if (AAIConfig.get("aai.dataimport.enable").equalsIgnoreCase("false")) {
-            LOGGER.info("Data Import is not enabled");
+            log.info("Data Import is not enabled");
             return;
         }
         // Check if the process was started via command line
         if (isDataImportRunning()) {
-            LOGGER.info("There is a dataImport process already running");
+            log.info("There is a dataImport process already running");
             return;
         }
 
-        LOGGER.info("Started importTask: " + dateFormat.format(new Date()));
+        log.info("Started importTask: " + dateFormat.format(new Date()));
 
         String inputLocation = AAIConstants.AAI_HOME_BUNDLECONFIG + AAIConfig.get("aai.dataimport.input.location");
 
@@ -126,7 +116,7 @@ public class DataImportTasks {
 
     /**
      * The isDataImportRunning method, checks if the data import task was started separately via command line
-     * 
+     *
      * @return true if another process is running, false if not
      */
     private static boolean isDataImportRunning() {
@@ -145,11 +135,11 @@ public class DataImportTasks {
             }
 
             int exitVal = process.waitFor();
-            LOGGER.info("Check if dataImport is running returned: " + exitVal);
+            log.info("Check if dataImport is running returned: " + exitVal);
         } catch (Exception e) {
             ErrorLogHelper.logError("AAI_8002",
                     "Exception while running the check to see if dataImport is running  " + e.getMessage());
-            LOGGER.info("Exception while running the check to see if dataImport is running " + e.getMessage());
+            log.info("Exception while running the check to see if dataImport is running " + e.getMessage());
         }
 
         if (count > 0) {
@@ -171,7 +161,7 @@ public class DataImportTasks {
         File[] allFilesArr = targetDirFile.listFiles((FileFilter) FileFileFilter.FILE);
         if (allFilesArr == null || allFilesArr.length == 0) {
             ErrorLogHelper.logError("AAI_8001", "Unable to find payload file at " + targetDir);
-            LOGGER.info("Unable to find payload at " + targetDir);
+            log.info("Unable to find payload at " + targetDir);
             return null;
         }
         if (allFilesArr.length > 1) {
@@ -195,7 +185,7 @@ public class DataImportTasks {
 
     /**
      * The deletePayload method deletes all the payload files that it finds at targetDirectory
-     * 
+     *
      * @param targetDirFile the directory that contains payload files
      * @throws AAIException
      */
@@ -203,7 +193,7 @@ public class DataImportTasks {
 
         File[] allFilesArr = targetDirFile.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
         if (allFilesArr == null || allFilesArr.length == 0) {
-            LOGGER.info("No payload files found at " + targetDirFile.getPath());
+            log.info("No payload files found at " + targetDirFile.getPath());
             return;
         }
         for (File f : allFilesArr) {
@@ -211,7 +201,7 @@ public class DataImportTasks {
                 FileUtils.deleteDirectory(f);
             } catch (IOException e) {
 
-                LOGGER.info("Unable to delete directory " + f.getAbsolutePath() + " " + e.getMessage());
+                log.info("Unable to delete directory " + f.getAbsolutePath() + " " + e.getMessage());
             }
 
         }
@@ -220,7 +210,7 @@ public class DataImportTasks {
 
     /**
      * The isDataImportRunning method, checks if the data import task was started separately via command line
-     * 
+     *
      * @return true if another process is running, false if not
      */
     private static boolean unpackPayloadFile(String payLoadFileName) {
@@ -231,23 +221,23 @@ public class DataImportTasks {
             process =
                     new ProcessBuilder().command("bash", "-c", "gzip –d < " + payLoadFileName + " | tar xf -").start();
             int exitVal = process.waitFor();
-            LOGGER.info("gzip -d returned: " + exitVal);
+            log.info("gzip -d returned: " + exitVal);
         } catch (Exception e) {
             ErrorLogHelper.logError("AAI_8002", "Exception while running the unzip  " + e.getMessage());
-            LOGGER.info("Exception while running the unzip " + e.getMessage());
+            log.info("Exception while running the unzip " + e.getMessage());
             return false;
         }
         /*
          * if (payLoadFileName.indexOf(".") > 0)
          * payLoadFileName = payLoadFileName.substring(0, payLoadFileName.lastIndexOf("."));
-         * 
+         *
          * try {
          * process = new ProcessBuilder().command("bash", "-c", "tar xf " + payLoadFileName).start();
          * int exitVal = process.waitFor();
-         * LOGGER.info("tar xf returned: " + exitVal);
+         * log.info("tar xf returned: " + exitVal);
          * } catch (Exception e) {
          * ErrorLogHelper.logError("AAI_8002", "Exception while running the tar xf  "+ e.getMessage());
-         * LOGGER.info("Exception while running the tar xf "+ e.getMessage());
+         * log.info("Exception while running the tar xf "+ e.getMessage());
          * return false;
          * }
          */
@@ -266,7 +256,7 @@ public class DataImportTasks {
 
     /**
      * The runAddManualDataScript method runs a shell script/command with a variable number of arguments
-     * 
+     *
      * @param script The script/command arguments
      */
     private static void runAddManualDataScript(String... script) {
@@ -274,10 +264,10 @@ public class DataImportTasks {
         try {
             process = new ProcessBuilder().command(script).start();
             int exitVal = process.waitFor();
-            LOGGER.info("addManualData.sh returned: " + exitVal);
+            log.info("addManualData.sh returned: " + exitVal);
         } catch (Exception e) {
             ErrorLogHelper.logError("AAI_8002", "Exception while running addManualData.sh " + e.getMessage());
-            LOGGER.info("Exception while running addManualData.sh" + e.getMessage());
+            log.info("Exception while running addManualData.sh" + e.getMessage());
         }
 
     }
