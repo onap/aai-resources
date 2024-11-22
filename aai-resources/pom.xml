@@ -82,7 +82,8 @@
 
         <javax.servlet.version>4.0.1</javax.servlet.version>
         <keycloak.version>11.0.2</keycloak.version>
-        <testcontainers.version>1.6.1</testcontainers.version>
+        <testcontainers.version>1.20.4</testcontainers.version>
+        <testcontainers-keycloak.version>1.6.1</testcontainers-keycloak.version>
         <mockito.core.version>4.4.0</mockito.core.version>
         <eclipse.persistence.version>2.7.7</eclipse.persistence.version>
         <!-- Setting some default value to not complain by editor but it will be overridden by gmaven plugin -->
@@ -616,7 +617,7 @@
         <dependency>
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
-            <version>${testcontainers.version}</version>
+            <version>${testcontainers-keycloak.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -633,25 +634,25 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.19.8</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
-            <!-- <exclusions>
+            <exclusions>
                 <exclusion>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
                 </exclusion>
-            </exclusions> -->
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.19.8</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>k6</artifactId>
-            <version>1.19.8</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
