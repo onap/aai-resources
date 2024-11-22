@@ -24,8 +24,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.onap.aai.config.WebClientConfiguration;
-import org.onap.aai.tasks.AaiGraphChecker;
-import org.onap.aai.tasks.AaiGraphChecker.CheckerType;
+import org.onap.aai.util.GraphChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,11 +43,12 @@ public class EchoHealthIndicatorTest {
   @Qualifier("mgmtClient")
   WebTestClient webClient;
 
-  @MockBean private AaiGraphChecker aaiGraphChecker;
+  // @MockBean private AaiGraphChecker aaiGraphChecker;
+  @MockBean private GraphChecker graphChecker;
 
   @Test
   public void thatActuatorCheckIsHealthy() {
-    when(aaiGraphChecker.isAaiGraphDbAvailable(CheckerType.ACTUAL)).thenReturn(true);
+    when(graphChecker.isAaiGraphDbAvailable()).thenReturn(true);
 
     webClient.get()
       .uri("/actuator/health")
@@ -59,7 +59,7 @@ public class EchoHealthIndicatorTest {
 
   @Test
   public void thatActuatorCheckIsUnhealthy() {
-    when(aaiGraphChecker.isAaiGraphDbAvailable(CheckerType.ACTUAL)).thenReturn(false);
+    when(graphChecker.isAaiGraphDbAvailable()).thenReturn(false);
 
     webClient.get()
       .uri("/actuator/health")

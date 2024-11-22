@@ -26,42 +26,35 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.restcore.RESTAPI;
-import org.onap.aai.tasks.AaiGraphChecker;
+import org.onap.aai.util.GraphChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * The Class EchoResponse.
  */
 @Component
 @Path("/util")
+@RequiredArgsConstructor
 public class EchoResponse extends RESTAPI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EchoResponse.class);
 
-    private static final String CHECK_DB_STATUS_ACTION = "checkDB";
-
-    private static final String CHECK_DB_STATUS_NOW_ACTION = "checkDBNow";
-
     private static final String UP_RESPONSE="{\"status\":\"UP\",\"groups\":[\"liveness\",\"readiness\"]}";
 
-    private final AaiGraphChecker aaiGraphChecker;
-
-    public EchoResponse(AaiGraphChecker aaiGraphChecker) {
-        this.aaiGraphChecker = aaiGraphChecker;
-    }
+    private final GraphChecker graphChecker;
 
     /**
      * Simple health-check API that echos back the X-FromAppId and X-TransactionId to clients.
@@ -77,8 +70,7 @@ public class EchoResponse extends RESTAPI {
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/echo")
-    public Response echoResult(@Context HttpHeaders headers, @Context HttpServletRequest req,
-            @QueryParam("action") String myAction) {
+    public Response echoResult(@Context HttpHeaders headers, @Context HttpServletRequest req) {
 
         String fromAppId;
         String transId;
@@ -98,10 +90,7 @@ public class EchoResponse extends RESTAPI {
         templateVars.add(transId);
 
         try {
-            if (CHECK_DB_STATUS_ACTION.equalsIgnoreCase(myAction)
-                    || CHECK_DB_STATUS_NOW_ACTION.equalsIgnoreCase(myAction)) {
-                validateDBStatus(myAction);
-            }
+            validateDBStatus();
             return generateSuccessResponse();
 
         } catch (AAIException aaiException) {
@@ -120,18 +109,9 @@ public class EchoResponse extends RESTAPI {
      * @param action expected input values 'checkDB' 'checkDBNow'
      * @throws AAIException exception thrown if DB is not available
      */
-    private void validateDBStatus(String action) throws AAIException {
-
-        Boolean dbAvailable = null;
-        if (CHECK_DB_STATUS_ACTION.equalsIgnoreCase(action)) {
-            dbAvailable = aaiGraphChecker.isAaiGraphDbAvailable(AaiGraphChecker.CheckerType.CACHED);
-        } else if (CHECK_DB_STATUS_NOW_ACTION.equalsIgnoreCase(action)) {
-            dbAvailable = aaiGraphChecker.isAaiGraphDbAvailable(AaiGraphChecker.CheckerType.ACTUAL);
-        } else {
-            LOGGER.error("Invalid check db action specified to generate echo response: '{}'", action);
-        }
-
-        if (BooleanUtils.isFalse(dbAvailable)) {
+    private void validateDBStatus() throws AAIException {
+        boolean dbAvailable = graphChecker.isAaiGraphDbAvailable();
+        if (!dbAvailable) {
             throw new AAIException("AAI_5105", "Error establishing a database connection");
         }
 

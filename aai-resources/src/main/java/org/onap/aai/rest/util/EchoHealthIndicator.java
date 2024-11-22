@@ -20,8 +20,7 @@
 
 package org.onap.aai.rest.util;
 
-import org.onap.aai.tasks.AaiGraphChecker;
-import org.onap.aai.tasks.AaiGraphChecker.CheckerType;
+import org.onap.aai.util.GraphChecker;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @ConditionalOnProperty(name = "aai.actuator.echo.enabled", havingValue = "true")
 public class EchoHealthIndicator implements HealthIndicator {
 
-  private final AaiGraphChecker aaiGraphChecker;
+  private final GraphChecker graphChecker;
 
 	@Override
 	public Health health() {
@@ -44,7 +43,7 @@ public class EchoHealthIndicator implements HealthIndicator {
 	}
 
 	private boolean healthy() {
-    return aaiGraphChecker.isAaiGraphDbAvailable(CheckerType.ACTUAL);
+    return graphChecker.isAaiGraphDbAvailable();
 	}
 
 }
