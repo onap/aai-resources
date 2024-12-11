@@ -50,6 +50,24 @@
       "message": "Please remove v29 from the array here. Those schema versions are loaded in the tests and that takes longer the more versions there are",
       "revId": "97c4c81aa5ee743bd5eb8b68d4ff7aaa1ec242b6",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9baea2f6_f3974b93",
+        "filename": "aai-resources/src/main/resources/application.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8412
+      },
+      "writtenOn": "2024-12-11T12:56:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc21434d_3f7f093b",
+      "revId": "97c4c81aa5ee743bd5eb8b68d4ff7aaa1ec242b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ]
 }
