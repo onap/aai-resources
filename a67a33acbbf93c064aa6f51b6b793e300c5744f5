@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c9488d4_a491b412",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2024-12-18T07:14:24Z",
+      "side": 1,
+      "message": "Please don\u0027t release this. There is no need to create a release when you really only want to use the new schema. The schema-service will provide it during the runtime, and the schema service dependency here is only used in the tests",
+      "revId": "a67a33acbbf93c064aa6f51b6b793e300c5744f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ]
+}
