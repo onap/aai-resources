@@ -20,13 +20,15 @@
 
 package org.onap.aai;
 
-
 import java.io.IOException;
+
 import javax.net.ssl.SSLContext;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +60,18 @@ public class ResourcesTestConfiguration {
 
         RestTemplate restTemplate = null;
         if (env.acceptsProfiles(Profiles.of(ResourcesProfiles.TWO_WAY_SSL, ResourcesProfiles.ONE_WAY_SSL))) {
-            SSLContext sslContext = SSLContextBuilder.create().build();
-
-            HttpClient client = HttpClients.custom().setSSLContext(sslContext)
-                    .setSSLHostnameVerifier((s, sslSession) -> true).build();
+            SSLContext sslContext = SSLContext.getDefault();
+            PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setSSLSocketFactory(
+                    SSLConnectionSocketFactoryBuilder.create()
+                        .setSslContext(sslContext)
+                        .build()
+                    )
+                .build();
+            HttpClient client = HttpClients
+                .custom()
+                .setConnectionManager(connectionManager)
+                .build();
 
             restTemplate = builder.requestFactory(() -> new HttpComponentsClientHttpRequestFactory(client)).build();
         } else {
@@ -79,7 +89,7 @@ public class ResourcesTestConfiguration {
                         return true;
                     }
 
-                    if (clientHttpResponse.getRawStatusCode() % 100 == 5) {
+                    if (clientHttpResponse.getStatusCode().value() % 100 == 5) {
                         logger.debug("Call returned a error " + clientHttpResponse.getStatusText());
                         return true;
                     }
