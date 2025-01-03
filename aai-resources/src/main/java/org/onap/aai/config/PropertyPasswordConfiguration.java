@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -76,6 +77,7 @@ public class PropertyPasswordConfiguration implements ApplicationContextInitiali
                     log.info("Not using AAF Certman password file");
                 }
             } catch (IOException e) {
+                Logger smth = log;
                 log.warn("Not using AAF Certman password file, e=" + e.getMessage());
             } finally {
                 if (passwordStream != null) {

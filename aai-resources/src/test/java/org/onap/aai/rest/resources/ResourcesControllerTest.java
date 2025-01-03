@@ -41,12 +41,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -62,6 +62,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.onap.aai.config.WebClientConfiguration;
 import org.onap.aai.db.props.AAIProperties;
@@ -84,6 +85,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -276,15 +278,15 @@ public class ResourcesControllerTest {
         String hostname = "590a8943-1200-43b3-825b-75dde6b8f44a";
         String physicalLocationId = "e13d4587-19ad-4bf5-80f5-c021efb5b61c";
 
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        String cloudRegionUri = String.format("/cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
+        String cloudRegionUri = "/cloud-infrastructure/complexes/complex/%s".formatted(physicalLocationId);
 
         doSetupResource(pserverUri, pserverData);
         doSetupResource(cloudRegionUri, complexData);
 
         String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship");
         String cloudToPserverRelationshipUri =
-                String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
+                "/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship".formatted(hostname);
 
         webClient.put()
                 .uri(cloudToPserverRelationshipUri)
@@ -304,21 +306,21 @@ public class ResourcesControllerTest {
     public void testPutPassWithEmptyData() throws JSONException {
 
         String payload = "{}";
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s", UUID.randomUUID().toString());
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(UUID.randomUUID().toString());
 
         doSetupResource(pserverUri, payload);
 
         payload = "{}";
-        pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s", UUID.randomUUID().toString());
+        pserverUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(UUID.randomUUID().toString());
         doSetupResource(pserverUri, payload);
     }
 
     @ParameterizedTest
-    @EnumSource(value = HttpMethod.class, names = {"GET", "PUT", "DELETE"})
-    public void thatUnknownPathReturnsBadRequest(HttpMethod method) throws JSONException {
+    @ValueSource(strings = {"GET", "PUT", "DELETE"})
+    public void thatUnknownPathReturnsBadRequest(String method) throws JSONException {
         String uri = "/fake-infrastructure/pservers/pserver/fajsidj";
         AAIErrorResponse errorResponse = webClient
-                .method(method)
+                .method(HttpMethod.valueOf(method))
                 .uri(uri)
                 .bodyValue("{}")
                 .exchange()
@@ -496,16 +498,16 @@ public class ResourcesControllerTest {
 
     public String getResourcePayload(String resourceName) throws IOException {
         String rawPayload = IOUtils.toString(this.getClass().getResourceAsStream("/payloads/resource/" + resourceName + ".json"), StandardCharsets.UTF_8);
-        return String.format(rawPayload, defaultSchemaVersion);
+        return rawPayload.formatted(defaultSchemaVersion);
     }
 
     public String getRelationshipPayload(String relationshipName) throws IOException {
         String rawPayload = IOUtils.toString(this.getClass().getResourceAsStream("/payloads/relationship/" + relationshipName + ".json"), StandardCharsets.UTF_8);
-        return String.format(rawPayload, defaultSchemaVersion);
+        return rawPayload.formatted(defaultSchemaVersion);
     }
 
     public String getUri(String hostname) {
-        return String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
+        return "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
     }
 
     public String getGetAllPserversURI() {
@@ -535,15 +537,15 @@ public class ResourcesControllerTest {
         String hostname = "590a8943-1200-43b3-825b-75dde6b8f44b";
         String physicalLocationId = "e13d4587-19ad-4bf5-80f5-c021efb5b61d";
 
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        String cloudRegionUri = String.format("/cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
+        String cloudRegionUri = "/cloud-infrastructure/complexes/complex/%s".formatted(physicalLocationId);
 
         doSetupResource(pserverUri, pserverData);
         doSetupResource(cloudRegionUri, complexData);
 
         String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship2");
         String cloudToPserverRelationshipUri =
-                String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
+                "/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship".formatted(hostname);
 
         webClient.put()
             .uri(cloudToPserverRelationshipUri)
@@ -552,7 +554,7 @@ public class ResourcesControllerTest {
             .expectStatus()
             .isOk();
 
-        String getRelationshipUri = String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
+        String getRelationshipUri = "/cloud-infrastructure/pservers/pserver/%s/relationship-list".formatted(hostname);
         String responseBody = webClient.get()
             .uri(uriBuilder ->
                 uriBuilder
@@ -578,15 +580,15 @@ public class ResourcesControllerTest {
         String hostname = "590a8943-1200-43b3-825b-75dde6b8f44c";
         String physicalLocationId = "e13d4587-19ad-4bf5-80f5-c021efb5b61e";
 
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        String cloudRegionUri = String.format("/cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
+        String cloudRegionUri = "/cloud-infrastructure/complexes/complex/%s".formatted(physicalLocationId);
 
         doSetupResource(pserverUri, pserverData);
         doSetupResource(cloudRegionUri, complexData);
 
         String cloudToPserverRelationshipData = getRelationshipPayload("pserver-complex-relationship3");
         String cloudToPserverRelationshipUri =
-                String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
+                "/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship".formatted(hostname);
 
         webClient.put()
             .uri(cloudToPserverRelationshipUri)
@@ -595,7 +597,7 @@ public class ResourcesControllerTest {
             .expectStatus()
             .isOk();
 
-        String getRelationshipUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
+        String getRelationshipUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
         String responseBody = webClient.get()
             .uri(uriBuilder ->
                 uriBuilder
@@ -651,14 +653,14 @@ public class ResourcesControllerTest {
         String hostname = "590a8943-1200-43b3-825b-75dde6b8f44d";
         String physicalLocationId = "e13d4587-19ad-4bf5-80f5-c021efb5b61f";
 
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        String cloudRegionUri = String.format("/cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
+        String cloudRegionUri = "/cloud-infrastructure/complexes/complex/%s".formatted(physicalLocationId);
 
         doSetupResource(pserverUri, pserverData);
         doSetupResource(cloudRegionUri, complexData);
 
         String getRelationshipMockRequestUri =
-                String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list", hostname);
+                "/cloud-infrastructure/pservers/pserver/%s/relationship-list".formatted(hostname);
         webClient.get()
             .uri(getRelationshipMockRequestUri)
             .exchange()
@@ -676,18 +678,16 @@ public class ResourcesControllerTest {
         String tenant = "tenant01";
         String vserver = "vserver01";
 
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
-        String vserverUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true", cloudRegionId);
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true".formatted(hostname);
+        String vserverUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true".formatted(cloudRegionId);
 
         // PUT the resources
         putResourceWithQueryParam(pserverUri, pserverData);
         putResourceWithQueryParam(vserverUri, vserverData);
 
         String pserverMockRequestUri =
-                String.format("/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
-        String vserverMockRequestUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true",
+                "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true".formatted(hostname);
+        String vserverMockRequestUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true".formatted(
                 cloudRegionId, tenant, vserver);
 
         // === GET - related-to-property should not exist ===
@@ -702,13 +702,12 @@ public class ResourcesControllerTest {
 
         // === Clean up (DELETE) ===
         // vserver
-        String deleteUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String deleteUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
         deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
 
         // pserver
-        deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
+        deleteUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
         deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
@@ -722,16 +721,15 @@ public class ResourcesControllerTest {
         String tenant = "tenant02";
         String vserver = "vserver02";
 
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        String vserverUri = String.format("/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s", cloudRegionId);
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
+        String vserverUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s".formatted(cloudRegionId);
 
         // PUT the resources
         doSetupResource(pserverUri, pserverData);
         doSetupResource(vserverUri, vserverData);
 
-        String pserverMockRequestUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
-        String vserverMockRequestUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String pserverMockRequestUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
+        String vserverMockRequestUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
 
         // === GET - related-to-property should not exist ===
@@ -746,13 +744,12 @@ public class ResourcesControllerTest {
 
         // === Clean up (DELETE) ===
         // vserver
-        String deleteUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String deleteUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
         deleteServerObject(vserverMockRequestUri, deleteUri, "vserver");
 
         // pserver
-        deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
+        deleteUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
         deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
@@ -766,20 +763,18 @@ public class ResourcesControllerTest {
         String tenant = "tenant03";
         String vserver = "vserver03";
 
-        String pserverUri = String
-                .format("/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource", hostname);
-        String vserverUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true&format=resource",
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource"
+                .formatted(hostname);
+        String vserverUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true&format=resource".formatted(
                 cloudRegionId);
 
         // PUT the resources
         putResourceWithQueryParam(pserverUri, pserverData);
         putResourceWithQueryParam(vserverUri, vserverData);
 
-        String pserverMockRequestUri = String
-                .format("/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource", hostname);
-        String vserverMockRequestUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true&format=resource",
+        String pserverMockRequestUri = "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource"
+                .formatted(hostname);
+        String vserverMockRequestUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true&format=resource".formatted(
                 cloudRegionId, tenant, vserver);
 
         // === GET - related-to-property should not exist ===
@@ -794,16 +789,14 @@ public class ResourcesControllerTest {
 
         // === Clean up (DELETE) ===
         // vserver
-        String deleteUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String deleteUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
-        String vserverMockRequestUriNoFormat = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String vserverMockRequestUriNoFormat = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
         deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
 
         // pserver
-        deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
+        deleteUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
         deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
@@ -817,20 +810,16 @@ public class ResourcesControllerTest {
         String tenant = "tenant04";
         String vserver = "vserver04";
 
-        String pserverUri = String.format(
-                "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource_and_url", hostname);
-        String vserverUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true&format=resource_and_url",
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource_and_url".formatted(hostname);
+        String vserverUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true&format=resource_and_url".formatted(
                 cloudRegionId);
 
         // PUT the resources
         putResourceWithQueryParam(pserverUri, pserverData);
         putResourceWithQueryParam(vserverUri, vserverData);
 
-        String pserverMockRequestUri = String.format(
-                "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource_and_url", hostname);
-        String vserverMockRequestUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true&format=resource_and_url",
+        String pserverMockRequestUri = "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true&format=resource_and_url".formatted(hostname);
+        String vserverMockRequestUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s?skip-related-to=true&format=resource_and_url".formatted(
                 cloudRegionId, tenant, vserver);
 
         // === GET - related-to-property should not exist ===
@@ -845,16 +834,14 @@ public class ResourcesControllerTest {
 
         // === Clean up (DELETE) ===
         // vserver
-        String deleteUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String deleteUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
-        String vserverMockRequestUriNoFormat = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String vserverMockRequestUriNoFormat = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
         deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
 
         // pserver
-        deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
+        deleteUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
         deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 
@@ -868,18 +855,16 @@ public class ResourcesControllerTest {
         String tenant = "tenant05";
         String vserver = "vserver05";
 
-        String pserverUri = String.format("/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
-        String vserverUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true", cloudRegionId);
+        String pserverUri = "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true".formatted(hostname);
+        String vserverUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s?skip-related-to=true".formatted(cloudRegionId);
 
         // PUT the resources
         putResourceWithQueryParam(pserverUri, pserverData);
         putResourceWithQueryParam(vserverUri, vserverData);
 
         String pserverMockRequestUri =
-                String.format("/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true", hostname);
-        String vserverMockRequestUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers?vserver-selflink=somelink05&skip-related-to=true",
+                "/cloud-infrastructure/pservers/pserver/%s?skip-related-to=true".formatted(hostname);
+        String vserverMockRequestUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers?vserver-selflink=somelink05&skip-related-to=true".formatted(
                 cloudRegionId, tenant, vserver);
 
         // === GET - related-to-property should not exist ===
@@ -894,16 +879,14 @@ public class ResourcesControllerTest {
 
         // === Clean up (DELETE) ===
         // vserver
-        String deleteUri = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String deleteUri = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
-        String vserverMockRequestUriNoFormat = String.format(
-                "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s",
+        String vserverMockRequestUriNoFormat = "/cloud-infrastructure/cloud-regions/cloud-region/test-aic/%s/tenants/tenant/%s/vservers/vserver/%s".formatted(
                 cloudRegionId, tenant, vserver);
         deleteServerObject(vserverMockRequestUriNoFormat, deleteUri, "vserver");
 
         // pserver
-        deleteUri = String.format("/cloud-infrastructure/pservers/pserver/%s", hostname);
+        deleteUri = "/cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
         deleteServerObject(pserverMockRequestUri, deleteUri, "pserver");
     }
 

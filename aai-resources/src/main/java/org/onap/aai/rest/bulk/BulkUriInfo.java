@@ -23,7 +23,7 @@ package org.onap.aai.rest.bulk;
 import java.net.URI;
 import java.util.List;
 
-import javax.ws.rs.core.*;
+import jakarta.ws.rs.core.*;
 
 public class BulkUriInfo implements UriInfo {
 
