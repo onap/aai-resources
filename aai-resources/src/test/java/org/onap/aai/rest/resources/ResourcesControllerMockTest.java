@@ -79,13 +79,13 @@ public class ResourcesControllerMockTest {
       "DELETE, /cloud-infrastructure/pservers/pserver/someHostname",
       "DELETE, /cloud-infrastructure/pservers/pserver/someHostname/relationship-list/relationship",
   })
-  public void thatInternalServerErrorsAreMappedToAAIErrorResponse(HttpMethod method, String uri) {
+  public void thatInternalServerErrorsAreMappedToAAIErrorResponse(String method, String uri) {
       // assure that any exception is mapped to an AAIErrorResponse
       when(mockHttpEntry.setHttpEntryProperties(any())).thenThrow(new IllegalArgumentException());
       when(mockHttpEntry.setHttpEntryProperties(any(), anyString())).thenThrow(new IllegalArgumentException());
 
       AAIErrorResponse errorResponse = webClient
-          .method(method)
+          .method(HttpMethod.valueOf(method))
           .uri(uri)
           .bodyValue("{}")
           .exchange()
