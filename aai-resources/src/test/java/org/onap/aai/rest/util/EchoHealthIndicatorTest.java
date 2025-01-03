@@ -43,7 +43,6 @@ public class EchoHealthIndicatorTest {
   @Qualifier("mgmtClient")
   WebTestClient webClient;
 
-  // @MockBean private AaiGraphChecker aaiGraphChecker;
   @MockBean private GraphChecker graphChecker;
 
   @Test
