@@ -36,17 +36,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
@@ -93,8 +93,8 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
     }
 
     @POST
-    @Consumes(value = javax.ws.rs.core.MediaType.APPLICATION_JSON)
-    @Produces(value = javax.ws.rs.core.MediaType.APPLICATION_JSON)
+    @Consumes(value = jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
+    @Produces(value = jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
     public Response process(String content, @PathParam(value = "version") String versionParam,
             @Context HttpHeaders headers, @Context UriInfo info, @Context HttpServletRequest req) {
 
@@ -155,12 +155,12 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
                         .entity(new GsonBuilder().serializeNulls().create().toJson(transactionResponse)).build();
             } else {
                 response = getErrorResponseForFirstFailure(transaction, results.getValue1(), info,
-                        javax.ws.rs.HttpMethod.POST, headers);
+                        jakarta.ws.rs.HttpMethod.POST, headers);
 
             }
 
         } catch (AAIException e) {
-            response = consumerExceptionResponseGenerator(headers, info, javax.ws.rs.HttpMethod.POST, e);
+            response = consumerExceptionResponseGenerator(headers, info, jakarta.ws.rs.HttpMethod.POST, e);
             success = false;
         } finally {
             if (dbEngine != null) {

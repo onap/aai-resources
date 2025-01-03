@@ -24,10 +24,12 @@ package org.onap.aai.rest;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import java.util.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import javax.ws.rs.core.Response.Status;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.core.Response.Status;
+
 import org.onap.aai.concurrent.AaiCallable;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.query.builder.Pageable;
@@ -58,7 +60,7 @@ public class ResourcesController extends RESTAPI {
             @Context HttpServletRequest req) {
         Set<String> roles = Collections.emptySet();
         MediaType mediaType = headers.getMediaType();
-        return resourcesService.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info, roles);
+        return resourcesService.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info);
     }
 
     @PUT
@@ -89,7 +91,7 @@ public class ResourcesController extends RESTAPI {
             @Context HttpServletRequest req) {
         Set<String> roles = Collections.emptySet();
         MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
-        return resourcesService.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info, roles);
+        return resourcesService.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info);
 
     }
 
@@ -135,7 +137,7 @@ public class ResourcesController extends RESTAPI {
                     @Override
                     public Response process() {
                         return resourcesService.getLegacy(versionParam, uri, depthParam, cleanUp, headers, info, req,
-                                new HashSet<String>(), pageable, roles);
+                                new HashSet<String>(), pageable);
                     }
                 });
     }
@@ -150,8 +152,7 @@ public class ResourcesController extends RESTAPI {
             @Context UriInfo info,
             @QueryParam("resource-version") String resourceVersion,
             @Context HttpServletRequest req) {
-        Set<String> roles = Collections.emptySet();
-        return resourcesService.delete(versionParam, uri, headers, info, req, roles);
+        return resourcesService.delete(versionParam, uri, headers, info, req);
     }
 
     /**

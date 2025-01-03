@@ -22,7 +22,7 @@ package org.onap.aai.rest;
 
 import io.micrometer.core.annotation.Timed;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import org.onap.aai.restcore.HttpMethod;
 

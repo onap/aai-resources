@@ -29,14 +29,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.javatuples.Pair;
 import org.onap.aai.config.SpringContextAware;
@@ -73,7 +73,8 @@ public class ResourcesService {
    */
   public Response getLegacy(String versionParam, String uri, String depthParam, String cleanUp,
       HttpHeaders headers, UriInfo info, HttpServletRequest req, Set<String> removeQueryParams,
-      Pageable pageable, Set<String> roles) {
+      Pageable pageable) {
+    Set<String> roles = Collections.emptySet();
     String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
     String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
     Response response;
@@ -197,8 +198,8 @@ public class ResourcesService {
   }
 
   public Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam,
-      String uri, HttpHeaders headers, UriInfo info, Set<String> roles) {
-
+      String uri, HttpHeaders headers, UriInfo info) {
+    Set<String> roles = Collections.emptySet();
     Response response;
     TransactionalGraphEngine dbEngine = null;
     Loader loader;
@@ -395,8 +396,8 @@ public class ResourcesService {
   }
 
   public Response delete(String versionParam, String uri, HttpHeaders headers, UriInfo info,
-      HttpServletRequest req, Set<String> roles) {
-
+      HttpServletRequest req) {
+    Set<String> roles = Collections.emptySet();
     String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
     String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
     String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
