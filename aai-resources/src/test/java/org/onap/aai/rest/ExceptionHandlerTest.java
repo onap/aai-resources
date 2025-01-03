@@ -38,12 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ public class ExceptionHandlerTest extends AAISetup {
     private HttpServletRequest request;
 
     @InjectMocks
-    private ExceptionHandler handler = new ExceptionHandler();
+    private ExceptionHandler handler;
 
     @BeforeEach
     public void setup() {
@@ -109,7 +109,7 @@ public class ExceptionHandlerTest extends AAISetup {
         assertEquals("Error parsing input performing %1 on %2 (msg=%3) (ec=%4)",responseEntity.getRequestError().getServiceException().getText());
         assertEquals("UnmarshalException",responseEntity.getRequestError().getServiceException().getVariables().get(0));
         assertEquals("null",responseEntity.getRequestError().getServiceException().getVariables().get(1));
-        assertEquals("Input parsing error:javax.ws.rs.WebApplicationException: HTTP 500 Internal Server Error",responseEntity.getRequestError().getServiceException().getVariables().get(2));
+        assertEquals("Input parsing error:jakarta.ws.rs.WebApplicationException: HTTP 500 Internal Server Error",responseEntity.getRequestError().getServiceException().getVariables().get(2));
         assertEquals("ERR.5.4.4007",responseEntity.getRequestError().getServiceException().getVariables().get(3));
     }
 

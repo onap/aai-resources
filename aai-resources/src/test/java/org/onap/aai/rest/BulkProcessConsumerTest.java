@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -126,8 +126,8 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String hostname = "pserver-9876543210-77-jenkins";
         String physicalLocationId = "complex-987654321-77-jenkins";
 
-        String pserverUri = String.format("cloud-infrastructure/pservers/pserver/%s", hostname);
-        String complexUri = String.format("cloud-infrastructure/complexes/complex/%s", physicalLocationId);
+        String pserverUri = "cloud-infrastructure/pservers/pserver/%s".formatted(hostname);
+        String complexUri = "cloud-infrastructure/complexes/complex/%s".formatted(physicalLocationId);
 
         doSetupResource(pserverUri, pserverData);
         doSetupResource(complexUri, complexData);
@@ -135,7 +135,7 @@ public class BulkProcessConsumerTest extends BulkProcessorTestAbstraction {
         String complexToPserverRelationshipData =
                 getPayload("payloads/relationship/pserver-complex-relationship-for-bulk.json");
         String complexToPserverRelationshipUri =
-                String.format("cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
+                "cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship".formatted(hostname);
 
         Response response = resourcesController.updateRelationship(complexToPserverRelationshipData,
                 schemaVersions.getDefaultVersion().toString(), complexToPserverRelationshipUri, httpHeaders, uriInfo,

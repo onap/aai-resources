@@ -42,7 +42,7 @@ public class PayloadUtil {
         InputStream inputStream =
                 PayloadUtil.class.getClassLoader().getResourceAsStream("payloads/resource/" + fileName);
 
-        String message = String.format("Unable to find the %s in src/test/resources", fileName);
+        String message = "Unable to find the %s in src/test/resources".formatted(fileName);
         assertNotNull(inputStream, message);
 
         String resource = IOUtils.toString(inputStream, Charset.defaultCharset());
@@ -56,7 +56,7 @@ public class PayloadUtil {
         InputStream inputStream =
                 PayloadUtil.class.getClassLoader().getResourceAsStream("payloads/templates/" + fileName);
 
-        String message = String.format("Unable to find the %s in src/test/resources", fileName);
+        String message = "Unable to find the %s in src/test/resources".formatted(fileName);
         assertNotNull(inputStream, message);
 
         String resource;
@@ -93,7 +93,7 @@ public class PayloadUtil {
 
         InputStream inputStream = PayloadUtil.class.getClassLoader().getResourceAsStream("payloads/" + fileName);
 
-        String message = String.format("Unable to find the %s in src/test/resources/payloads/", fileName);
+        String message = "Unable to find the %s in src/test/resources/payloads/".formatted(fileName);
         assertNotNull(inputStream, message);
 
         String resource = IOUtils.toString(inputStream, Charset.defaultCharset());
