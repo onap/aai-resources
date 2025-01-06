@@ -41,7 +41,6 @@ import org.onap.aai.introspection.LoaderFactory;
 import org.onap.aai.introspection.ModelType;
 import org.onap.aai.introspection.exceptions.AAIUnknownObjectException;
 import org.onap.aai.logging.ErrorLogHelper;
-import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.serialization.db.EdgeSerializer;
 import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersions;
@@ -76,8 +75,6 @@ public class IncreaseNodesTool {
             throws AAIUnknownObjectException, UnsupportedEncodingException, AAIException {
 
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        PropertyPasswordConfiguration initializer = new PropertyPasswordConfiguration();
-        initializer.initialize(context);
         try {
             context.scan("org.onap.aai.config", "org.onap.aai.setup");
             context.refresh();
@@ -129,7 +126,7 @@ public class IncreaseNodesTool {
      * /cloud-infrastructure/pservers/pserver/
      * /network/pnfs/pnf/
      * /cloud-infrastructure/pservers/pserver/random-056fd6c4-7313-4fa0-b854-0d9983bdb0ab/p-interfaces/p-interface/
-     * 
+     *
      * @param
      * @param
      * @param cArgs
