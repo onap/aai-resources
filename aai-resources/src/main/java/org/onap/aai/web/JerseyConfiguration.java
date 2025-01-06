@@ -38,6 +38,7 @@ import javax.ws.rs.ext.ReaderInterceptor;
 
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.onap.aai.config.SecurityConfig;
 import org.onap.aai.rest.BulkAddConsumer;
 import org.onap.aai.rest.BulkProcessConsumer;
 import org.onap.aai.rest.ExampleConsumer;
@@ -82,7 +83,8 @@ public class JerseyConfiguration {
         resourceConfig.registerClasses(classes);
         registerFiltersForClasses(resourceConfig, ContainerRequestFilter.class, ContainerResponseFilter.class,
                 ReaderInterceptor.class,
-                AuditLogContainerFilter.class);
+                AuditLogContainerFilter.class, SecurityConfig.class);
+        resourceConfig.register(SecurityConfig.class);
 
         if (isLoggingEnabled()) {
             logRequests(resourceConfig);

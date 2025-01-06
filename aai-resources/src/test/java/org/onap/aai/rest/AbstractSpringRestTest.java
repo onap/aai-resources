@@ -36,7 +36,6 @@ import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.nodes.NodeIngestor;
-import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.util.AAIConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -54,7 +53,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Import(ResourcesTestConfiguration.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(initializers = PropertyPasswordConfiguration.class)
+@ContextConfiguration
 @EnableAutoConfiguration(exclude = {CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class}) // there is no running cassandra instance for the test
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = ResourcesApp.class)
 public abstract class AbstractSpringRestTest {
