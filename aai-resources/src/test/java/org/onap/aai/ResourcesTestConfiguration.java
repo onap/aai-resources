@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
 
@@ -63,20 +62,7 @@ public class ResourcesTestConfiguration {
 
         RestTemplate restTemplate = null;
         if (env.acceptsProfiles(Profiles.of(ResourcesProfiles.TWO_WAY_SSL, ResourcesProfiles.ONE_WAY_SSL))) {
-            char[] trustStorePassword = env.getProperty("server.ssl.trust-store-password").toCharArray();
-            char[] keyStorePassword = env.getProperty("server.ssl.key-store-password").toCharArray();
-
-            String keyStore = env.getProperty("server.ssl.key-store");
-            String trustStore = env.getProperty("server.ssl.trust-store");
-            SSLContextBuilder sslContextBuilder = SSLContextBuilder.create();
-
-            if (env.acceptsProfiles(Profiles.of(ResourcesProfiles.TWO_WAY_SSL))) {
-                sslContextBuilder =
-                        sslContextBuilder.loadKeyMaterial(loadPfx(keyStore, keyStorePassword), keyStorePassword);
-            }
-
-            SSLContext sslContext =
-                    sslContextBuilder.loadTrustMaterial(ResourceUtils.getFile(trustStore), trustStorePassword).build();
+            SSLContext sslContext = SSLContextBuilder.create().build();
 
             HttpClient client = HttpClients.custom().setSSLContext(sslContext)
                     .setSSLHostnameVerifier((s, sslSession) -> true).build();
@@ -112,14 +98,5 @@ public class ResourcesTestConfiguration {
         });
 
         return restTemplate;
-    }
-
-    private KeyStore loadPfx(String file, char[] password) throws Exception {
-        KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        File key = ResourceUtils.getFile(file);
-        try (InputStream in = new FileInputStream(key)) {
-            keyStore.load(in, password);
-        }
-        return keyStore;
     }
 }
