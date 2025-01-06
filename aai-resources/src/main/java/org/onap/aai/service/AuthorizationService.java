@@ -2,7 +2,7 @@
  * ============LICENSE_START=======================================================
  * org.onap.aai
  * ================================================================================
- * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
+ * Copyright © 2025 Deutsche Telekom. All rights reserved.
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,92 +20,45 @@
 
 package org.onap.aai.service;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
-import org.eclipse.jetty.util.security.Password;
-import org.onap.aai.ResourcesProfiles;
-import org.onap.aai.util.AAIConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
+import org.onap.aai.config.AuthProperties;
 import org.springframework.stereotype.Service;
 
-@Profile(ResourcesProfiles.ONE_WAY_SSL)
+/**
+ * Should be removed once Spring Security-based auth works
+ */
 @Service
 public class AuthorizationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthorizationService.class);
+  // Saved in this format for best performance
+  private final Set<String> authorizedHeaders;
 
-    private final Map<String, String> authorizedUsers = new HashMap<>();
+  public AuthorizationService(AuthProperties authProperties) {
+    authorizedHeaders = getAuthorizedHeaders(authProperties);
+  }
 
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+  public boolean isAuthorized(String authHeaderValue) {
+    return authorizedHeaders.contains(authHeaderValue);
+  }
 
-    @PostConstruct
-    public void init() {
+  /**
+   * Returns valid Bearer auth headers for all users.
+   * @param authProperties
+   * @param encoder
+   * @return
+   */
+  private Set<String> getAuthorizedHeaders(AuthProperties authProperties) {
+    Base64.Encoder encoder = Base64.getEncoder();
+    return authProperties.getUsers().stream()
+      .map(user -> user.getUsername() + ":" + user.getPassword())
+      .map(usernamePasswordPair -> encoder.encode(usernamePasswordPair.getBytes()))
+      .map(String::new)
+      .map(encodedPair -> "Basic " + encodedPair)
+      .collect(Collectors.toSet());
+  }
 
-        String basicAuthFile = getBasicAuthFilePath();
 
-        try (Stream<String> stream = Files.lines(Path.of(basicAuthFile))) {
-            stream.filter(line -> !line.startsWith("#")).forEach(str -> {
-                byte[] bytes = null;
-
-                String usernamePassword = null;
-                String accessType = null;
-
-                try {
-                    String[] userAccessType = str.split(",");
-
-                    if (userAccessType == null || userAccessType.length != 2) {
-                        throw new RuntimeException(
-                                "Please check the realm.properties file as it is not conforming to the basic auth");
-                    }
-
-                    usernamePassword = userAccessType[0];
-                    accessType = userAccessType[1];
-
-                    String[] usernamePasswordArray = usernamePassword.split(":");
-
-                    if (usernamePasswordArray == null || usernamePasswordArray.length != 3) {
-                        throw new RuntimeException("This username / pwd is not a valid entry in realm.properties");
-                    }
-
-                    String username = usernamePasswordArray[0];
-                    String password = null;
-
-                    if (str.contains("OBF:")) {
-                        password = usernamePasswordArray[1] + ":" + usernamePasswordArray[2];
-                        password = Password.deobfuscate(password);
-                    }
-
-                    bytes = ENCODER.encode((username + ":" + password).getBytes("UTF-8"));
-
-                    authorizedUsers.put(new String(bytes), accessType);
-
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("Unable to support the encoding of the file" + basicAuthFile);
-                }
-
-                authorizedUsers.put(new String(ENCODER.encode(bytes)), accessType);
-            });
-        } catch (IOException e) {
-            logger.error("IO Exception occurred during the reading of realm.properties", e);
-        }
-    }
-
-    public boolean checkIfUserAuthorized(String authorization) {
-        return authorizedUsers.containsKey(authorization) && "admin".equals(authorizedUsers.get(authorization));
-    }
-
-    public String getBasicAuthFilePath() {
-        return AAIConstants.AAI_HOME_ETC_AUTH + AAIConstants.AAI_FILESEP + "realm.properties";
-    }
 }

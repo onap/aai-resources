@@ -30,7 +30,6 @@ import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.nodes.NodeIngestor;
-import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.onap.aai.util.AAIConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +41,11 @@ import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoCo
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 
+@EnableConfigurationProperties
 @SpringBootApplication(
         exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
                 HibernateJpaAutoConfiguration.class, CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class})
@@ -105,7 +106,6 @@ public class ResourcesApp {
             SpringApplication app = new SpringApplication(ResourcesApp.class);
             app.setLogStartupInfo(false);
             app.setRegisterShutdownHook(true);
-            app.addInitializers(new PropertyPasswordConfiguration());
             env = app.run(args).getEnvironment();
         } catch (Exception ex) {
             AAIException aai = null;
@@ -131,8 +131,6 @@ public class ResourcesApp {
 
         logger.info("Resources MicroService Started");
         logger.debug("Resources MicroService Started");
-
-        System.out.println("Resources Microservice Started");
 
     }
 
