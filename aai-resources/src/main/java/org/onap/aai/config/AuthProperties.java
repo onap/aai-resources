@@ -2,7 +2,7 @@
  * ============LICENSE_START=======================================================
  * org.onap.aai
  * ================================================================================
- * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
+ * Copyright © 2025 Deutsche Telekom. All rights reserved.
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,30 @@
  * ============LICENSE_END=========================================================
  */
 
-package org.onap.aai.it.multitenancy;
+package org.onap.aai.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
 
-class KeycloakTestProperties {
+import javax.validation.constraints.NotEmpty;
 
-    @Value("${test.keycloak.realm.json}")
-    public String realmJson;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-    @Value("${keycloak.realm}")
-    public String realm;
+import lombok.Data;
 
-    @Value("${keycloak.resource}")
-    public String clientId;
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "aai.basic-auth")
+public class AuthProperties {
 
-    @Value("${test.keycloak.client.secret}")
-    public String clientSecret;
+  boolean enabled = true;
 
-    @Value("${test.keycloak.admin.cli}")
-    public String adminCli;
+  @NotEmpty
+  List<User> users;
 
-    @Value("${test.keycloak.auth-server-port}")
-    public String port;
-
+  @Data
+  public static class User {
+    private String username;
+    private String password;
+  }
 }

@@ -2,7 +2,7 @@
  * ============LICENSE_START=======================================================
  * org.onap.aai
  * ================================================================================
- * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
+ * Copyright © 2025 Deutsche Telekom. All rights reserved.
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -37,47 +38,47 @@ import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.interceptors.AAIContainerFilter;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.service.AuthorizationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-@Profile(ResourcesProfiles.ONE_WAY_SSL)
+import lombok.RequiredArgsConstructor;
+
+@Component
 @PreMatching
+@RequiredArgsConstructor
+@Profile(ResourcesProfiles.ONE_WAY_SSL) // this mainly serves the purpose of making the tests work
 @Priority(AAIRequestFilterPriority.AUTHORIZATION)
-public class OneWaySslAuthorization extends AAIContainerFilter implements ContainerRequestFilter {
+public class AuthInterceptor extends AAIContainerFilter implements ContainerRequestFilter {
 
-    @Autowired
-    private AuthorizationService authorizationService;
+  private static final Pattern PATTERN_ECHO = Pattern.compile("^.*/util/echo$");
+  private static final Pattern PATTERN_ACTUATOR = Pattern.compile("^.*/actuator/.*$");
+  private final AuthorizationService authorizationService;
 
-    @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-
-        if (containerRequestContext.getUriInfo().getRequestUri().getPath().matches("^.*/util/echo$")) {
-            return;
-        }
-
-        String basicAuth = containerRequestContext.getHeaderString("Authorization");
-        List<MediaType> acceptHeaderValues = containerRequestContext.getAcceptableMediaTypes();
-
-        if (basicAuth == null || !basicAuth.startsWith("Basic ")) {
-            Optional<Response> responseOptional = errorResponse("AAI_3300", acceptHeaderValues);
-            containerRequestContext.abortWith(responseOptional.get());
-            return;
-        }
-
-        basicAuth = basicAuth.replaceAll("Basic ", "");
-
-        if (!authorizationService.checkIfUserAuthorized(basicAuth)) {
-            Optional<Response> responseOptional = errorResponse("AAI_3300", acceptHeaderValues);
-            containerRequestContext.abortWith(responseOptional.get());
-            return;
-        }
-
+  @Override
+  public void filter(ContainerRequestContext requestContext) throws IOException {
+    String path = requestContext.getUriInfo().getRequestUri().getPath();
+    if (PATTERN_ECHO.matcher(path).matches() || PATTERN_ACTUATOR.matcher(path).matches()) {
+      return;
     }
 
-    private Optional<Response> errorResponse(String errorCode, List<MediaType> acceptHeaderValues) {
+    String basicAuth = requestContext.getHeaders().getFirst("Authorization");
+    if (basicAuth == null || !basicAuth.startsWith("Basic ")) {
+      Optional<Response> responseOptional = errorResponse("AAI_3300", requestContext.getAcceptableMediaTypes());
+      requestContext.abortWith(responseOptional.get());
+      return;
+    }
+
+    if (!authorizationService.isAuthorized(basicAuth)) {
+        Optional<Response> responseOptional = errorResponse("AAI_3300", requestContext.getAcceptableMediaTypes());
+        requestContext.abortWith(responseOptional.get());
+        return;
+    }
+  }
+
+      private Optional<Response> errorResponse(String errorCode, List<MediaType> acceptHeaderValues) {
         AAIException aaie = new AAIException(errorCode);
         return Optional.of(Response.status(aaie.getErrorObject().getHTTPResponseCode())
                 .entity(ErrorLogHelper.getRESTAPIErrorResponse(acceptHeaderValues, aaie, new ArrayList<>())).build());
-
     }
+
 }

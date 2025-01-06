@@ -34,8 +34,6 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.onap.aai.concurrent.AaiCallable;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.introspection.sideeffect.OwnerCheck;
@@ -65,7 +63,7 @@ public class ResourcesController extends RESTAPI {
             @Context HttpHeaders headers,
             @Context UriInfo info,
             @Context HttpServletRequest req) {
-        Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
+        Set<String> roles = Collections.emptySet();
         MediaType mediaType = headers.getMediaType();
         return resourcesService.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info, roles);
     }
@@ -96,7 +94,7 @@ public class ResourcesController extends RESTAPI {
             @Context HttpHeaders headers,
             @Context UriInfo info,
             @Context HttpServletRequest req) {
-        Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
+        Set<String> roles = Collections.emptySet();
         MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
         return resourcesService.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info, roles);
 
@@ -134,7 +132,7 @@ public class ResourcesController extends RESTAPI {
             @Context HttpHeaders headers,
             @Context UriInfo info,
             @Context HttpServletRequest req) {
-        Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
+        Set<String> roles = Collections.emptySet();
         Pageable pageable = includeTotalCount == false
             ? new Pageable(resultIndex -1, resultSize)
             : new Pageable(resultIndex -1, resultSize).includeTotalCount();
@@ -159,7 +157,7 @@ public class ResourcesController extends RESTAPI {
             @Context UriInfo info,
             @QueryParam("resource-version") String resourceVersion,
             @Context HttpServletRequest req) {
-        Set<String> roles = getRoles(req.getUserPrincipal(), req.getMethod());
+        Set<String> roles = Collections.emptySet();
         return resourcesService.delete(versionParam, uri, headers, info, req, roles);
     }
 
@@ -209,30 +207,5 @@ public class ResourcesController extends RESTAPI {
 
     protected boolean isEmptyObject(Introspector obj) {
         return "{}".equals(obj.marshal(false));
-    }
-
-    private Set<String> getRoles(Principal userPrincipal, String method) {
-        KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) userPrincipal;
-        if (ObjectUtils.isEmpty(token)) {
-            return Collections.emptySet();
-        }
-        SimpleKeycloakAccount account = (SimpleKeycloakAccount) token.getDetails();
-        if (ObjectUtils.isEmpty(account)) {
-            return Collections.emptySet();
-        }
-        // When the request is not a GET, we need to exclude ReadOnly access roles
-        if (isNotGetRequest(method)) {
-            return getExcludedReadOnlyAccessRoles(account);
-        }
-        return account.getRoles();
-    }
-
-    private Set<String> getExcludedReadOnlyAccessRoles(SimpleKeycloakAccount account) {
-        return account.getRoles().stream().filter(role -> !role.endsWith(OwnerCheck.READ_ONLY_SUFFIX))
-                .collect(Collectors.toSet());
-    }
-
-    private boolean isNotGetRequest(String method) {
-        return !Action.GET.name().equalsIgnoreCase(method);
     }
 }
