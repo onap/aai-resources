@@ -99,70 +99,10 @@ import reactor.core.publisher.Mono;
 public class ResourcesControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class.getName());
-    private static final Set<Integer> VALID_HTTP_STATUS_CODES = new HashSet<>();
-    protected static final MediaType APPLICATION_JSON = MediaType.valueOf("application/json");
-
-    static {
-        VALID_HTTP_STATUS_CODES.add(200);
-        VALID_HTTP_STATUS_CODES.add(201);
-        VALID_HTTP_STATUS_CODES.add(204);
-    }
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired WebTestClient webClient;
     @Autowired SchemaVersions schemaVersions;
-
-    ObjectMapper mapper = new ObjectMapper();
-
-    private ResourcesController resourcesController;
-    private HttpHeaders httpHeaders;
-    private UriInfo uriInfo;
-    private MultivaluedMap<String, String> headersMultiMap;
-    private MultivaluedMap<String, String> queryParameters;
-    private List<String> aaiRequestContextList;
-    private List<MediaType> outputMediaTypes;
-    private String defaultSchemaVersion;
-
-    @BeforeEach
-    public void setup() throws AAIException {
-        if(!AAIGraph.isInit()) {
-            AAIConfig.init();
-            AAIGraph.getInstance();
-        }
-        logger.info("Starting the setup for the integration tests of Rest Endpoints");
-
-        resourcesController = new ResourcesController(new ResourcesService());
-        httpHeaders = Mockito.mock(HttpHeaders.class);
-        uriInfo = Mockito.mock(UriInfo.class);
-
-        headersMultiMap = new MultivaluedHashMap<>();
-        queryParameters = Mockito.spy(new MultivaluedHashMap<>());
-
-        headersMultiMap.add("X-FromAppId", "JUNIT");
-        headersMultiMap.add("X-TransactionId", UUID.randomUUID().toString());
-        headersMultiMap.add("Real-Time", "true");
-        headersMultiMap.add("Accept", "application/json");
-        headersMultiMap.add("aai-request-context", "");
-
-        outputMediaTypes = new ArrayList<>();
-        outputMediaTypes.add(APPLICATION_JSON);
-
-        aaiRequestContextList = new ArrayList<>();
-        aaiRequestContextList.add("");
-        defaultSchemaVersion = schemaVersions.getDefaultVersion().toString();
-
-        when(httpHeaders.getAcceptableMediaTypes()).thenReturn(outputMediaTypes);
-        when(httpHeaders.getRequestHeaders()).thenReturn(headersMultiMap);
-
-        when(httpHeaders.getRequestHeader("aai-request-context")).thenReturn(aaiRequestContextList);
-
-        when(uriInfo.getQueryParameters()).thenReturn(queryParameters);
-        when(uriInfo.getQueryParameters(false)).thenReturn(queryParameters);
-
-        // TODO - Check if this is valid since RemoveDME2QueryParameters seems to be very unreasonable
-        Mockito.doReturn(null).when(queryParameters).remove(any());
-
-        when(httpHeaders.getMediaType()).thenReturn(APPLICATION_JSON);
-    }
 
     @AfterEach
     public void tearDown() {
@@ -423,11 +363,6 @@ public class ResourcesControllerTest {
 
         String patchData = "{\"in-maint\": false}";
 
-        headersMultiMap.add("Content-Type", "application/json");
-
-        outputMediaTypes.remove(APPLICATION_JSON);
-        outputMediaTypes.add(MediaType.valueOf("application/merge-patch+json"));
-
         webClient.patch()
             .uri(uri)
             .header("Content-Type", "application/merge-patch+json")
@@ -496,12 +431,12 @@ public class ResourcesControllerTest {
 
     public String getResourcePayload(String resourceName) throws IOException {
         String rawPayload = IOUtils.toString(this.getClass().getResourceAsStream("/payloads/resource/" + resourceName + ".json"), StandardCharsets.UTF_8);
-        return String.format(rawPayload, defaultSchemaVersion);
+        return String.format(rawPayload, schemaVersions.getDefaultVersion());
     }
 
     public String getRelationshipPayload(String relationshipName) throws IOException {
         String rawPayload = IOUtils.toString(this.getClass().getResourceAsStream("/payloads/relationship/" + relationshipName + ".json"), StandardCharsets.UTF_8);
-        return String.format(rawPayload, defaultSchemaVersion);
+        return String.format(rawPayload, schemaVersions.getDefaultVersion());
     }
 
     public String getUri(String hostname) {

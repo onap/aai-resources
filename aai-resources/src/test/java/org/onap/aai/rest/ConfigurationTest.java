@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.config.SpringContextAware;
-import org.onap.aai.restclient.PropertyPasswordConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -61,7 +60,7 @@ import org.springframework.web.client.RestTemplate;
 
 @AutoConfigureMetrics
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(initializers = PropertyPasswordConfiguration.class, classes = {SpringContextAware.class})
+@ContextConfiguration(classes = {SpringContextAware.class})
 @EnableAutoConfiguration(exclude={CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class}) // there is no running cassandra instance for the test
 @Import(ResourcesTestConfiguration.class)
 @SpringBootTest(

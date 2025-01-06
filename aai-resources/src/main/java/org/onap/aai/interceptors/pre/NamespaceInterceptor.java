@@ -41,7 +41,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.onap.aai.IncreaseNodesTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -67,7 +66,7 @@ import org.xml.sax.InputSource;
 @ConditionalOnProperty(value = "aai.remove-xmlns.enabled", havingValue = "true", matchIfMissing = true)
 public class NamespaceInterceptor implements ReaderInterceptor {
 
-    private static final Logger log = LoggerFactory.getLogger(IncreaseNodesTool.class);
+    private static final Logger log = LoggerFactory.getLogger(NamespaceInterceptor.class);
     private static final String xslStr = String.join("\n",
         "<xsl:transform xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\">",
         "<xsl:output version=\"1.0\" encoding=\"UTF-8\" indent=\"no\"/>",
