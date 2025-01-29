@@ -25,14 +25,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.janusgraph.core.JanusGraph;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.onap.aai.ResourcesApp;
 import org.onap.aai.db.props.AAIProperties;
 import org.onap.aai.dbmap.AAIGraph;
 import org.slf4j.Logger;

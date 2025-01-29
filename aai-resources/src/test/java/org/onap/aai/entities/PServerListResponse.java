@@ -21,7 +21,6 @@
 package org.onap.aai.entities;
 
 import java.util.List;
-
 import lombok.Data;
 
 @Data

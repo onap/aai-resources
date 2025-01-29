@@ -22,10 +22,8 @@ package org.onap.aai.it.performance;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.janusgraph.core.JanusGraph;
 import org.junit.jupiter.api.AfterAll;

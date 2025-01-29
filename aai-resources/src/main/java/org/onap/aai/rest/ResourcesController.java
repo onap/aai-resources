@@ -23,20 +23,13 @@ package org.onap.aai.rest;
 
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
-
-import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-
-import org.apache.commons.lang3.ObjectUtils;
 import org.onap.aai.concurrent.AaiCallable;
 import org.onap.aai.introspection.Introspector;
-import org.onap.aai.introspection.sideeffect.OwnerCheck;
 import org.onap.aai.query.builder.Pageable;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;

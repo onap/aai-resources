@@ -23,7 +23,6 @@ package org.onap.aai.interceptors.pre;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.Priority;
