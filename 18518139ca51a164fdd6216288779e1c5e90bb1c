@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35a4abb6_781b0ec7",
+        "filename": "aai-resources/src/main/java/org/onap/aai/rest/ResourcesController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-07T15:32:03Z",
+      "side": 1,
+      "message": "I think a better approach for this would be to implement this as an interceptor.\nThat way the validation could be applied to *all* requests without affecting the business logic of these controllers.\nYou can find examples of other interceptors in `interceptors.pre`.\n\nI would also suggest to introduce some `aai.request.encodingvalidation.enabled` property to be able to toggle this on and off.\nI could imagine that this kind of char decoding that you are doing in the UTF8Validator is quite expensive performance-wise.",
+      "revId": "18518139ca51a164fdd6216288779e1c5e90bb1c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a7ef6a7_957619c8",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-07T15:32:03Z",
+      "side": 1,
+      "message": "Please register the `decoder` as a `private static final` variable to avoid creating this object on each invocation.",
+      "revId": "18518139ca51a164fdd6216288779e1c5e90bb1c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ]
+}
