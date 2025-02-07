@@ -25,9 +25,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -50,6 +47,9 @@ import org.onap.aai.rest.BulkConsumer;
 import org.onap.aai.rest.BulkProcessorTestAbstraction;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 
 @TestPropertySource(properties = {"delta.events.enabled=true",})
 public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstraction {
@@ -304,6 +304,45 @@ public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstract
         assertThat("Response contains invalid payload details.", response.getEntity().toString(), containsString(
                 "[Operation 0 missing 'body', Operation 1 missing 'action', Operation 2 missing 'uri']"));
 
+    }
+    
+    @Test
+    public void putInvalidContentNotUft8() throws IOException {
+    	
+    	String invalidjson="{\r\n"
+    			+ "  \"operations\": [\r\n"
+    			+ "    {\r\n"
+    			+ "      \"action\": \"put\",\r\n"
+    			+ "      \"uri\": \"/cloud-infrastructure/pservers/pserver/pserver\",\r\n"
+    			+ "      \"body\": {\r\n"
+    			+ "        \"hostname\": \"pserver\",\r\n"
+    			+ "        \"fqdn\": \"pserver-fqdn\"\r\n"
+    			+ "      }\r\n"
+    			+ "    },\r\n"
+    			+ "    {\r\n"
+    			+ "      \"action\": \"put\",\r\n"
+    			+ "      \"uri\": \"/cloud-infrastructure/complexes/complex/complex\",\r\n"
+    			+ "      \"body\": {\r\n"
+    			+ "        \"physical-location-id\": \"complex\",\r\n"
+    			+ "        \"data-center-code\": \"code\",\r\n"
+    			+ "        \"identity-url\": \"N/A\",\r\n"
+    			+ "        \"physical-location-type\": \"type\",\r\n"
+    			+ "        \"street1\": \"streetÿþ\",\r\n"
+    			+ "        \"city\": \"cityÿþ\",\r\n"
+    			+ "        \"state\": \"state\",\r\n"
+    			+ "        \"postal-code\": \"12345\",\r\n"
+    			+ "        \"country\": \"NONE\",\r\n"
+    			+ "        \"region\": \"Earth\"\r\n"
+    			+ "\r\n"
+    			+ "      }\r\n"
+    			+ "    },\r\n"
+    			+ "  ]\r\n"
+    			+ "}\r\n"
+    			+ "";
+        Response response = executeRequest(invalidjson);
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus(), "Request fails with 400");
+        assertThat("Response contains invalid payload msg.", response.getEntity().toString(),
+                containsString("Invalid input performing %1 on %2:Invalid UTF-8 character detected....!!"));  
     }
 
     @Test

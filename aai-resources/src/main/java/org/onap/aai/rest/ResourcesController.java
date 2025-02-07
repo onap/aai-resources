@@ -29,12 +29,16 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import org.onap.aai.concurrent.AaiCallable;
+import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.introspection.Introspector;
 import org.onap.aai.query.builder.Pageable;
 import org.onap.aai.restcore.HttpMethod;
 import org.onap.aai.restcore.RESTAPI;
 import org.onap.aai.service.ResourcesService;
 import org.onap.aai.util.AAIConstants;
+import org.onap.aai.util.UTF8Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
 @Timed
@@ -44,6 +48,7 @@ import org.springframework.stereotype.Controller;
 public class ResourcesController extends RESTAPI {
 
     private final ResourcesService resourcesService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourcesController.class);
 
     @PUT
     @Path("/{uri: .+}")
@@ -55,7 +60,10 @@ public class ResourcesController extends RESTAPI {
             @PathParam("uri") @Encoded String uri,
             @Context HttpHeaders headers,
             @Context UriInfo info,
-            @Context HttpServletRequest req) {
+            @Context HttpServletRequest req) throws AAIException {
+    	if (!UTF8Validator.isValidUTF8(content)) {
+    		LOGGER.info("Invalid UTF-8 character detected....!!");
+    	}
         Set<String> roles = Collections.emptySet();
         MediaType mediaType = headers.getMediaType();
         return resourcesService.handleWrites(mediaType, HttpMethod.PUT, content, versionParam, uri, headers, info, roles);
@@ -71,9 +79,12 @@ public class ResourcesController extends RESTAPI {
             @PathParam("uri") @Encoded String uri,
             @Context HttpHeaders headers,
             @Context UriInfo info,
-            @Context HttpServletRequest req) {
-
-        return resourcesService.updateRelationship(content, versionParam, uri, headers, info);
+            @Context HttpServletRequest req) throws AAIException {
+    	
+    	if (!UTF8Validator.isValidUTF8(content)) {
+    		LOGGER.info("Invalid UTF-8 character detected....!!");
+    	}
+    	return resourcesService.updateRelationship(content, versionParam, uri, headers, info);
     }
 
     @PATCH
@@ -86,7 +97,11 @@ public class ResourcesController extends RESTAPI {
             @PathParam("uri") @Encoded String uri,
             @Context HttpHeaders headers,
             @Context UriInfo info,
-            @Context HttpServletRequest req) {
+            @Context HttpServletRequest req) throws AAIException {
+
+    	if (!UTF8Validator.isValidUTF8(content)) {
+    		LOGGER.info("Invalid UTF-8 character detected....!!");
+    	}
         Set<String> roles = Collections.emptySet();
         MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;
         return resourcesService.handleWrites(mediaType, HttpMethod.MERGE_PATCH, content, versionParam, uri, headers, info, roles);
