@@ -55,6 +55,7 @@ import org.onap.aai.entities.PServerListResponse;
 import org.onap.aai.entities.PolicyException;
 import org.onap.aai.entities.ServiceException;
 import org.onap.aai.exceptions.AAIException;
+import org.onap.aai.interceptors.pre.UTF8ValidationFilter;
 import org.onap.aai.rest.ResourcesController;
 import org.onap.aai.setup.SchemaVersions;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -65,6 +66,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
@@ -79,6 +81,10 @@ public class ResourcesControllerTest {
 
     @Autowired WebTestClient webClient;
     @Autowired SchemaVersions schemaVersions;
+    
+    @Autowired
+    private UTF8ValidationFilter utf8ValidationFilter;
+
 
     @AfterEach
     public void tearDown() {
@@ -317,6 +323,73 @@ public class ResourcesControllerTest {
             "Cannot write via this URL",
             "ERR.5.6.3010");
         assertIterableEquals(expected, serviceException.getVariables());
+    }
+    
+    
+    @Test
+    public void testInvalidUTF8Character() throws JSONException, IOException {
+    	
+    	ReflectionTestUtils.setField(utf8ValidationFilter, "encodingvalidation_enabled", true);
+    	String uri = "/cloud-infrastructure/pservers/pserver/pserver-patch-test";
+    	byte[] invalidBytes = new byte[]{0x48, 0x65, 0x6C, 0x6C, 0x6F, (byte) 0xFF, (byte) 0xFF};
+    	String invalidContent = new String(invalidBytes, StandardCharsets.ISO_8859_1);
+    	String payload= "{\r\n"
+    			+ "  \"hostname\": \"pserver-patch-test\",\r\n"
+    			+ "  \"ptnii-equip-name\": \"example-ptnii-equip-name-val-36969\",\r\n"
+    			+ "  \"number-of-cpus\": 62220,\r\n"
+    			+ "  \"disk-in-gigabytes\": 872,\r\n"
+    			+ "  \"ram-in-megabytes\": 35331,\r\n"
+    			+ "  \"equip-type\": \"example-equiÿþp-type-val-22986\",\r\n"
+    			+ "  \"equip-vendor\": \"example-equip-vendor-val-37452\",\r\n"
+    			+ "  \"equip-model\": \"example-equip-modelÿþ-val-14665"+invalidContent+"\",\r\n"
+    			+ "  \"fqdn\": \"example-fqdn-val-33429\",\r\n"
+    			+ "  \"pserver-selflink\": \"example-pserver-selflink-val-10125\",\r\n"
+    			+ "  \"ipv4-oam-address\": \"example-ipv4-oam-address-val-3155\",\r\n"
+    			+ "  \"serial-number\": \"example-serial-number-val-12010\",\r\n"
+    			+ "  \"ipaddress-v4-loopback-0\": \"example-ipaddress-v4"+invalidContent+"-loopback0-val-77686\",\r\n"
+    			+ "  \"ipaddress-v6-loopback-0\": \"example-ipaddress-v6-loopback0-val-17856\",\r\n"
+    			+ "  \"ipaddress-v4-aim\": \"example-ipaddress-v4-aim-val-33665\",\r\n"
+    			+ "  \"ipaddress-v6-aim\": \"example-ipaddress-v6-aim-val-6210\",\r\n"
+    			+ "  \"ipaddress-v6-oam\": \"example-ipaddress-v6-oam-val-40977\",\r\n"
+    			+ "  \"inv-status\": \"example-inv-status-val-3682\",\r\n"
+    			+ "  \"pserver-id\": \"example-pserver-id-val-82142\",\r\n"
+    			+ "  \"internet-topology\": \"example-internet-topology-val-56425\",\r\n"
+    			+ "  \"in-maint\": true,\r\n"
+    			+ "  \"pserver-name2\": \"example-pserver-name2-val-53802\",\r\n"
+    			+ "  \"purpose\": \"example-purpose-val-90218\",\r\n"
+    			+ "  \"prov-status\": \"example-prov-status-val-11642\",\r\n"
+    			+ "  \"management-option\": \"example-management-option-val-91111\",\r\n"
+    			+ "  \"host-profile\": \"example-host-profile-val-36247\"\r\n"
+    			+ "}";
+
+    	 String responseBody =	webClient.put()
+		    	.uri(uri)
+		    	.bodyValue(payload)
+		    	.exchange()
+		    	.expectBody(String.class)
+	            .returnResult().getResponseBody();
+    	 assertEquals(responseBody,"Invalid UTF-8 encoding in request");
+    	 
+    	 String hostname = "pserver-hostname-test02";
+    	 String cloudToPserverRelationshipData = "{\r\n"
+    	 		+ "  \"related-to\" : \"complex"+invalidContent+"\",\r\n"
+    	 		+ "  \"related-link\" : \"/aai/v11/cloud-infrastructure/complexes/complex/e13d4587-19ad-4bf5-80f5-c021efb5b61d\",\r\n"
+    	 		+ "  \"relationship-data\" : [{\r\n"
+    	 		+ "    \"relationship-key\" : \"complex.physical-location"+invalidContent+"-id\",\r\n"
+    	 		+ "    \"relationship-value\" : \"e13d4587-19ad-4bf5-80f5-c021efb5b61d\"\r\n"
+    	 		+ "  }]\r\n"
+    	 		+ "}";
+         String cloudToPserverRelationshipUri =
+                 String.format("/cloud-infrastructure/pservers/pserver/%s/relationship-list/relationship", hostname);
+         
+         String response =	webClient.put()
+ 		    	.uri(cloudToPserverRelationshipUri)
+ 		    	.bodyValue(cloudToPserverRelationshipData)
+ 		    	.exchange()
+ 		    	.expectBody(String.class)
+ 	            .returnResult().getResponseBody();
+     	 assertEquals(response,"Invalid UTF-8 encoding in request");
+     	ReflectionTestUtils.setField(utf8ValidationFilter, "encodingvalidation_enabled", false);
     }
 
     @Test

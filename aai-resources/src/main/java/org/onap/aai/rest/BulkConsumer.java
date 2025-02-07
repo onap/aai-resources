@@ -72,6 +72,8 @@ import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -100,7 +102,7 @@ public abstract class BulkConsumer extends RESTAPI {
 
     /** The query style. */
     private QueryStyle queryStyle = QueryStyle.TRAVERSAL_URI;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(BulkConsumer.class);
     /**
      * Bulk add.
      *
@@ -123,7 +125,7 @@ public abstract class BulkConsumer extends RESTAPI {
         String outputMediaType = getMediaType(headers.getAcceptableMediaTypes());
         SchemaVersion version = new SchemaVersion(versionParam);
         Response response = null;
-
+       
         try {
 
             /*
@@ -133,7 +135,7 @@ public abstract class BulkConsumer extends RESTAPI {
              * and BulkOperationResponse each response with its matching URI (which will be null if there wasn't one).
              */
             List<List<BulkOperationResponse>> allResponses = new ArrayList<>();
-
+            
             JsonArray transactions = getTransactions(content, headers);
 
             for (int i = 0; i < transactions.size(); i++) {

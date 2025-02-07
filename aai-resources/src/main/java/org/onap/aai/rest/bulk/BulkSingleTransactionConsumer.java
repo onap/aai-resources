@@ -20,13 +20,6 @@
 
 package org.onap.aai.rest.bulk;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
-
-import io.micrometer.core.annotation.Timed;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -67,10 +60,18 @@ import org.onap.aai.serialization.engines.TransactionalGraphEngine;
 import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.util.AAIConfig;
 import org.onap.aai.util.AAIConstants;
+import org.onap.aai.util.UTF8Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+
+import io.micrometer.core.annotation.Timed;
 
 @Path(value = "{version: v[1-9][0-9]*|latest}/bulk/single-transaction")
 @Timed
@@ -109,7 +110,7 @@ public class BulkSingleTransactionConsumer extends RESTAPI {
         Response response;
 
         try {
-
+			
             // unmarshall the payload.
             Gson gson = new Gson();
             Transaction transaction;
