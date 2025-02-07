@@ -25,9 +25,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -46,10 +43,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.onap.aai.db.props.AAIProperties;
 import org.onap.aai.dbmap.AAIGraph;
+import org.onap.aai.interceptors.pre.UTF8ValidationFilter;
 import org.onap.aai.rest.BulkConsumer;
 import org.onap.aai.rest.BulkProcessorTestAbstraction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 
 @TestPropertySource(properties = {"delta.events.enabled=true",})
 public class BulkSingleTransactionConsumerTest extends BulkProcessorTestAbstraction {
