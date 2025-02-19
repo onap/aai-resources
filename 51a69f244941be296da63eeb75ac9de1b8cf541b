@@ -33,6 +33,24 @@
       "message": "Please make this final by setting it in the constructor",
       "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fbb150f_d9ad201e",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-19T13:44:31Z",
+      "side": 1,
+      "message": "Correction: constructor is not possible, but you can just declare it there:\n```java\n\tprivate static final CharsetDecoder decoder \u003d StandardCharsets.UTF_8\n\t\t.newDecoder()\n\t\t.onMalformedInput(CodingErrorAction.REPORT)\n\t\t.onUnmappableCharacter(CodingErrorAction.REPORT);\n```",
+      "parentUuid": "d78c59df_cb1e5384",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ]
 }
