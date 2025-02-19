@@ -50,6 +50,24 @@
       "message": "Please register the `decoder` as a `private static final` variable to avoid creating this object on each invocation.",
       "revId": "18518139ca51a164fdd6216288779e1c5e90bb1c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46e20c52_6817d3df",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-19T14:07:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a7ef6a7_957619c8",
+      "revId": "18518139ca51a164fdd6216288779e1c5e90bb1c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ]
 }
