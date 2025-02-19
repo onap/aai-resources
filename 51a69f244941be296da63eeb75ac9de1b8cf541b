@@ -85,6 +85,40 @@
       "message": "I think it would be nice if we would be more low level here:\n```java\n\t/**\n\t * Validates if the given string content is valid UTF-8\n\t *\n\t * @param content The string to validate\n\t * @return true if content is valid UTF-8, false otherwise\n\t * @throws AAIException\n\t */\n\tpublic static boolean isValidUTF8(String content){\n\t\tif (content \u003d\u003d null) {\n\t\t\treturn false;\n\t\t}\n\t\tbyte[] bytes \u003d content.getBytes(StandardCharsets.ISO_8859_1);\n\t\treturn isValidUTF8(ByteBuffer.wrap(bytes));\n\t}\n\n\t/**\n\t * Validates if the given bytebuffer content is valid UTF-8\n\t *\n\t * @param content The string to validate\n\t * @return true if content is valid UTF-8, false otherwise\n\t * @throws AAIException\n\t */\n\tpublic static boolean isValidUTF8(ByteBuffer bytes) {\n\t\tif (bytes \u003d\u003d null) {\n\t\t\treturn false;\n\t\t}\n\n\t\ttry {\n\t\t\tdecoder.decode(bytes);\n\t\t\treturn true;\n\t\t} catch (CharacterCodingException e) {\n\t\t\treturn false;\n\t\t}\n\t}\n```\nThis way we would have a method for Strings and one where we can avoid the extra conversion to and from `String`.",
       "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e98ebb5b_0a994098",
+        "filename": "aai-resources/src/test/java/org/onap/aai/rest/bulk/BulkSingleTransactionConsumerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-19T14:06:53Z",
+      "side": 1,
+      "message": "Can you remove these imports?",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6aca780a_6ca26a2d",
+        "filename": "aai-resources/src/test/java/org/onap/aai/rest/resources/ResourcesControllerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-19T14:06:53Z",
+      "side": 1,
+      "message": "We should solve this here by setting the appropriate property (for instance with a `properties \u003d \"aai.request.encodingvalidation.enabled\u003dtrue\" in the `@SpringBootTest` annotation) instead of via this hack",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ]
 }
