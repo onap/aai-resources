@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac45a580_d828785b",
+        "filename": "aai-resources/src/main/java/org/onap/aai/interceptors/pre/UTF8ValidationFilter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-19T13:40:40Z",
+      "side": 1,
+      "message": "Don\u0027t forget a copyright here",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d78c59df_cb1e5384",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-19T13:40:40Z",
+      "side": 1,
+      "message": "Please make this final by setting it in the constructor",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ]
+}
