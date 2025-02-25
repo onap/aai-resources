@@ -35,6 +35,24 @@
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cfafb02_aa148d26",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T08:16:08Z",
+      "side": 1,
+      "message": "We agreed that this will be done this way after the spring boot 3 upgrade. For now it will remain here",
+      "parentUuid": "47cab4f4_a29443f9",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d78c59df_cb1e5384",
