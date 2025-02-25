@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "730226f6_4547d296",
+        "filename": "aai-resources/src/main/java/org/onap/aai/interceptors/pre/UTF8ValidationFilter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T14:17:09Z",
+      "side": 1,
+      "message": "There is no need to covert to and from `String` here, you can use:\n```java\nByteBuffer buffer \u003d ByteBuffer.wrap(requestContext.getEntityStream().readAllBytes());\n```",
+      "revId": "0d314edaae113c5afe30a2f2e422a1b44bb359a1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3c95af3_2f2fff53",
+        "filename": "aai-resources/src/main/java/org/onap/aai/interceptors/pre/UTF8ValidationFilter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T14:17:09Z",
+      "side": 1,
+      "message": "If you are using `requestContext.getEntityStream()`, then you may as well do\n```java\nrequestContext.setEntityStream(requestContext.getEntityStream());\n```\nand following that line of thought, you can just leave out this whole line I believe.",
+      "revId": "0d314edaae113c5afe30a2f2e422a1b44bb359a1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2365f349_1b65463f",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T14:17:09Z",
+      "side": 1,
+      "message": "We should make this `private` if possible",
+      "revId": "0d314edaae113c5afe30a2f2e422a1b44bb359a1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ]
+}

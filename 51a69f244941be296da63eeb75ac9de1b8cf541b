@@ -18,6 +18,24 @@
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf058b41_dc492055",
+        "filename": "aai-resources/src/main/java/org/onap/aai/interceptors/pre/UTF8ValidationFilter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T14:17:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac45a580_d828785b",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47cab4f4_a29443f9",
@@ -88,6 +106,24 @@
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5d4d408_f374fd96",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T14:17:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fbb150f_d9ad201e",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c51b8f9_996bd31c",
@@ -105,6 +141,24 @@
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb5b572b_5408d88e",
+        "filename": "aai-resources/src/main/java/org/onap/aai/util/UTF8Validator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T14:17:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c51b8f9_996bd31c",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e98ebb5b_0a994098",
@@ -118,6 +172,24 @@
       "writtenOn": "2025-02-19T14:06:53Z",
       "side": 1,
       "message": "Can you remove these imports?",
+      "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2735efe5_7b4780e6",
+        "filename": "aai-resources/src/test/java/org/onap/aai/rest/bulk/BulkSingleTransactionConsumerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-02-25T14:17:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e98ebb5b_0a994098",
       "revId": "51a69f244941be296da63eeb75ac9de1b8cf541b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
