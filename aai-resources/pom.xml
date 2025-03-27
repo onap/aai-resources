@@ -121,8 +121,7 @@
                             <apiVersion>1.23</apiVersion>
                             <images>
                                 <image>
-                                    <name>${docker.push.registry}/${aai.docker.namespace}/${project.artifactId}:%l
-                                    </name>
+                                    <name>${docker.push.registry}/${aai.docker.namespace}/${project.artifactId}:%l</name>
                                     <build>
                                         <filter>@</filter>
                                         <tags>
