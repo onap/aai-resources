@@ -89,7 +89,6 @@
         <skipITs>true</skipITs>
 
         <swagger.version>1.6.8</swagger.version>
-        <spring-cloud.version>2022.0.5</spring-cloud.version>
         <!-- fix the driver version to match the one defined in janusgraph-cql
             spring-boot (2.4) is otherwise downgrading it to 4.9.0 -->
         <!-- see https://github.com/spring-projects/spring-boot/blob/d336a96b7f204a398b8237560c5dfa7095c53460/spring-boot-project/spring-boot-dependencies/build.gradle#L163 -->
@@ -314,11 +313,11 @@
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.zipkin.reporter2</groupId>
-            <artifactId>zipkin-reporter-brave</artifactId>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-zipkin</artifactId>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -621,13 +620,6 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- cassandra driver -->
             <dependency>
                 <groupId>com.datastax.oss</groupId>
