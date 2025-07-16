@@ -81,7 +81,7 @@ public class VersionInterceptor extends AAIContainerFilter implements ContainerR
         }
     }
 
-    private Response createInvalidVersionResponse(String errorCode, ContainerRequestContext context, String version) {
+    Response createInvalidVersionResponse(String errorCode, ContainerRequestContext context, String version) {
         AAIException e = new AAIException(errorCode);
         ArrayList<String> templateVars = new ArrayList<>();
 

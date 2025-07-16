@@ -18,7 +18,7 @@
  * ============LICENSE_END=========================================================
  */
 
-package org.onap.aai.TenantIsolation;
+package org.onap.aai.tenantisolation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -189,7 +189,7 @@ public class DataImportTasks {
      * @param targetDirFile the directory that contains payload files
      * @throws AAIException
      */
-    private static void deletePayload(File targetDirFile) throws AAIException {
+    static void deletePayload(File targetDirFile) throws AAIException {
 
         File[] allFilesArr = targetDirFile.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
         if (allFilesArr == null || allFilesArr.length == 0) {
@@ -213,7 +213,7 @@ public class DataImportTasks {
      *
      * @return true if another process is running, false if not
      */
-    private static boolean unpackPayloadFile(String payLoadFileName) {
+    static boolean unpackPayloadFile(String payLoadFileName) {
 
         Process process = null;
 
@@ -244,7 +244,7 @@ public class DataImportTasks {
         return true;
     }
 
-    private static boolean isTargzExtension(String fileName) {
+    static boolean isTargzExtension(String fileName) {
         boolean found = false;
         for (String ext : EXTS) {
             if (fileName.toLowerCase().endsWith("." + ext)) {
