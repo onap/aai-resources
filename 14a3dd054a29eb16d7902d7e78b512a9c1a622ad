@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fccc573b_f31b5a8b",
+        "filename": "aai-resources/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-17T09:25:43Z",
+      "side": 1,
+      "message": "`mockito-inline` very likely has the same versions as `mockito-core` right?\nI would suggest to rename the `mockito.core.version` property to `mockito.version` and then reference that both for `mockito-core` and `mockito-inline` with `${mockito.version}`",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c84d6d2_1d96d164",
+        "filename": "aai-resources/src/test/java/org/onap/aai/TenantIsolation/DataImportTasksTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-17T09:25:43Z",
+      "side": 1,
+      "message": "Please rename the package of this test from `TenantIsolation` to `tenantisolation` to have a consistent naming of all folders",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9b11690_b87e12cb",
+        "filename": "aai-resources/src/test/java/org/onap/aai/TenantIsolation/DataImportTasksTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-17T09:25:43Z",
+      "side": 1,
+      "message": "You can use `assertDoesNotThrow(() -\u003e  dataImportTasks.import1());` here to have a assertion.\nIn practice it is more or less the same, but generally there is the guidance to have at least one assertion for each test case",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d8ba865_65f19b2c",
+        "filename": "aai-resources/src/test/java/org/onap/aai/TenantIsolation/DataImportTasksTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-17T09:25:43Z",
+      "side": 1,
+      "message": "Is this try really necessary?",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b1c1522_4b52b638",
+        "filename": "aai-resources/src/test/java/org/onap/aai/TenantIsolation/DataImportTasksTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-17T09:25:43Z",
+      "side": 1,
+      "message": "Same here with the `assertDoesNotThrow`",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81c47aee_8ce2b1a6",
+        "filename": "aai-resources/src/test/java/org/onap/aai/TenantIsolation/DataImportTasksTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-17T09:25:43Z",
+      "side": 1,
+      "message": "Can you add a `assertTrue(subDir.toFile().exists());` here, just to make this more clear that the test is indeed working as expected?\nOtherwise `assertFalse` would be a bit ambiguous, because it could also be that the file never existed",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf86ffd0_cd8765e2",
+        "filename": "aai-resources/src/test/java/org/onap/aai/interceptors/pre/HeaderValidationTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-17T09:25:43Z",
+      "side": 1,
+      "message": "Please remove these `// Arrange` `// Act` and `// Assert` annotations in the whole file",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ]
+}
