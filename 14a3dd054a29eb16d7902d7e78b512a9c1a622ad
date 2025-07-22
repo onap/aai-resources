@@ -193,6 +193,24 @@
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b67bdc2d_1e99c1e5",
+        "filename": "aai-resources/src/test/java/org/onap/aai/TenantIsolation/DataImportTasksTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-07-22T11:46:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81c47aee_8ce2b1a6",
+      "revId": "14a3dd054a29eb16d7902d7e78b512a9c1a622ad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf86ffd0_cd8765e2",
