@@ -51,6 +51,7 @@
         <aai.project.version>${project.version}</aai.project.version>
         <aai.common.version>1.16.1-SNAPSHOT</aai.common.version>
         <aai.schema.service.version>1.12.7</aai.schema.service.version>
+        <sonar.scanner.version>3.11.0.3922</sonar.scanner.version>
     </properties>
     <build>
         <pluginManagement>
