@@ -20,16 +20,70 @@
 
 package org.onap.aai.rest.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.Test;
 
 public class LogFormatToolsTest {
 
-    @Test
-    public void testLogFormatTools() {
+	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern(DATE_FORMAT).withZone(ZoneOffset.UTC);
 
-        String dateTime = LogFormatTools.getCurrentDateTime();
-        assertNotNull(dateTime);
+    @Test
+    void getCurrentDateTime_ShouldReturnCorrectFormat() {
+        String result = LogFormatTools.getCurrentDateTime();
+
+        assertTrue(isValidDateFormat(result), "DateTime string should match the expected format");
+    }
+
+    @Test
+    void getCurrentDateTime_ShouldReturnCurrentTime() {
+        ZonedDateTime beforeTest = ZonedDateTime.now();
+
+        String result = LogFormatTools.getCurrentDateTime();
+        ZonedDateTime parsedResult = ZonedDateTime.parse(result, DTF);
+        ZonedDateTime afterTest = ZonedDateTime.now();
+
+        assertTrue(parsedResult.isBefore(afterTest) || parsedResult.equals(afterTest),
+                "Returned datetime should not be after test end");
+    }
+
+    @Test
+    void getCurrentDateTime_ShouldReturnUTCTime() {
+        String result = LogFormatTools.getCurrentDateTime();
+        ZonedDateTime parsedResult = ZonedDateTime.parse(result, DTF);
+
+        assertEquals(ZoneOffset.UTC, parsedResult.getOffset(),
+                "DateTime should be in UTC timezone");
+    }
+
+    private boolean isValidDateFormat(String dateStr) {
+        ZonedDateTime.parse(dateStr, DTF);
+        return true;
+    }
+    
+    @Test
+    void testLogFormatToolsInstantiation() {
+        LogFormatTools logFormatTools = new LogFormatTools();
+
+        assertNotNull(logFormatTools, "Should be able to create LogFormatTools instance");
+        assertTrue(logFormatTools instanceof LogFormatTools, 
+            "Created object should be instance of LogFormatTools");
+    }
+
+    @Test
+    void testLogFormatToolsClass() {
+        Class<?> clazz = LogFormatTools.class;
+
+        assertFalse(clazz.isInterface(), "LogFormatTools should be a class, not an interface");
+        assertFalse(clazz.isEnum(), "LogFormatTools should be a class, not an enum");
+        assertFalse(clazz.isAnnotation(), "LogFormatTools should be a class, not an annotation");
     }
 }

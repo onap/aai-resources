@@ -72,7 +72,7 @@ public class ResourcesApp {
     private SpringContextAware loaderFactory;
 
     @PostConstruct
-    private void init() throws AAIException {
+    void init() throws AAIException {
         System.setProperty("org.onap.aai.serverStarted", "false");
         setDefaultProps();
         logger.info("AAI Server initialization started...");
