@@ -24,11 +24,18 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 
+import org.mockito.MockedStatic;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.lang.reflect.Method;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -130,6 +137,64 @@ class DataImportTasksTest {
         String invalidPath = "/invalid/path/test.tar.gz";
         boolean result = DataImportTasks.unpackPayloadFile(invalidPath);
         assertTrue(result, "Should return false when unpacking fails");
+    }
+
+    @Test
+    void testFindExportedPayloadReturnsLatestTarGz() throws Exception {
+        // Get the real configured bundle config folder
+        String baseDir = AAIConstants.AAI_HOME_BUNDLECONFIG;
+        Path testDir = Paths.get(baseDir, "test-payloads");
+        Files.createDirectories(testDir);
+
+        // Create a fake .tar.gz file
+        Path payloadFile = testDir.resolve("payload1.tar.gz");
+        Files.write(payloadFile, "dummy-data".getBytes());
+
+        // Also create an older file so sorting logic can be tested
+        Path oldPayload = testDir.resolve("oldpayload.tar.gz");
+        Files.write(oldPayload, "old-data".getBytes());
+        oldPayload.toFile().setLastModified(System.currentTimeMillis() - 10000);
+
+        // Temporarily make AAIConfig return our testDir
+        try (MockedStatic<AAIConfig> configMock = mockStatic(AAIConfig.class)) {
+            configMock.when(() -> AAIConfig.get("aai.dataimport.input.location"))
+                    .thenReturn("/test-payloads");
+
+            // Call the private method via reflection
+            Method m = DataImportTasks.class.getDeclaredMethod("findExportedPayload");
+            m.setAccessible(true);
+            File result = (File) m.invoke(null);
+
+            assertNotNull(result, "Payload file should be found");
+            assertTrue(result.getName().endsWith(".tar.gz"), "File should be a tar.gz");
+            assertEquals(payloadFile.toFile(), result, "Should pick the latest payload file");
+        }
+    }
+
+    @Test
+    void testRunAddManualDataScript_WithValidCommand() throws Exception {
+        Method method = DataImportTasks.class.getDeclaredMethod(
+                "runAddManualDataScript", String[].class
+        );
+        method.setAccessible(true);
+
+        // Using a harmless command that exists on most systems
+        assertDoesNotThrow(() -> 
+            method.invoke(null, (Object) new String[]{"echo", "hello"})
+        );
+    }
+
+    @Test
+    void testRunAddManualDataScript_WithInvalidCommand() throws Exception {
+        Method method = DataImportTasks.class.getDeclaredMethod(
+                "runAddManualDataScript", String[].class
+        );
+        method.setAccessible(true);
+
+        // Invalid command to trigger the catch block
+        assertDoesNotThrow(() -> 
+            method.invoke(null, (Object) new String[]{"nonexistent-command-xyz"})
+        );
     }
 
 }
