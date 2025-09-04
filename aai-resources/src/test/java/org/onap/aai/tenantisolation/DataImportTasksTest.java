@@ -20,15 +20,20 @@
 package org.onap.aai.tenantisolation;
 
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mockStatic;
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+
+import org.mockito.MockedStatic;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -132,4 +137,68 @@ class DataImportTasksTest {
         assertTrue(result, "Should return false when unpacking fails");
     }
 
+    @Test
+    void testImportTask_FullFlow() throws Exception {
+        try (MockedStatic<AAIConfig> mockedAAIConfig = mockStatic(AAIConfig.class);
+            MockedStatic<DataImportTasks> mockedDataImportTasks = mockStatic(DataImportTasks.class)) {
+
+            mockedAAIConfig.when(() -> AAIConfig.get("aai.dataimport.enable"))
+                        .thenReturn("true");
+
+            Path inputDir = Files.createTempDirectory("withGoodPayload");
+            mockedAAIConfig.when(() -> AAIConfig.get("aai.dataimport.input.location"))
+                        .thenReturn(inputDir.toString());
+
+            // create a "payload" tar.gz file
+            Path fakePayload = inputDir.resolve("fullPayload.tar.gz");
+            Files.createFile(fakePayload);
+
+            // stub static methods
+            mockedDataImportTasks.when(() -> DataImportTasks.findExportedPayload())
+                                .thenReturn(fakePayload.toFile());
+
+            mockedDataImportTasks.when(() -> DataImportTasks.unpackPayloadFile(fakePayload.toString()))
+                                .thenReturn(true);
+
+            mockedDataImportTasks.when(() -> DataImportTasks.runAddManualDataScript(new String[] {
+                    AAIConstants.AAI_HOME + AAIConstants.AAI_FILESEP + "bin"
+                            + AAIConstants.AAI_FILESEP + "install"
+                            + AAIConstants.AAI_FILESEP + "addManualData.sh",
+                    "tenant_isolation"
+            })).thenAnswer(invocation -> null); // no-op
+
+            DataImportTasks task = new DataImportTasks();
+
+            assertDoesNotThrow(task::importTask);
+
+            // verify cleanup
+            assert !fakePayload.toFile().exists();
+        }
+    }
+
+    @Test
+    void testRunAddManualDataScript_WithValidCommand() throws Exception {
+        Method method = DataImportTasks.class.getDeclaredMethod(
+                "runAddManualDataScript", String[].class
+        );
+        method.setAccessible(true);
+
+        // Using a harmless command that exists on most systems
+        assertDoesNotThrow(() -> 
+            method.invoke(null, (Object) new String[]{"echo", "hello"})
+        );
+    }
+
+    @Test
+    void testRunAddManualDataScript_WithInvalidCommand() throws Exception {
+        Method method = DataImportTasks.class.getDeclaredMethod(
+                "runAddManualDataScript", String[].class
+        );
+        method.setAccessible(true);
+
+        // Invalid command to trigger the catch block
+        assertDoesNotThrow(() -> 
+            method.invoke(null, (Object) new String[]{"nonexistent-command-xyz"})
+        );
+    }
 }

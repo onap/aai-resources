@@ -119,7 +119,7 @@ public class DataImportTasks {
      *
      * @return true if another process is running, false if not
      */
-    private static boolean isDataImportRunning() {
+    static boolean isDataImportRunning() {
 
         Process process = null;
 
@@ -153,7 +153,7 @@ public class DataImportTasks {
      * The findPayExportedPayload method tries to find the latest exported payload.
      * Also deletes the old files if any or any other file in this directory
      */
-    private static File findExportedPayload() throws AAIException {
+    static File findExportedPayload() throws AAIException {
         String targetDir = AAIConstants.AAI_HOME_BUNDLECONFIG + AAIConfig.get("aai.dataimport.input.location");
         File targetDirFile = new File(targetDir);
         File payloadFile = null;
@@ -259,7 +259,7 @@ public class DataImportTasks {
      *
      * @param script The script/command arguments
      */
-    private static void runAddManualDataScript(String... script) {
+    static void runAddManualDataScript(String... script) {
         Process process = null;
         try {
             process = new ProcessBuilder().command(script).start();
