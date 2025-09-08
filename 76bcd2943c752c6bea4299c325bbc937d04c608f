@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3cfbae6_6a52a539",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-09-08T05:35:41Z",
+      "side": 1,
+      "message": "I think you can fix the pipeline by using the release version of the `aai-parent`.\nThat is by switching from `1.16.X-SNAPSHOT` to `1.16.X`.\nPlease also do that for the aai common version",
+      "revId": "76bcd2943c752c6bea4299c325bbc937d04c608f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ]
+}
