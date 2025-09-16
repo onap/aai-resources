@@ -48,15 +48,15 @@ import lombok.RequiredArgsConstructor;
 @Priority(AAIRequestFilterPriority.AUTHORIZATION)
 public class AuthInterceptor extends AAIContainerFilter implements ContainerRequestFilter {
 
-  private static final Pattern PATTERN_ECHO = Pattern.compile("^.*/util/echo$");
-  private static final Pattern PATTERN_ACTUATOR = Pattern.compile("^.*/actuator/.*$");
+  private static final String ECHO_SEGMENT = "/util/echo";
+  private static final String ACTUATOR_SEGMENT = "/actuator/";
   private static final AAIException AAI_EXCEPTION = new AAIException("AAI_3300");
   private final AuthorizationService authorizationService;
 
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {
     String path = requestContext.getUriInfo().getRequestUri().getPath();
-    if (PATTERN_ECHO.matcher(path).matches() || PATTERN_ACTUATOR.matcher(path).matches()) {
+    if (path.endsWith(ECHO_SEGMENT) || path.contains(ACTUATOR_SEGMENT)) {
       return;
     }
 
