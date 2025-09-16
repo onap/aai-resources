@@ -43,7 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Priority(AAIRequestFilterPriority.VERSION)
 public class VersionInterceptor extends AAIContainerFilter implements ContainerRequestFilter {
 
-    public static final Pattern EXTRACT_VERSION_PATTERN = Pattern.compile("^(v[1-9][0-9]*).*$");
+    public static final Pattern EXTRACT_VERSION_PATTERN = Pattern.compile("^(v[1-9][0-9]*)(?>.{0,2048})$");
 
     private final Set<String> allowedVersions;
 

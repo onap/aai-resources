@@ -110,8 +110,9 @@ public class DataImportTasks {
         }
 
         // clean up
-        payloadFile.delete();
-
+        if (!payloadFile.delete()) {
+            log.warn("Failed to delete payload file: {}", payloadFile.getAbsolutePath());
+        }
     }
 
     /**
@@ -125,17 +126,22 @@ public class DataImportTasks {
 
         int count = 0;
         try {
-            process = new ProcessBuilder().command("bash", "-c", "ps -ef | grep 'addManualData'").start();
+            process = new ProcessBuilder().command("/bin/bash", "-c", "ps -ef | grep 'addManualData'").start();
             InputStream is = process.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
 
-            while (br.readLine() != null) {
+            String line;
+            while ((line = br.readLine()) != null) {
                 count++;
             }
 
             int exitVal = process.waitFor();
             log.info("Check if dataImport is running returned: " + exitVal);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.warn("Thread interrupted while checking if dataImport is running", ie);
+            return false;
         } catch (Exception e) {
             ErrorLogHelper.logError("AAI_8002",
                     "Exception while running the check to see if dataImport is running  " + e.getMessage());
@@ -172,8 +178,11 @@ public class DataImportTasks {
                 if (!foundTheLatestPayload && isTargzExtension(f.getAbsolutePath())) {
                     payloadFile = f;
                     foundTheLatestPayload = true;
-                } else // delete all files except the latest payload file!
-                    f.delete();
+                } else {
+                    if (!f.delete()) {
+                        log.warn("Failed to delete old payload file: {}", f.getAbsolutePath());
+                    }
+                }
             }
         } else {
             if (isTargzExtension(allFilesArr[0].getAbsolutePath()))
@@ -219,9 +228,13 @@ public class DataImportTasks {
 
         try {
             process =
-                    new ProcessBuilder().command("bash", "-c", "gzip –d < " + payLoadFileName + " | tar xf -").start();
+                    new ProcessBuilder().command("/bin/bash", "-c", "gzip –d < " + payLoadFileName + " | tar xf -").start();
             int exitVal = process.waitFor();
             log.info("gzip -d returned: " + exitVal);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.warn("Thread interrupted while running the unzip {}", payLoadFileName, ie);
+            return false;
         } catch (Exception e) {
             ErrorLogHelper.logError("AAI_8002", "Exception while running the unzip  " + e.getMessage());
             log.info("Exception while running the unzip " + e.getMessage());
@@ -265,6 +278,9 @@ public class DataImportTasks {
             process = new ProcessBuilder().command(script).start();
             int exitVal = process.waitFor();
             log.info("addManualData.sh returned: " + exitVal);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.warn("Thread interrupted while running addManualData.sh", ie);
         } catch (Exception e) {
             ErrorLogHelper.logError("AAI_8002", "Exception while running addManualData.sh " + e.getMessage());
             log.info("Exception while running addManualData.sh" + e.getMessage());
