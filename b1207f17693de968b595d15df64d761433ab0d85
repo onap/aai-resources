@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05898244_3c7676d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8423
+      },
+      "writtenOn": "2025-09-18T12:17:41Z",
+      "side": 1,
+      "message": "stage-docker-release",
+      "revId": "b1207f17693de968b595d15df64d761433ab0d85",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {
