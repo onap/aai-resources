@@ -87,7 +87,7 @@ public class K6ReadTest {
         .withAccessToHost(true)
         .withTestScript(MountableFile.forClasspathResource("k6/readWithoutRelations.js"))
         .withScriptVar("API_PORT", String.valueOf(port))
-        .withScriptVar("API_VERSION", "v30")
+        .withScriptVar("API_VERSION", "v31")
         .withScriptVar("DURATION_SECONDS", String.valueOf(testDuration))
         .withScriptVar("N_PSERVERS", String.valueOf(nPservers))
         .withCmdOptions("--quiet", "--no-usage-report");
@@ -128,7 +128,7 @@ public class K6ReadTest {
         .withAccessToHost(true)
         .withTestScript(MountableFile.forClasspathResource("k6/writeWithoutRelations.js"))
         .withScriptVar("API_PORT", String.valueOf(port))
-        .withScriptVar("API_VERSION", "v30")
+        .withScriptVar("API_VERSION", "v31")
         .withScriptVar("DURATION_SECONDS", String.valueOf(testDuration))
         .withScriptVar("N_PSERVERS", String.valueOf(nPservers))
         .withCmdOptions("--quiet", "--no-usage-report");
