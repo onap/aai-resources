@@ -274,7 +274,7 @@ public class ResourcesControllerTest {
         assertEquals("Error writing output performing %1 on %2 (msg=%3) (ec=%4)", serviceException.getText());
         List<String> expected = List.of(
             "PUT",
-            "v30/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf",
+            "v31/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf",
             "Cannot write via this URL",
             "ERR.5.6.3010");
         assertIterableEquals(expected, serviceException.getVariables());
@@ -293,7 +293,7 @@ public class ResourcesControllerTest {
         serviceException = errorResponse.getRequestError().getServiceException();
         expected = List.of(
             "PUT",
-            "v30/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf/relationship-list/relationship",
+            "v31/cloud-infrastructure/pservers/pserver/hostname/related-to/fsdf/relationship-list/relationship",
             "Cannot write via this URL",
             "ERR.5.6.3010");
         assertIterableEquals(expected, serviceException.getVariables());
@@ -394,7 +394,7 @@ public class ResourcesControllerTest {
         assertEquals("Error parsing input performing %1 on %2 (msg=%3) (ec=%4)", policyException.getText());
         List<String> expected = List.of(
             "DELETE",
-            "v30/cloud-infrastructure/pservers/pserver/testData/relationship-list/relationship",
+            "v31/cloud-infrastructure/pservers/pserver/testData/relationship-list/relationship",
             "Error parsing input performing %1 on %2:You must supply a relationship",
             "ERR.5.1.3102");
         assertIterableEquals(expected, policyException.getVariables());

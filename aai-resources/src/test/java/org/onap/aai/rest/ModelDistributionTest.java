@@ -64,7 +64,7 @@ public class ModelDistributionTest {
     @Test
     @Order(1)
     public void thatModelsCanBeDistributed() throws Exception {
-        String uri = "/aai/v30/service-design-and-creation/models/model/d821d1aa-8a69-47a4-aa63-3dae1742c47c";
+        String uri = "/aai/v31/service-design-and-creation/models/model/d821d1aa-8a69-47a4-aa63-3dae1742c47c";
 
         webClient.get()
                 .uri(uri)
@@ -117,7 +117,7 @@ public class ModelDistributionTest {
         final String UPDATE_MODEL_FILE = "src/test/resources/payloads/models/model-version.xml";
         String modelInvariantId = "d821d1aa-8a69-47a4-aa63-3dae1742c47c";
         String modelVersionId = "8b713350-90fc-44b1-8c6e-a2b3973aa9d3";
-        String modelUri = "/aai/v30/service-design-and-creation/models/model/" + modelInvariantId;
+        String modelUri = "/aai/v31/service-design-and-creation/models/model/" + modelInvariantId;
         String modelVersionUri = modelUri + "/model-vers/model-ver/" + modelVersionId;
         webClient.get()
                 .uri(modelUri)
