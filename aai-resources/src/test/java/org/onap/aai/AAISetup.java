@@ -41,12 +41,15 @@ import org.onap.aai.introspection.LoaderFactory;
 import org.onap.aai.introspection.MoxyLoader;
 import org.onap.aai.nodes.NodeIngestor;
 import org.onap.aai.rest.db.HttpEntry;
+import org.onap.aai.rest.notification.DeltaEventsService;
+import org.onap.aai.util.delta.DeltaEventsConfig;
 import org.onap.aai.rest.notification.NotificationService;
 import org.onap.aai.serialization.db.EdgeSerializer;
 import org.onap.aai.setup.AAIConfigTranslator;
 import org.onap.aai.setup.SchemaVersion;
 import org.onap.aai.setup.SchemaVersions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -55,10 +58,11 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 @SpringJUnitConfig(
         classes = {ConfigConfiguration.class, AAIConfigTranslator.class, NodeIngestor.class, EdgeIngestor.class,
                 EdgeSerializer.class, SpringContextAware.class, IntrospectionConfig.class,
-                XmlFormatTransformerConfiguration.class, RestBeanConfig.class, LoaderFactory.class, NotificationService.class, KafkaConfig.class})
+                XmlFormatTransformerConfiguration.class, RestBeanConfig.class, LoaderFactory.class, NotificationService.class, KafkaConfig.class, DeltaEventsService.class})
 @TestPropertySource(
         properties = {"schema.uri.base.path = /aai",
                 "schema.ingest.file = src/test/resources/application-test.properties"})
+@EnableConfigurationProperties(DeltaEventsConfig.class)
 public abstract class AAISetup {
 
     @Autowired
