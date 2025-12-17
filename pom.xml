@@ -26,11 +26,11 @@
     <parent>
         <groupId>org.onap.aai.aai-common</groupId>
         <artifactId>aai-parent</artifactId>
-        <version>1.17.0-SNAPSHOT</version>
+        <version>1.17.0</version>
     </parent>
     <groupId>org.onap.aai.resources</groupId>
     <artifactId>resources</artifactId>
-    <version>1.17.1-SNAPSHOT</version>
+    <version>1.17.0-SNAPSHOT</version>
     <name>aai-resources</name>
     <packaging>pom</packaging>
     <modules>
@@ -50,7 +50,7 @@
         <!-- GMaven plugin uses this property to figure out the name of the docker tag -->
         <aai.project.version>${project.version}</aai.project.version>
         <aai.common.version>1.17.0-SNAPSHOT</aai.common.version>
-        <aai.schema.service.version>1.13.3-SNAPSHOT</aai.schema.service.version>
+        <aai.schema.service.version>1.13.3</aai.schema.service.version>
         <sonar.scanner.version>3.11.0.3922</sonar.scanner.version>
     </properties>
     <build>
