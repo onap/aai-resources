@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c27423e_696bd8da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7849
+      },
+      "writtenOn": "2025-12-18T07:43:52Z",
+      "side": 1,
+      "message": "We have not published `1.17.0` yet, so we shouldn\u0027t publish `1.17.1`",
+      "revId": "572a80e481158922ad1306431a26da819fdc45bc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    }
+  ]
+}
