@@ -1,11 +1,21 @@
 FROM eclipse-temurin:17-jre-alpine
-USER nobody
 
 ENV SERVER_PORT=8447
+ENV JAVA_TOOL_OPTIONS="-javaagent:/opt/app/opentelemetry/opentelemetry-javaagent.jar"
+
+USER nobody
+
 EXPOSE ${SERVER_PORT}
 
-# Add the proper files into the docker image from your build
 WORKDIR /opt/app/aai-resources
+
+# To have this reproducible we are using an explicit version, effectively
+# this should always be the latest version available
+# https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases
+ARG AGENT_VERSION=2.24.0
+
+RUN mkdir -p /opt/app/opentelemetry && \
+    wget -O /opt/app/opentelemetry/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v${AGENT_VERSION}/opentelemetry-javaagent.jar
 
 COPY --chown=nobody:nobody /maven/aai-resources/ .
 
