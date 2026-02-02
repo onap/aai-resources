@@ -67,4 +67,8 @@ JAVA_OPTS="${JAVA_OPTS} ${POST_JAVA_OPTS}";
 
 JAVA_MAIN_JAR=$(ls lib/aai-resources*.jar);
 
+if [ "${OTEL_AGENT_TRACING_ENABLED}" = "true" ]; then
+        export JAVA_TOOL_OPTIONS="-javaagent:/opt/app/opentelemetry/opentelemetry-javaagent.jar"
+fi
+
 ${JAVA_CMD} ${JVM_OPTS} ${JAVA_OPTS} -jar ${JAVA_MAIN_JAR};
