@@ -70,8 +70,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(WebClientConfiguration.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ResourcesControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class.getName());

@@ -22,8 +22,8 @@ package org.onap.aai.web;
 
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
-import io.micrometer.jersey2.server.JerseyTags;
-import io.micrometer.jersey2.server.JerseyTagsProvider;
+import io.micrometer.core.instrument.binder.jersey.server.JerseyTags;
+import io.micrometer.core.instrument.binder.jersey.server.JerseyTagsProvider;
 
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
