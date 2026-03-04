@@ -33,6 +33,23 @@
       "message": "run-clm",
       "revId": "82df5c51af05abf38f1ce38eda772bde1882492a",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a917d8c0_73406623",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8519
+      },
+      "writtenOn": "2026-03-04T07:56:27Z",
+      "side": 1,
+      "message": "stage-docker-release",
+      "revId": "82df5c51af05abf38f1ce38eda772bde1882492a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ],
   "submitRequirementResults": [
