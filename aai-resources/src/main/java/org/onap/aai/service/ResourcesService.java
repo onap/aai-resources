@@ -77,7 +77,7 @@ public class ResourcesService {
     Set<String> roles = Collections.emptySet();
     String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
     String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
-    Response response;
+    Response response = null;
     TransactionalGraphEngine dbEngine = null;
     Loader loader;
 
@@ -128,13 +128,7 @@ public class ResourcesService {
 
       response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET, ex);
     } finally {
-      if (dbEngine != null) {
-        if (cleanUp.equals("true")) {
-          dbEngine.commit();
-        } else {
-          dbEngine.rollback();
-        }
-      }
+      response = finalizeTransaction(dbEngine, cleanUp.equals("true"), response, headers, info, HttpMethod.GET);
     }
 
     return response;
@@ -145,7 +139,7 @@ public class ResourcesService {
     String sourceOfTruth = headers.getRequestHeaders().getFirst("X-FromAppId");
     String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
     MediaType inputMediaType = headers.getMediaType();
-    Response response;
+    Response response = null;
     Loader loader;
     TransactionalGraphEngine dbEngine = null;
     boolean success = true;
@@ -184,14 +178,7 @@ public class ResourcesService {
       response = consumerExceptionResponseGenerator(headers, info, HttpMethod.PUT, aaiException);
       success = false;
     } finally {
-      if (dbEngine != null) {
-        if (success) {
-          dbEngine.commit();
-        } else {
-          dbEngine.rollback();
-        }
-      }
-
+      response = finalizeTransaction(dbEngine, success, response, headers, info, HttpMethod.PUT);
     }
 
     return response;
@@ -200,7 +187,7 @@ public class ResourcesService {
   public Response handleWrites(MediaType mediaType, HttpMethod method, String content, String versionParam,
       String uri, HttpHeaders headers, UriInfo info) {
     Set<String> roles = Collections.emptySet();
-    Response response;
+    Response response = null;
     TransactionalGraphEngine dbEngine = null;
     Loader loader;
     SchemaVersion version;
@@ -258,13 +245,7 @@ public class ResourcesService {
       response = consumerExceptionResponseGenerator(headers, info, method, ex);
       success = false;
     } finally {
-      if (dbEngine != null) {
-        if (success) {
-          dbEngine.commit();
-        } else {
-          dbEngine.rollback();
-        }
-      }
+      response = finalizeTransaction(dbEngine, success, response, headers, info, method);
     }
 
     return response;
@@ -277,7 +258,7 @@ public class ResourcesService {
     String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
     Loader loader;
     TransactionalGraphEngine dbEngine = null;
-    Response response;
+    Response response = null;
 
     boolean success = true;
 
@@ -317,13 +298,7 @@ public class ResourcesService {
       response = consumerExceptionResponseGenerator(headers, info, HttpMethod.DELETE, ex);
       success = false;
     } finally {
-      if (dbEngine != null) {
-        if (success) {
-          dbEngine.commit();
-        } else {
-          dbEngine.rollback();
-        }
-      }
+      response = finalizeTransaction(dbEngine, success, response, headers, info, HttpMethod.DELETE);
     }
 
     return response;
@@ -384,13 +359,8 @@ public class ResourcesService {
 
       response = consumerExceptionResponseGenerator(headers, info, HttpMethod.GET_RELATIONSHIP, ex);
     } finally {
-      if (dbEngine != null) {
-        if (cleanUp.equals("true")) {
-          dbEngine.commit();
-        } else {
-          dbEngine.rollback();
-        }
-      }
+      response = finalizeTransaction(dbEngine, cleanUp.equals("true"), response, headers, info,
+          HttpMethod.GET_RELATIONSHIP);
     }
     return response;
   }
@@ -403,7 +373,7 @@ public class ResourcesService {
     String transId = headers.getRequestHeaders().getFirst("X-TransactionId");
 
     TransactionalGraphEngine dbEngine = null;
-    Response response;
+    Response response = null;
 
     boolean success = true;
 
@@ -441,13 +411,7 @@ public class ResourcesService {
       response = consumerExceptionResponseGenerator(headers, info, HttpMethod.DELETE, ex);
       success = false;
     } finally {
-      if (dbEngine != null) {
-        if (success) {
-          dbEngine.commit();
-        } else {
-          dbEngine.rollback();
-        }
-      }
+      response = finalizeTransaction(dbEngine, success, response, headers, info, HttpMethod.DELETE);
     }
 
     return response;
@@ -581,6 +545,54 @@ public class ResourcesService {
 
   protected boolean isEmptyObject(Introspector obj) {
     return "{}".equals(obj.marshal(false));
+  }
+
+  /**
+   * Finalizes the graph transaction after request processing.
+   *
+   * <p>
+   * The commit/rollback is performed here rather than inline in each consumer method's
+   * {@code finally} block so that a failure while flushing the transaction to the storage
+   * backend (e.g. a {@link org.janusgraph.core.JanusGraphException} caused by lock contention
+   * under concurrent writes) is caught and mapped to a proper AAI error response ({@code AAI_6134},
+   * HTTP 500) instead of escaping uncaught and surfacing to the caller as a bare Spring Boot
+   * {@code /error} 500 that clients cannot classify or retry.
+   *
+   * @param dbEngine the transaction engine, may be {@code null} if no transaction was established
+   * @param commit {@code true} to commit, {@code false} to roll back
+   * @param response the response produced by request processing, returned unchanged on success
+   * @param headers the request headers, used to build the error response media type
+   * @param info the request URI info, used for error templating
+   * @param method the HTTP method, used for error templating
+   * @return the original response on success, or an AAI_6134 error response if the commit failed
+   */
+  protected Response finalizeTransaction(TransactionalGraphEngine dbEngine, boolean commit, Response response,
+      HttpHeaders headers, UriInfo info, HttpMethod method) {
+    if (dbEngine == null) {
+      return response;
+    }
+    if (!commit) {
+      // Nothing was meant to persist; roll back on a best-effort basis and keep the original
+      // response (a valid read or the genuine error) rather than masking it on rollback failure.
+      try {
+        dbEngine.rollback();
+      } catch (Exception rollbackException) {
+        ErrorLogHelper.logError("AAI_6134", rollbackException.getMessage());
+      }
+      return response;
+    }
+    try {
+      dbEngine.commit();
+      return response;
+    } catch (Exception e) {
+      try {
+        dbEngine.rollback();
+      } catch (Exception rollbackException) {
+        ErrorLogHelper.logError("AAI_6134", rollbackException.getMessage());
+      }
+      AAIException ex = new AAIException("AAI_6134", e);
+      return consumerExceptionResponseGenerator(headers, info, method, ex);
+    }
   }
 
 }
