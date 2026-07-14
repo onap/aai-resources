@@ -83,7 +83,6 @@
         <testcontainers.version>1.20.4</testcontainers.version>
         <!-- Docker Engine API version to pin the docker-java client to (see surefire config below). -->
         <docker.api.version>1.41</docker.api.version>
-        <mockito.core.version>4.4.0</mockito.core.version>
         <!-- Setting some default value to not complain by editor but it will be overridden by gmaven plugin -->
 
         <!-- Integration tests will be skipped by default. Could be enabled here or by -DskipITs=false-->
@@ -400,10 +399,6 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
             <version>3.1.12</version>
@@ -434,15 +429,8 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.core.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-        	<groupId>org.mockito</groupId>
-        	<artifactId>mockito-inline</artifactId>
-        	<version>${mockito.core.version}</version>
-            <scope>test</scope>
-    	</dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>

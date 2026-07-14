@@ -40,7 +40,7 @@ import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.nodes.NodeIngestor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
@@ -65,7 +65,7 @@ class ResourcesAppTest {
 	@InjectMocks
 	private ResourcesApp resourceApp;
 
-	@MockBean
+	@MockitoBean
 	private ConfigurableApplicationContext applicationContext;
 
 
