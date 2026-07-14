@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -43,7 +43,7 @@ public class EchoHealthIndicatorTest {
   @Qualifier("mgmtClient")
   WebTestClient webClient;
 
-  @MockBean private GraphChecker graphChecker;
+  @MockitoBean private GraphChecker graphChecker;
 
   @Test
   public void thatActuatorCheckIsHealthy() {

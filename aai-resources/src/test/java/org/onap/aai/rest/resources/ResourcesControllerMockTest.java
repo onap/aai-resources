@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -34,8 +35,10 @@ import org.janusgraph.core.JanusGraphTransaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import org.onap.aai.config.WebClientConfiguration;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.entities.AAIErrorResponse;
@@ -45,24 +48,45 @@ import org.onap.aai.rest.db.HttpEntry;
 import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.util.AAIConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @DirtiesContext
-// This currently has to be executed last, since the @MockBean is dirtying the context.
-// Restarting the context leads to other test failures that would need to be investigated.
+// This currently has to be executed last, since the @TestConfiguration mock bean overrides the
+// prototype bean and dirties the context. Restarting the context leads to other test failures.
 @Order(Integer.MAX_VALUE)
-@Import(WebClientConfiguration.class)
+@Import({WebClientConfiguration.class, ResourcesControllerMockTest.MockConfig.class})
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ResourcesControllerMockTest {
 
-  @MockBean(name = "traversalUriHttpEntry")
+  /**
+   * Provides a singleton mock for traversalUriHttpEntry, overriding the prototype-scoped
+   * bean from RestBeanConfig. Spring Framework 6.2+ @MockitoBean cannot override prototype
+   * beans; this @TestConfiguration approach provides a singleton mock instead.
+   */
+  @TestConfiguration
+  static class MockConfig {
+    static final HttpEntry MOCK = mock(HttpEntry.class);
+
+    @Bean(name = "traversalUriHttpEntry")
+    @Primary
+    public HttpEntry traversalUriHttpEntry() {
+      return MOCK;
+    }
+  }
+
+  @Autowired
+  @Qualifier("traversalUriHttpEntry")
   HttpEntry mockHttpEntry;
 
   @Autowired
@@ -70,6 +94,11 @@ public class ResourcesControllerMockTest {
 
   @Autowired
   SchemaVersions schemaVersions;
+
+  @BeforeEach
+  public void resetMock() {
+    Mockito.reset(MockConfig.MOCK);
+  }
 
   @ParameterizedTest
   @CsvSource({
