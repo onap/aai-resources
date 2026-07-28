@@ -169,6 +169,7 @@ public class ResourcesControllerTest {
                     .path("/cloud-infrastructure/pservers")
                     .queryParam("resultIndex", "1")
                     .queryParam("resultSize", "10")
+                    .queryParam("includeTotalCount", "true")
                     .build())
             .exchange()
             .expectStatus()
@@ -176,6 +177,42 @@ public class ResourcesControllerTest {
             // TODO: Assert values here once test data is isolated to individual test
             .expectHeader().exists("total-results")
             .expectHeader().exists("total-pages")
+            .returnResult(PServerListResponse.class)
+            .getResponseBody()
+            .blockFirst();
+
+        assertTrue(pservers.getPserver().size() > 0);
+    }
+
+    @Test
+    public void testResponseGetOnResourcePaginatedOmitsTotalCountByDefault() throws JSONException, IOException, AAIException {
+        JanusGraph graph = AAIGraph.getInstance().getGraph();
+        GraphTraversalSource g = graph.traversal();
+        g.addV()
+            .property("aai-node-type", "pserver")
+            .property("hostname", "hostname-no-count-1")
+            .property("resource-version", UUID.randomUUID().toString())
+            .property(AAIProperties.AAI_URI, "/cloud-infrastructure/pservers/pserver/hostname-no-count-1")
+         .addV()
+            .property("aai-node-type", "pserver")
+            .property("hostname", "hostname-no-count-2")
+            .property("resource-version", UUID.randomUUID().toString())
+            .property(AAIProperties.AAI_URI, "/cloud-infrastructure/pservers/pserver/hostname-no-count-2")
+            .next();
+        g.tx().commit();
+
+        PServerListResponse pservers = webClient.get()
+            .uri(uriBuilder ->
+                uriBuilder
+                    .path("/cloud-infrastructure/pservers")
+                    .queryParam("resultIndex", "1")
+                    .queryParam("resultSize", "10")
+                    .build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader().doesNotExist("total-results")
+            .expectHeader().doesNotExist("total-pages")
             .returnResult(PServerListResponse.class)
             .getResponseBody()
             .blockFirst();
