@@ -54,7 +54,7 @@
         <maven.skip.tests>true</maven.skip.tests>
         <snapshot.file>${project.basedir}/snapshots/snapshot.graphson</snapshot.file>
 
-        <jacoco.line.coverage.limit>0.68</jacoco.line.coverage.limit>
+        <jacoco.line.coverage.limit>0.79</jacoco.line.coverage.limit>
         <license.goal.type>check</license.goal.type>
 
         <!-- This will be used for the docker images as the default format of maven build has issues -->
