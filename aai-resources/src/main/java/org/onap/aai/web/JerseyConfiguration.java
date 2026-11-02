@@ -3,6 +3,7 @@
  * org.onap.aai
  * ================================================================================
  * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
+ * Modifications Copyright (C) 2026 Deutsche Telekom AG.
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,11 +49,13 @@ import org.onap.aai.rest.bulk.BulkSingleTransactionConsumer;
 import org.onap.aai.rest.util.EchoResponse;
 import org.onap.logging.filter.base.AuditLogContainerFilter;
 import org.reflections.Reflections;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.stereotype.Component;
 
 @Configuration
 public class JerseyConfiguration {
@@ -67,9 +70,11 @@ public class JerseyConfiguration {
     private final Reflections reflections = new Reflections(INTERCEPTOR_PACKAGE);
     private final Reflections loggingReflections = new Reflections(LOGGING_INTERCEPTOR_PACKAGE);
     private final Environment environment;
+    private final ListableBeanFactory beanFactory;
 
-    public JerseyConfiguration(Environment environment) {
+    public JerseyConfiguration(Environment environment, ListableBeanFactory beanFactory) {
         this.environment = environment;
+        this.beanFactory = beanFactory;
     }
 
     @Bean
@@ -102,7 +107,8 @@ public class JerseyConfiguration {
         filters.addAll(reflections.getSubTypesOf(clazz));
         throwIfPriorityAnnotationAbsent(filters);
 
-        filters.stream().filter(this::isEnabledByActiveProfiles).sorted(priorityComparator())
+        filters.stream().filter(this::isEnabledByActiveProfiles).filter(this::isSpringBeanPresent)
+                .sorted(priorityComparator())
                 .forEach(resourceConfig::register);
     }
 
@@ -131,6 +137,13 @@ public class JerseyConfiguration {
     private boolean isEnabledByActiveProfiles(AnnotatedElement annotatedElement) {
         return !annotatedElement.isAnnotationPresent(Profile.class)
                 || environment.acceptsProfiles(Profiles.of(annotatedElement.getAnnotation(Profile.class).value()));
+    }
+
+    // Filters are registered by class scan, so a @Component filter whose bean a Spring
+    // condition (e.g. @ConditionalOnProperty) switched off would otherwise still be handed
+    // to Jersey, which cannot construct it outside the Spring context.
+    private boolean isSpringBeanPresent(Class<?> clazz) {
+        return !clazz.isAnnotationPresent(Component.class) || beanFactory.getBeanNamesForType(clazz).length > 0;
     }
 
     private class MissingFilterPriorityException extends RuntimeException {

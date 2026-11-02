@@ -3,6 +3,7 @@
  * org.onap.aai
  * ================================================================================
  * Copyright © 2025 Deutsche Telekom. All rights reserved.
+ * Modifications Copyright (C) 2026 Deutsche Telekom AG.
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.onap.aai.ResourcesProfiles;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.interceptors.AAIContainerFilter;
 import org.onap.aai.logging.ErrorLogHelper;
 import org.onap.aai.service.AuthorizationService;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Priority;
@@ -44,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @PreMatching
 @RequiredArgsConstructor
-@Profile(ResourcesProfiles.ONE_WAY_SSL) // this mainly serves the purpose of making the tests work
+@ConditionalOnProperty(name = "aai.basic-auth.enabled", havingValue = "true", matchIfMissing = true)
 @Priority(AAIRequestFilterPriority.AUTHORIZATION)
 public class AuthInterceptor extends AAIContainerFilter implements ContainerRequestFilter {
 
