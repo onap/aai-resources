@@ -3,6 +3,7 @@
  * org.onap.aai
  * ================================================================================
  * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
+ * Modifications Copyright (C) 2026 Deutsche Telekom AG.
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +21,9 @@
 
 package org.onap.aai.interceptors;
 
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.UUID;
@@ -78,5 +82,47 @@ public class AAIContainerFilterTest {
         // Validate that the UUID with extra characters is invalid
         assertFalse(filter.isValidUUID(invalidUUIDWithExtraChars), 
             "UUID with extra characters should return false");
+    }
+
+    @Test
+    void headersForLogMasksCredentialHeadersCaseInsensitively() {
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.add("Authorization", "Basic dXNlcjpzZWNyZXQ=");
+        headers.add("proxy-authorization", "Basic cHJveHk6c2VjcmV0");
+        headers.add("COOKIE", "JSESSIONID=abc123");
+        headers.add("X-FromAppId", "test-app");
+
+        String logged = filter.headersForLog(headers);
+
+        assertFalse(logged.contains("dXNlcjpzZWNyZXQ="));
+        assertFalse(logged.contains("cHJveHk6c2VjcmV0"));
+        assertFalse(logged.contains("abc123"));
+        assertTrue(logged.contains("Authorization=[***]"));
+        assertTrue(logged.contains("proxy-authorization=[***]"));
+        assertTrue(logged.contains("COOKIE=[***]"));
+        assertTrue(logged.contains("X-FromAppId=[test-app]"));
+    }
+
+    @Test
+    void headersForLogMasksSetCookieInResponseHeaders() {
+        MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+        headers.add("Set-Cookie", "JSESSIONID=abc123");
+        headers.add("Content-Type", MediaType.APPLICATION_JSON_TYPE);
+
+        String logged = filter.headersForLog(headers);
+
+        assertFalse(logged.contains("abc123"));
+        assertTrue(logged.contains("Set-Cookie=[***]"));
+        assertTrue(logged.contains("Content-Type=[application/json]"));
+    }
+
+    @Test
+    void headersForLogKeepsFormatOfNonSensitiveHeaders() {
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.add("X-TransactionId", "tx-1");
+        headers.add("Accept", "application/json");
+        headers.add("Accept", "application/xml");
+
+        assertEquals(headers.toString(), filter.headersForLog(headers));
     }
 }
