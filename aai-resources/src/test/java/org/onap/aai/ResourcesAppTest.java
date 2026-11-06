@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.catalina.connector.Connector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,8 @@ import org.onap.aai.config.SpringContextAware;
 import org.onap.aai.dbmap.AAIGraph;
 import org.onap.aai.exceptions.AAIException;
 import org.onap.aai.nodes.NodeIngestor;
+import org.onap.aai.web.WebConfiguration;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
@@ -100,9 +103,14 @@ class ResourcesAppTest {
 
 		resourceApp.init();
 
+		TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+		new WebConfiguration().encodedSlashCustomizer().customize(factory);
+		Connector connector = new Connector();
+		factory.getConnectorCustomizers().forEach(customizer -> customizer.customize(connector));
+
 		assertAll(
 				() -> assertEquals("false", System.getProperty("org.onap.aai.serverStarted")),
-				() -> assertEquals("true", System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH"))
+				() -> assertEquals("passthrough", connector.getEncodedSolidusHandling())
 				);
 	}
 	

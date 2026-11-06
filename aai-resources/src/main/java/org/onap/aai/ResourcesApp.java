@@ -36,19 +36,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 
 @EnableConfigurationProperties
-@SpringBootApplication(
-        exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class, CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class})
+@SpringBootApplication
 public class ResourcesApp {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesApp.class.getName());
@@ -76,10 +69,6 @@ public class ResourcesApp {
         System.setProperty("org.onap.aai.serverStarted", "false");
         setDefaultProps();
         logger.info("AAI Server initialization started...");
-
-        // Setting this property to allow for encoded slash (/) in the path parameter
-        // This is only needed for tomcat keeping this as temporary
-        System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
 
         logger.info("Starting AAIGraph connections and the NodeInjestor");
 

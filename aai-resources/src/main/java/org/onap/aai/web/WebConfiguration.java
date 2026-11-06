@@ -20,6 +20,8 @@
 
 package org.onap.aai.web;
 
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -27,6 +29,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfiguration {
+
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> encodedSlashCustomizer() {
+        return factory -> factory.addConnectorCustomizers(connector -> connector.setEncodedSolidusHandling("passthrough"));
+    }
 
     @Bean
     public WebMvcConfigurer forwardToIndex() {

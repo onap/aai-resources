@@ -21,6 +21,7 @@
 package org.onap.aai;
 
 import java.io.IOException;
+import java.net.URI;
 
 import javax.net.ssl.SSLContext;
 
@@ -33,10 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -99,7 +101,7 @@ public class ResourcesTestConfiguration {
             }
 
             @Override
-            public void handleError(ClientHttpResponse clientHttpResponse) throws IOException {
+            public void handleError(URI url, HttpMethod method, ClientHttpResponse clientHttpResponse) throws IOException {
             }
         });
 

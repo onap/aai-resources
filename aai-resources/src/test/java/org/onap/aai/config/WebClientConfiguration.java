@@ -32,6 +32,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
+import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @TestConfiguration
@@ -45,6 +47,10 @@ public class WebClientConfiguration {
   WebTestClient webTestClient(@LocalServerPort int port) {
     return WebTestClient.bindToServer()
       .baseUrl("http://localhost:" + port + "/aai/" + schemaVersions.getDefaultVersion())
+      .codecs(codecs -> {
+        codecs.defaultCodecs().jacksonJsonDecoder(new Jackson2JsonDecoder());
+        codecs.defaultCodecs().jacksonJsonEncoder(new Jackson2JsonEncoder());
+      })
       .responseTimeout(Duration.ofSeconds(300))
       .defaultHeaders(headers -> {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

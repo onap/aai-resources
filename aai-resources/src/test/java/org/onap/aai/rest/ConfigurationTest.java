@@ -35,15 +35,15 @@ import org.junit.jupiter.api.Test;
 import org.onap.aai.ResourcesApp;
 import org.onap.aai.ResourcesTestConfiguration;
 import org.onap.aai.config.SpringContextAware;
+import org.onap.aai.restcore.CustomJacksonJaxBJsonProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics;
+import org.springframework.boot.micrometer.tracing.test.autoconfigure.AutoConfigureTracing;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -58,10 +58,10 @@ import org.springframework.web.client.RestTemplate;
  * Test REST requests against configuration resource
  */
 
-@AutoConfigureObservability
+@AutoConfigureMetrics
+@AutoConfigureTracing
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ContextConfiguration(classes = {SpringContextAware.class})
-@EnableAutoConfiguration(exclude={CassandraDataAutoConfiguration.class, CassandraAutoConfiguration.class}) // there is no running cassandra instance for the test
 @Import(ResourcesTestConfiguration.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -70,6 +70,9 @@ public class ConfigurationTest extends AbstractSpringRestTest {
 
     @Autowired
     RestTemplate restTemplate;
+
+        @Autowired
+        ApplicationContext applicationContext;
 
     @LocalServerPort
     int randomPort;
@@ -170,6 +173,29 @@ public class ConfigurationTest extends AbstractSpringRestTest {
     }
 
     @Test
+    public void testJackson2MapperAndJerseyProvider() throws Exception {
+        com.fasterxml.jackson.databind.ObjectMapper mapper =
+                applicationContext.getBean(com.fasterxml.jackson.databind.ObjectMapper.class);
+        assertEquals("{\"status\":\"UP\"}", mapper.writeValueAsString(Collections.singletonMap("status", "UP")));
+        assertEquals("UP", new CustomJacksonJaxBJsonProvider().getMapper()
+                .readTree("{\"status\":\"UP\"}").get("status").asText());
+    }
+
+    @Test
+        public void testManagementEndpointsWithoutCredentials() {
+                ResponseEntity<String> health = restTemplate.getForEntity(actuatorurl + "/actuator/health", String.class);
+                assertEquals(HttpStatus.OK, health.getStatusCode());
+                assertTrue(health.getBody().contains("UP"));
+
+                HttpHeaders scrapeHeaders = new HttpHeaders();
+                scrapeHeaders.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+                ResponseEntity<String> metrics = restTemplate.exchange(actuatorurl + "/actuator/prometheus", HttpMethod.GET,
+                                new HttpEntity<String>(scrapeHeaders), String.class);
+                assertEquals(HttpStatus.OK, metrics.getStatusCode());
+                assertTrue(metrics.getBody().contains("group_id"));
+        }
+
+        @Test
     public void testManagementEndpointConfiguration() {
         ResponseEntity<String> responseEntity = null;
         String responseBody = null;

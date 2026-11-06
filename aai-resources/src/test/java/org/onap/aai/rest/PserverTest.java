@@ -24,6 +24,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,6 +44,26 @@ import org.springframework.http.ResponseEntity;
  * they will be testing against the same thing except fitnesse uses hbase
  */
 public class PserverTest extends AbstractSpringRestTest {
+
+    @Test
+    public void testEncodedSlashInPserverId() {
+    String hostname = "test/" + UUID.randomUUID();
+    String endpoint = baseUrl + "/aai/v11/cloud-infrastructure/pservers/pserver/"
+        + hostname.replace("/", "%2F");
+    ResponseEntity<String> created = restTemplate.exchange(URI.create(endpoint), HttpMethod.PUT, httpEntity,
+        String.class);
+    assertEquals(HttpStatus.CREATED, created.getStatusCode());
+
+    ResponseEntity<String> retrieved = restTemplate.exchange(URI.create(endpoint), HttpMethod.GET, httpEntity,
+        String.class);
+    assertEquals(HttpStatus.OK, retrieved.getStatusCode());
+    assertEquals(hostname, JsonPath.read(retrieved.getBody(), "$.hostname"));
+
+    String resourceVersion = JsonPath.read(retrieved.getBody(), "$.resource-version");
+    ResponseEntity<String> deleted = restTemplate.exchange(URI.create(endpoint + "?resource-version=" + resourceVersion),
+        HttpMethod.DELETE, httpEntity, String.class);
+    assertEquals(HttpStatus.NO_CONTENT, deleted.getStatusCode());
+    }
 
     @Test
     public void testPutPserverExtractVertexAndThenDoGetByVertexIdAndThenDeleteIt() {
